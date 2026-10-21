@@ -1,0 +1,82 @@
+{% extends "base.html" %}
+
+{% block title %}Events Management{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+  <div>
+    <h3 class="fw-bold mb-1">Campus Events Management</h3>
+    <p class="text-muted mb-0">Organize, schedule, budget, and monitor events organized by college clubs.</p>
+  </div>
+  <a href="{{ url_for('main.create_event') }}" class="btn btn-primary">
+    <i class="bi bi-calendar-plus me-1"></i> New Event
+  </a>
+</div>
+
+<div class="card shadow-sm">
+  <div class="table-responsive">
+    <table class="table table-hover align-middle mb-0">
+      <thead>
+        <tr>
+          <th>Event ID</th>
+          <th>Event Name</th>
+          <th>Host Club</th>
+          <th>Date</th>
+          <th>Venue</th>
+          <th>Budget</th>
+          <th>Status</th>
+          <th class="text-center">Registrations</th>
+          <th class="text-end">Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for ev in events %}
+        <tr>
+          <td><span class="badge bg-dark">{{ ev.event_id }}</span></td>
+          <td class="fw-semibold">
+            {{ ev.event_name }}
+            {% if ev.is_award_winning %}
+              <span class="badge bg-warning text-dark ms-1"><i class="bi bi-trophy-fill me-1"></i>Award</span>
+            {% endif %}
+          </td>
+          <td><span class="badge bg-light text-dark border">{{ ev.club_name }}</span></td>
+          <td><small>{{ ev.event_date or 'TBA' }}</small></td>
+          <td><small>{{ ev.venue or 'TBA' }}</small></td>
+          <td><small class="fw-semibold">₹{{ "{:,.2f}".format(ev.budget_allocated) }}</small></td>
+          <td>
+            {% if ev.status == 'Completed' %}
+              <span class="badge bg-success">Completed</span>
+            {% elif ev.status == 'Ongoing' %}
+              <span class="badge bg-primary">Ongoing</span>
+            {% elif ev.status == 'Cancelled' %}
+              <span class="badge bg-danger">Cancelled</span>
+            {% else %}
+              <span class="badge bg-secondary">Planned</span>
+            {% endif %}
+          </td>
+          <td class="text-center">
+            <span class="badge bg-info text-dark rounded-pill px-2">{{ ev.attendee_count }}</span>
+          </td>
+          <td class="text-end">
+            <div class="btn-group btn-group-sm">
+              <a href="{{ url_for('main.edit_event', event_id=ev.event_id) }}" class="btn btn-outline-secondary" title="Edit">
+                <i class="bi bi-pencil"></i>
+              </a>
+              <form method="POST" action="{{ url_for('main.delete_event', event_id=ev.event_id) }}" class="d-inline delete-form" data-entity="event">
+                <button type="submit" class="btn btn-outline-danger" title="Delete">
+                  <i class="bi bi-trash"></i>
+                </button>
+              </form>
+            </div>
+          </td>
+        </tr>
+        {% else %}
+        <tr>
+          <td colspan="9" class="text-center text-muted py-4">No events scheduled.</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}

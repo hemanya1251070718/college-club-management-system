@@ -1,0 +1,92 @@
+{% extends "base.html" %}
+
+{% block title %}{{ title }}{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+  <div class="col-lg-7">
+    <div class="card shadow-sm">
+      <div class="card-header bg-white py-3">
+        <h5 class="mb-0 fw-bold">{{ title }}</h5>
+      </div>
+      <div class="card-body p-4">
+        {% if not membership %}
+        <div class="alert alert-info py-2 small mb-4">
+          <i class="bi bi-info-circle-fill me-1"></i>
+          Submitting this form triggers <code>trg_increase_member_count</code> in MySQL automatically.
+        </div>
+        {% endif %}
+
+        <form method="POST">
+          <div class="row g-3">
+            {% if not membership %}
+            <div class="col-md-6">
+              <label class="form-label fw-semibold">Student *</label>
+              <select name="student_id" class="form-select" required>
+                <option value="" disabled selected>Select student...</option>
+                {% for s in students %}
+                <option value="{{ s.student_id }}">
+                  {{ s.name }} ({{ s.student_id }})
+                </option>
+                {% endfor %}
+              </select>
+            </div>
+            <div class="col-md-6">
+              <label class="form-label fw-semibold">Club *</label>
+              <select name="club_id" class="form-select" required>
+                <option value="" disabled selected>Select club...</option>
+                {% for c in clubs %}
+                <option value="{{ c.club_id }}">
+                  {{ c.club_name }} ({{ c.club_id }})
+                </option>
+                {% endfor %}
+              </select>
+            </div>
+            {% else %}
+            <div class="col-md-6">
+              <label class="form-label fw-semibold">Student</label>
+              <input type="text" class="form-control" value="{{ membership.student_name }} ({{ membership.student_id }})" readonly>
+            </div>
+            <div class="col-md-6">
+              <label class="form-label fw-semibold">Club</label>
+              <input type="text" class="form-control" value="{{ membership.club_name }} ({{ membership.club_id }})" readonly>
+            </div>
+            {% endif %}
+
+            <div class="col-md-4">
+              <label class="form-label fw-semibold">Role *</label>
+              <select name="role" class="form-select" required>
+                {% for r in ['Member', 'Core Member', 'Volunteer', 'Event Coordinator', 'Treasurer', 'Secretary', 'President'] %}
+                <option value="{{ r }}" {% if membership and membership.role == r %}selected{% endif %}>{{ r }}</option>
+                {% endfor %}
+              </select>
+            </div>
+
+            <div class="col-md-4">
+              <label class="form-label fw-semibold">Join Date *</label>
+              <input type="date" name="join_date" class="form-control" value="{{ membership.join_date if membership and membership.join_date else '' }}" required>
+            </div>
+
+            <div class="col-md-4">
+              <label class="form-label fw-semibold">Status *</label>
+              <select name="status" class="form-select" required>
+                <option value="Active" {% if not membership or membership.status == 'Active' %}selected{% endif %}>Active</option>
+                <option value="Inactive" {% if membership and membership.status == 'Inactive' %}selected{% endif %}>Inactive</option>
+              </select>
+            </div>
+          </div>
+
+          <hr class="my-4">
+
+          <div class="d-flex justify-content-end gap-2">
+            <a href="{{ url_for('main.list_memberships') }}" class="btn btn-outline-secondary">Cancel</a>
+            <button type="submit" class="btn btn-warning text-dark fw-semibold">
+              <i class="bi bi-lightning-charge-fill me-1"></i> Save & Trigger Count
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

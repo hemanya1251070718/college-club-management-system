@@ -1,0 +1,73 @@
+{% extends "base.html" %}
+
+{% block title %}System Health & Database Status{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+  <div class="col-lg-8">
+    <div class="card shadow-sm">
+      <div class="card-header bg-white py-3 d-flex justify-content-between align-items-center">
+        <h5 class="mb-0 fw-bold">
+          <i class="bi bi-activity text-primary me-2"></i>Service & Database Health
+        </h5>
+        {% if healthy %}
+          <span class="badge bg-success fs-6"><i class="bi bi-check-circle me-1"></i>STATUS: HEALTHY</span>
+        {% else %}
+          <span class="badge bg-danger fs-6"><i class="bi bi-x-octagon me-1"></i>STATUS: UNHEALTHY</span>
+        {% endif %}
+      </div>
+
+      <div class="card-body p-4">
+        <div class="alert {% if healthy %}alert-success{% else %}alert-danger{% endif %} d-flex align-items-center" role="alert">
+          <i class="bi {% if healthy %}bi-check-circle-fill{% else %}bi-exclamation-triangle-fill{% endif %} fs-3 me-3"></i>
+          <div>
+            <strong>{{ msg }}</strong>
+            <div class="small">Endpoint: <code>GET /health</code> (Supports JSON via <code>Accept: application/json</code>)</div>
+          </div>
+        </div>
+
+        <h6 class="fw-bold text-uppercase text-muted mt-4 mb-3" style="font-size: 0.8rem; letter-spacing: 0.5px;">Connection Metadata</h6>
+        <div class="table-responsive">
+          <table class="table table-bordered align-middle">
+            <tbody>
+              <tr>
+                <th style="width: 35%; background-color: #f8fafc;">Database Engine</th>
+                <td><code>{{ details.version or 'Unavailable' }}</code></td>
+              </tr>
+              <tr>
+                <th style="background-color: #f8fafc;">Active Database Name</th>
+                <td><code>{{ details.database or 'None' }}</code></td>
+              </tr>
+              <tr>
+                <th style="background-color: #f8fafc;">Connection Mode</th>
+                <td>
+                  <span class="badge {% if 'Unix Socket' in details.mode %}bg-primary{% else %}bg-secondary{% endif %}">
+                    {{ details.mode }}
+                  </span>
+                </td>
+              </tr>
+              <tr>
+                <th style="background-color: #f8fafc;">Security & Cloud Run Integration</th>
+                <td>
+                  <small class="text-muted">
+                    No database credentials in code. Password retrieved at runtime from Secret Manager.
+                  </small>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="mt-4 text-end">
+          <a href="{{ url_for('main.health', format='json') }}" target="_blank" class="btn btn-outline-dark btn-sm">
+            <i class="bi bi-code-slash me-1"></i> Raw JSON Output
+          </a>
+          <a href="{{ url_for('main.dashboard') }}" class="btn btn-primary btn-sm ms-2">
+            Back to Dashboard
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

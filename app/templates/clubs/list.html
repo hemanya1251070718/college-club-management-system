@@ -1,0 +1,72 @@
+{% extends "base.html" %}
+
+{% block title %}Clubs Management{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+  <div>
+    <h3 class="fw-bold mb-1">Clubs Management</h3>
+    <p class="text-muted mb-0">Browse, register, edit, and manage club listings and faculty coordinators.</p>
+  </div>
+  <a href="{{ url_for('main.create_club') }}" class="btn btn-primary">
+    <i class="bi bi-plus-lg me-1"></i> Add New Club
+  </a>
+</div>
+
+<div class="card shadow-sm">
+  <div class="table-responsive">
+    <table class="table table-hover align-middle mb-0">
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Club Name</th>
+          <th>Category</th>
+          <th>Faculty Coordinator</th>
+          <th>Official Email / IG</th>
+          <th class="text-center">Members</th>
+          <th class="text-end">Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for club in clubs %}
+        <tr>
+          <td><span class="badge bg-dark">{{ club.club_id }}</span></td>
+          <td class="fw-semibold">{{ club.club_name }}</td>
+          <td><span class="badge bg-light text-dark border">{{ club.category }}</span></td>
+          <td>
+            <div>{{ club.faculty_name or 'Not Assigned' }}</div>
+            <small class="text-muted">{{ club.faculty_email or '' }}</small>
+          </td>
+          <td>
+            <small>
+              {% if club.official_email %}<div><i class="bi bi-envelope me-1"></i>{{ club.official_email }}</div>{% endif %}
+              {% if club.instagram_handle %}<div><i class="bi bi-instagram me-1 text-danger"></i>@{{ club.instagram_handle }}</div>{% endif %}
+              {% if not club.official_email and not club.instagram_handle %}<span class="text-muted">None</span>{% endif %}
+            </small>
+          </td>
+          <td class="text-center">
+            <span class="badge bg-primary rounded-pill px-3 py-2">{{ club.member_count }}</span>
+          </td>
+          <td class="text-end">
+            <div class="btn-group btn-group-sm">
+              <a href="{{ url_for('main.edit_club', club_id=club.club_id) }}" class="btn btn-outline-secondary" title="Edit">
+                <i class="bi bi-pencil"></i>
+              </a>
+              <form method="POST" action="{{ url_for('main.delete_club', club_id=club.club_id) }}" class="d-inline delete-form" data-entity="club">
+                <button type="submit" class="btn btn-outline-danger" title="Delete">
+                  <i class="bi bi-trash"></i>
+                </button>
+              </form>
+            </div>
+          </td>
+        </tr>
+        {% else %}
+        <tr>
+          <td colspan="7" class="text-center text-muted py-4">No clubs found.</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}
