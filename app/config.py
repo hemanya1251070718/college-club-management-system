@@ -8,9 +8,9 @@ class Config:
     SECRET_KEY = os.environ.get("SECRET_KEY", "dev-secret-key-vit-cloud-2026")
     
     # Database Settings
-    DB_USER = os.environ.get("DB_USER", "root")
-    DB_PASSWORD = os.environ.get("DB_PASSWORD", "")
-    DB_NAME = os.environ.get("DB_NAME", "trial_club")
+    DB_USER = os.environ.get("DB_USER", "root").strip()
+    DB_PASSWORD = os.environ.get("DB_PASSWORD", "").strip()
+    DB_NAME = os.environ.get("DB_NAME", "trial_club").strip()
     
     # TCP Connection (used locally and for Cloud SQL Auth Proxy)
     DB_HOST = os.environ.get("DB_HOST", "127.0.0.1")
