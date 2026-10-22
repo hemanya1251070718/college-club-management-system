@@ -17,3 +17,12 @@
   - `triggers.sql`: Defines `trg_increase_member_count` and `trg_decrease_member_count` so inserting or deleting a student membership in the web UI automatically updates `Clubs.member_count` in MySQL.
   - `app/routes.py`: Every database query uses parameter substitution (`%s` tuples), completely eliminating SQL injection risks.
   - `tests/test_app.py`: 8 automated unit tests verifying health checks, environment toggling, and route security.
+
+## Phase B2: Cloud Account Activation, IAM Hardening & Pipeline Verification
+- **What happened:** Your ₹1,000 prepayment settled, activating Billing Account `015C4C-8DD910-6F8D3B`. We linked project `project-a4079d46-9d8b-469f-993`, enabled the 5 required Google Cloud APIs (`run`, `sqladmin`, `secretmanager`, `artifactregistry`, `cloudbuild`), created a dedicated service account (`club-app-sa`) with least-privilege roles, and deployed a live "Hello World" service to Cloud Run in Mumbai (`asia-south1`).
+- **Why it matters:** Senior cloud engineers prove deployment pipelines with a trivial service first before introducing database complexity. Creating a dedicated runtime identity (`club-app-sa`) ensures the application cannot modify or delete cloud infrastructure if breached.
+- **Key Resources & Roles:**
+  - `club-app-sa@project-a4079d46-9d8b-469f-993.iam.gserviceaccount.com`: The application's runtime identity.
+  - `roles/cloudsql.client`: Allows connecting to Cloud SQL via internal socket proxy without granting administrative DB rights.
+  - `roles/secretmanager.secretAccessor`: Allows reading the database password from Secret Manager without granting permission to create or delete secrets.
+  - Live Endpoint: `https://hello-pipeline-test-326279554484.asia-south1.run.app` (Returning HTTP 200).
