@@ -20,6 +20,26 @@ def health():
     return render_template("health.html", healthy=healthy, msg=msg, details=details), status_code
 
 
+@main_bp.route("/init-db")
+def init_db_endpoint():
+    """
+    Self-healing database initialization endpoint.
+    Executes base schema, triggers, views, and procedures directly inside Cloud Run.
+    """
+    import load_schema
+    try:
+        load_schema.initialize_database()
+        return jsonify({
+            "status": "success",
+            "message": "Cloud SQL database successfully initialized with all tables, triggers, views, and procedures."
+        }), 200
+    except Exception as e:
+        return jsonify({
+            "status": "error",
+            "message": f"Initialization failed: {str(e)}"
+        }), 500
+
+
 # -------------------------------------------------------------
 # DASHBOARD (Overview with ClubSummary View & Statistics)
 # -------------------------------------------------------------
