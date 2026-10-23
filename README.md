@@ -143,4 +143,4 @@ gcloud secrets delete club-db-password --quiet
 # 4. Delete Dedicated Service Account
 gcloud iam service-accounts delete club-app-sa@project-a4079d46-9d8b-469f-993.iam.gserviceaccount.com --quiet
 ```
-*(For detailed cost tracking and refund steps, refer to [docs/RESOURCES.md](file:///d:/VIT%20PUNE/GDG/cloud/docs/RESOURCES.md).)*
+
