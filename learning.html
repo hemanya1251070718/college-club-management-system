@@ -1,0 +1,459 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>College Club Management System - Complete Learning & Cloud Guide</title>
+  <style>
+    @page {
+      size: A4;
+      margin: 18mm 16mm 18mm 16mm;
+    }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      line-height: 1.55;
+      color: #1f2937;
+      background-color: #ffffff;
+      font-size: 11pt;
+    }
+    h1, h2, h3, h4 {
+      color: #111827;
+      font-weight: 700;
+    }
+    h1 {
+      font-size: 24pt;
+      margin-top: 0;
+      margin-bottom: 8px;
+      color: #1e3a8a;
+      border-bottom: 3px solid #3b82f6;
+      padding-bottom: 8px;
+    }
+    h2 {
+      font-size: 16pt;
+      margin-top: 24px;
+      margin-bottom: 10px;
+      color: #1e40af;
+      border-bottom: 1.5px solid #e5e7eb;
+      padding-bottom: 5px;
+      page-break-after: avoid;
+    }
+    h3 {
+      font-size: 13pt;
+      margin-top: 18px;
+      margin-bottom: 8px;
+      color: #1f2937;
+      page-break-after: avoid;
+    }
+    p {
+      margin-top: 0;
+      margin-bottom: 10px;
+    }
+    .badge {
+      display: inline-block;
+      padding: 2px 8px;
+      font-size: 8.5pt;
+      font-weight: 600;
+      border-radius: 4px;
+      background-color: #e0e7ff;
+      color: #3730a3;
+      margin-right: 4px;
+    }
+    .callout {
+      background-color: #f8fafc;
+      border-left: 4px solid #3b82f6;
+      padding: 10px 14px;
+      margin: 12px 0;
+      border-radius: 0 6px 6px 0;
+      page-break-inside: avoid;
+    }
+    .callout-success {
+      background-color: #f0fdf4;
+      border-left-color: #22c55e;
+    }
+    .callout-warning {
+      background-color: #fffbeb;
+      border-left-color: #f59e0b;
+    }
+    .callout-title {
+      font-weight: 700;
+      margin-bottom: 4px;
+      color: #0f172a;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 14px 0;
+      font-size: 9pt;
+      page-break-inside: auto;
+    }
+    tr {
+      page-break-inside: avoid;
+      page-break-after: auto;
+    }
+    th, td {
+      border: 1px solid #d1d5db;
+      padding: 6px 8px;
+      text-align: left;
+      vertical-align: top;
+    }
+    th {
+      background-color: #f3f4f6;
+      color: #111827;
+      font-weight: 700;
+    }
+    tr:nth-child(even) td {
+      background-color: #f9fafb;
+    }
+    code {
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+      font-size: 9pt;
+      background-color: #f1f5f9;
+      padding: 2px 5px;
+      border-radius: 4px;
+      color: #0f172a;
+      border: 1px solid #e2e8f0;
+    }
+    pre {
+      background-color: #0f172a;
+      color: #f8fafc;
+      padding: 10px 12px;
+      border-radius: 6px;
+      font-size: 8.5pt;
+      overflow-x: auto;
+      margin: 10px 0;
+      page-break-inside: avoid;
+    }
+    pre code {
+      background-color: transparent;
+      color: inherit;
+      border: none;
+      padding: 0;
+    }
+    .page-break {
+      page-break-before: always;
+    }
+    .subtitle {
+      font-size: 12pt;
+      color: #4b5563;
+      margin-bottom: 16px;
+    }
+    .meta-box {
+      background-color: #eff6ff;
+      border: 1px solid #bfdbfe;
+      border-radius: 6px;
+      padding: 12px 16px;
+      margin-bottom: 20px;
+    }
+    .meta-item {
+      margin-bottom: 4px;
+    }
+    .meta-label {
+      font-weight: 700;
+      color: #1e40af;
+      display: inline-block;
+      width: 140px;
+    }
+    ul, ol {
+      margin-top: 0;
+      margin-bottom: 10px;
+      padding-left: 20px;
+    }
+    li {
+      margin-bottom: 4px;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- COVER / HEADER -->
+  <h1>College Club Management System</h1>
+  <div class="subtitle">Complete Zero-to-Hero Cloud Architecture, Database Engineering & Interview Master Guide</div>
+
+  <div class="meta-box">
+    <div class="meta-item"><span class="meta-label">Live Application:</span> <code>https://club-management-app-326279554484.asia-south1.run.app/</code></div>
+    <div class="meta-item"><span class="meta-label">Google Cloud Region:</span> <code>asia-south1</code> (Mumbai, India)</div>
+    <div class="meta-item"><span class="meta-label">Backend Tech Stack:</span> Python 3.13, Flask 3.1, Gunicorn WSGI, PyMySQL</div>
+    <div class="meta-item"><span class="meta-label">Cloud Services:</span> Cloud Run, Cloud SQL (MySQL 8.0), Secret Manager, Cloud IAM</div>
+    <div class="meta-item"><span class="meta-label">Candidate Level:</span> Absolute Beginner to Production Cloud Defense</div>
+  </div>
+
+  <!-- CHAPTER 1 -->
+  <h2>Chapter 1: The Internet Fundamentals (Baby Steps)</h2>
+  
+  <h3>1. What is "Hosting"?</h3>
+  <p><strong>The Layman Analogy:</strong> When you invite friends to a Diwali party, you are the <em>host</em>. You provide the house, lights, food, and chairs.</p>
+  <p>In computer language, <strong>hosting</strong> means putting your project files inside a computer that never sleeps, never disconnects from Wi-Fi, and is always ready to serve visitors 24 hours a day, 7 days a week. When our files were only on your Windows laptop, your project had no host—the moment your laptop went to sleep, the website disappeared. On Google Cloud, Google is our host.</p>
+
+  <h3>2. What is a "Server"?</h3>
+  <p>A <strong>server</strong> is literally just a computer. It has CPU, RAM, and a hard drive just like your laptop. The only difference is that it has no monitor, keyboard, or mouse attached. It sits in a high-tech cooling room inside a data center, listening to internet cables, ready to <em>serve</em> web pages to anyone who asks.</p>
+
+  <h3>3. What is a "Browser"?</h3>
+  <p>Chrome, Edge, Safari, Brave. A browser is simply a <strong>digital television screen</strong>. If a server sent you raw computer code, it would look like messy text. The browser takes that raw code and paints beautiful buttons, colored badges, images, and tables on your screen.</p>
+
+  <h3>4. What is "HTTP" (The Rules of the Phone Call)?</h3>
+  <p>When you call a restaurant to order pizza, you speak polite, standard words (<em>"Can I get a pizza?"</em>). <strong>HTTP (HyperText Transfer Protocol)</strong> is that standard polite language computers use to talk over digital cables.</p>
+  <ul>
+    <li><strong>HTTP GET:</strong> <em>"Please GET me this page so I can look at it."</em> (Sent when you click a link or open the dashboard).</li>
+    <li><strong>HTTP POST:</strong> <em>"Here is the form I just filled out; please POST (save) it into your database."</em> (Sent when you submit a new student or membership).</li>
+    <li><strong>HTTP 200 OK:</strong> The server's thumbs-up meaning <em>"Everything worked perfectly, here is your page."</em></li>
+    <li><strong>HTTP 404:</strong> <em>"Sorry, that page does not exist."</em></li>
+    <li><strong>HTTP 500:</strong> <em>"Oops, my internal Python code crashed."</em></li>
+  </ul>
+
+  <h3>5. IP Address vs. URL (Phone Number vs. Contact Name)</h3>
+  <ul>
+    <li><strong>IP Address:</strong> Every computer connected to the internet gets a numerical phone number (e.g., <code>34.93.241.228</code>).</li>
+    <li><strong>URL (Website Link):</strong> Humans cannot remember dozens of 10-digit numbers! A URL (like <code>google.com</code> or our Cloud Run URL) is just the contact name in the internet's contact book (called <strong>DNS</strong>). When you type the URL, DNS automatically dials the IP address for you.</li>
+  </ul>
+
+  <div class="page-break"></div>
+
+  <!-- CHAPTER 2 -->
+  <h2>Chapter 2: Why Use Google Cloud Platform (GCP)?</h2>
+
+  <div class="callout callout-warning">
+    <div class="callout-title">The Big Question: What would happen if we didn't use Google Cloud?</div>
+    <p>If you tried hosting this website from your personal laptop on your desk:</p>
+    <ul>
+      <li><strong>No Public IP (NAT Wall):</strong> Home Wi-Fi routers hide laptops behind Network Address Translation (NAT). People outside your house cannot connect to your laptop.</li>
+      <li><strong>Zero Reliability:</strong> If your laptop battery dies, Windows reboots for updates, or home Wi-Fi drops, the entire college club system crashes.</li>
+      <li><strong>Hacking Vulnerability:</strong> Opening your home router ports invites malicious port scanners directly into your private home network.</li>
+    </ul>
+  </div>
+
+  <h3>The Restaurant Analogy (The 4 Main Actors)</h3>
+  <p>Every professional cloud web application works like a restaurant:</p>
+  <ol>
+    <li><strong>The Customer (The User / Browser):</strong> A student or interviewer clicks buttons on their phone.</li>
+    <li><strong>The Waiter (Google Cloud Run / Python Flask):</strong> Welcomes the customer, takes the order, and runs the application logic.</li>
+    <li><strong>The Locked Filing Cabinet (Google Cloud SQL / MySQL):</strong> The heavy, permanent storage room in the back. Stores 69 students, 5 clubs, events, and memberships. Only the waiter is allowed inside.</li>
+    <li><strong>The Bank Vault / Safe (Google Secret Manager):</strong> Holds the secret keys and database passwords. The waiter shows an official security badge to grab the key only when unlocking the cabinet.</li>
+  </ol>
+
+  <!-- CHAPTER 3 -->
+  <h2>Chapter 3: Relational Database Essentials (MySQL 8.0)</h2>
+
+  <h3>1. Why not just use a Microsoft Excel Sheet?</h3>
+  <ul>
+    <li><strong>Concurrence & Corruption:</strong> If two club heads edit an Excel sheet simultaneously, one overwrites the other. Relational databases use <strong>ACID transactions</strong> to guarantee zero conflicts.</li>
+    <li><strong>Typos & Integrity:</strong> In Excel, someone can type "comp eng" and another "Computer Engineering", or assign the same PRN to two students. Relational databases strictly enforce data rules.</li>
+  </ul>
+
+  <h3>2. Relational Design: Primary Keys & Foreign Keys</h3>
+  <div class="callout callout-success">
+    <div class="callout-title">Keys Simplified</div>
+    <p><strong>Primary Key:</strong> Your college PRN or Aadhar card number. Uniquely pinpoints one human being. It cannot be duplicated or blank (<code>student_id</code> in the <code>Students</code> table).</p>
+    <p><strong>Foreign Key:</strong> Writing your friend's PRN on an event entry pass. In the <code>Memberships</code> table, <code>student_id</code> and <code>club_id</code> are foreign keys linking the student to the club without duplicating the student's full name, email, or department.</p>
+  </div>
+
+  <!-- CHAPTER 4 -->
+  <h2>Chapter 4: The 3 Database Superpowers</h2>
+
+  <h3>1. Database View: <code>ClubSummary</code> (The Saved Lens)</h3>
+  <p>Instead of forcing Python to write long, messy SQL queries joining 3 tables every time someone loads the dashboard, we created a <strong>View</strong>. It acts like a saved lens that automatically displays the club name, faculty coordinator, and active member count in one simple command: <code>SELECT * FROM ClubSummary;</code>.</p>
+
+  <h3>2. Database Trigger: <code>trg_increase_member_count</code> (The Automatic Turnstile)</h3>
+  <p>Like a turnstile counter at a metro station that clicks +1 whenever a passenger enters. In our database, an <code>AFTER INSERT</code> trigger automatically runs <code>UPDATE Clubs SET member_count = member_count + 1</code>. Python code doesn't do the math—the database guarantees its own accuracy automatically.</p>
+
+  <h3>3. Stored Procedure & Cursor: <code>sp_audit_club_counts</code> (The Robot Inspector)</h3>
+  <p>A <strong>Stored Procedure</strong> is a saved mini-program stored directly inside MySQL. Our procedure uses a <strong>CURSOR</strong> (like a robot finger pointing down a list) to inspect each club one by one, count the actual rows in <code>Memberships</code>, compare it against <code>Clubs.member_count</code>, and report or automatically heal discrepancies (<code>p_fix = 1</code>).</p>
+
+  <div class="page-break"></div>
+
+  <!-- CHAPTER 5 -->
+  <h2>Chapter 5: Docker & Containerization</h2>
+
+  <h3>1. The "It Works on My Machine" Nightmare</h3>
+  <p>A developer writes code on Windows. When they send it to a Linux server, it crashes because of missing packages, different Python versions, or wrong file paths.</p>
+
+  <h3>2. The Shipping Container Revolution</h3>
+  <p>Before standard shipping containers, loose cargo broke on wooden ships. Standard steel containers seal everything inside and fit on any ship or train worldwide. <strong>Docker is that steel container for software.</strong> It seals Python 3.13, Flask, all libraries, and our code into a standard unit.</p>
+
+  <div class="callout">
+    <div class="callout-title">Image vs. Container (Classic Interview Question)</div>
+    <p><strong>Docker Image:</strong> The <em>Recipe</em> in a cookbook (the static, frozen blueprint on disk).</p>
+    <p><strong>Docker Container:</strong> The <em>Baked Cake</em> on your table (the live program running in memory).</p>
+  </div>
+
+  <!-- CHAPTER 6 -->
+  <h2>Chapter 6: Google Cloud Run & Cloud SQL</h2>
+
+  <h3>1. Google Cloud Run (Serverless Compute)</h3>
+  <ul>
+    <li><strong>Serverless:</strong> You don't manage virtual machines or operating system patches. Google automatically provides CPU and RAM when users arrive.</li>
+    <li><strong>Scale-to-Zero (<code>min-instances=0</code>):</strong> When zero students are using the site at night, Google turns off the container. <strong>You pay ₹0.00 while idle.</strong></li>
+    <li><strong>Budget Ceiling (<code>max-instances=2</code>):</strong> Even under high traffic, Cloud Run will never launch more than 2 instances, mathematically preventing unexpected billing.</li>
+  </ul>
+
+  <h3>2. Why Cloud SQL is Kept Separate from the Container</h3>
+  <div class="callout callout-warning">
+    <div class="callout-title">Critical Concept: Ephemeral vs. Persistent</div>
+    <p>Containers in Cloud Run are <strong>ephemeral (temporary)</strong>. Every time you redeploy or the app sleeps, the container is destroyed and replaced with a fresh one. If your database lived inside the container, <strong>all your student records would be permanently deleted on every restart!</strong> That is why the database lives on dedicated, durable SSD storage in <strong>Google Cloud SQL</strong>.</p>
+  </div>
+
+  <h3>3. The Private Underground Tunnel: Unix Domain Sockets</h3>
+  <p>Rookie student projects open their database port to the entire internet (<code>0.0.0.0/0</code>), allowing hackers to attack it. Our architecture leaves Cloud SQL with <strong>zero public access</strong>. Cloud Run and Cloud SQL communicate across a private <strong>Unix Domain Socket</strong> (<code>/cloudsql/project-...:club-mysql-instance</code>) inside Google's private Mumbai data center backbone.</p>
+
+  <!-- CHAPTER 7 -->
+  <h2>Chapter 7: Cloud Security & Secret Manager</h2>
+
+  <h3>1. The Rookie Mistake: Passwords in GitHub</h3>
+  <p>Hardcoding passwords in code or committing <code>.env</code> files to GitHub leads to bots stealing credentials in under 60 seconds.</p>
+
+  <h3>2. Google Secret Manager & The Principle of Least Privilege</h3>
+  <ul>
+    <li><strong>Secret Manager:</strong> An encrypted vault. The password string (<code>club-db-password</code>) is injected into Cloud Run memory at runtime.</li>
+    <li><strong>IAM Service Account (<code>club-app-sa</code>):</strong> A robot security badge given to our app. Following the <em>Principle of Least Privilege</em>, it has only two permissions:
+      <ol>
+        <li><code>roles/cloudsql.client</code>: Permission to connect to the database.</li>
+        <li><code>roles/secretmanager.secretAccessor</code>: Permission to read only the password.</li>
+      </ol>
+      <em>It cannot create servers, cannot view billing, and cannot alter projects.</em>
+    </li>
+    <li><strong>Parameterized Queries:</strong> All SQL queries use <code>%s</code> tuple substitutions (e.g. <code>cursor.execute("SELECT * FROM Students WHERE student_id = %s;", (student_id,))</code>), making SQL Injection mathematically impossible.</li>
+  </ul>
+
+  <div class="page-break"></div>
+
+  <!-- CHAPTER 8 -->
+  <h2>Chapter 8: Master Glossary Table</h2>
+
+  <table>
+    <thead>
+      <tr>
+        <th style="width: 20%;">Term</th>
+        <th style="width: 38%;">Layman Meaning (Baby Level)</th>
+        <th style="width: 42%;">Technical Role in Our Project</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><strong>Hosting</strong></td>
+        <td>Giving files a 24/7 house so they don't sleep with your laptop.</td>
+        <td>Google Cloud hosting in Mumbai region (<code>asia-south1</code>).</td>
+      </tr>
+      <tr>
+        <td><strong>Server</strong></td>
+        <td>A computer with no monitor waiting in a cold room to serve files.</td>
+        <td>Google's machines running our Flask web container and MySQL.</td>
+      </tr>
+      <tr>
+        <td><strong>Browser</strong></td>
+        <td>The TV screen on your phone (Chrome) painting pretty buttons.</td>
+        <td>Renders HTML/CSS from Cloud Run for the user.</td>
+      </tr>
+      <tr>
+        <td><strong>HTTP (GET / POST)</strong></td>
+        <td>Polite rules of the telephone: GET = "show me", POST = "save this".</td>
+        <td>GET loads pages/views; POST creates students/memberships.</td>
+      </tr>
+      <tr>
+        <td><strong>Port (443 / 3306)</strong></td>
+        <td>The specific door number in an apartment building.</td>
+        <td>Port 443 for HTTPS traffic; Port 3306 internally for MySQL.</td>
+      </tr>
+      <tr>
+        <td><strong>Docker Container</strong></td>
+        <td>The baked cake running live in memory from the recipe image.</td>
+        <td>Flask application container executed serverless by Cloud Run.</td>
+      </tr>
+      <tr>
+        <td><strong>Stateless</strong></td>
+        <td>Goldfish memory: forgets local disk changes between restarts.</td>
+        <td>Cloud Run container state resets; all state stored in Cloud SQL.</td>
+      </tr>
+      <tr>
+        <td><strong>Unix Socket</strong></td>
+        <td>Passing a private note through a slot in the wall between rooms.</td>
+        <td>Private connection between Cloud Run and Cloud SQL (no public IP).</td>
+      </tr>
+      <tr>
+        <td><strong>Primary Key</strong></td>
+        <td>Your unique College PRN number that belongs to only you.</td>
+        <td><code>student_id</code> in Students; <code>club_id</code> in Clubs.</td>
+      </tr>
+      <tr>
+        <td><strong>Foreign Key</strong></td>
+        <td>Writing a friend's PRN on an event ticket to link them.</td>
+        <td><code>student_id</code> and <code>club_id</code> in Memberships table.</td>
+      </tr>
+      <tr>
+        <td><strong>Database View</strong></td>
+        <td>A bookmarked lens summarizing complex data without duplication.</td>
+        <td><code>ClubSummary</code> view aggregating active member counts.</td>
+      </tr>
+      <tr>
+        <td><strong>Database Trigger</strong></td>
+        <td>An automatic turnstile: stepping on it triggers a counter click.</td>
+        <td><code>trg_increase_member_count</code> automatically updates counts.</td>
+      </tr>
+      <tr>
+        <td><strong>Database Cursor</strong></td>
+        <td>A robot finger pointing at a list, moving down row-by-row.</td>
+        <td>Used in <code>sp_audit_club_counts</code> to audit each club.</td>
+      </tr>
+      <tr>
+        <td><strong>Secret Manager</strong></td>
+        <td>A biometric digital bank vault holding passwords securely.</td>
+        <td>Stores encrypted DB password; zero secrets in GitHub code.</td>
+      </tr>
+      <tr>
+        <td><strong>Least Privilege</strong></td>
+        <td>Giving the intern keys to the broom closet, not the CEO's safe.</td>
+        <td>Service account <code>club-app-sa</code> has only 2 minimal roles.</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <!-- CHAPTER 9 -->
+  <h2>Chapter 9: The 7 Google Cloud Components Used</h2>
+
+  <ol>
+    <li><strong>Google Cloud Project (<code>project-a4079d46-9d8b-469f-993</code>):</strong> The master umbrella boundary containing all infrastructure and billing.</li>
+    <li><strong>Google Cloud Run (<code>club-management-app</code>):</strong> Serverless container runner configured with 0-to-2 autoscaling and 512MiB RAM.</li>
+    <li><strong>Google Cloud SQL (<code>club-mysql-instance</code>):</strong> Managed MySQL 8.0 instance (tier: <code>db-f1-micro</code>, 10GB SSD) with 0.0.0.0/0 completely blocked.</li>
+    <li><strong>Google Secret Manager (<code>club-db-password</code>):</strong> Encrypted vault injecting database credentials at runtime.</li>
+    <li><strong>IAM Service Account (<code>club-app-sa</code>):</strong> Least-privilege identity badge binding Cloud SQL client and secret accessor roles.</li>
+    <li><strong>Cloud Build & Artifact Registry:</strong> Automated CI/CD pipeline that built our Dockerfile and stored the container image.</li>
+    <li><strong>Cloud Billing Budget (<code>Safety-Budget-500INR</code>):</strong> Automated safety threshold sending email alerts at ₹450 and ₹500.</li>
+  </ol>
+
+  <div class="page-break"></div>
+
+  <!-- CHAPTER 10 -->
+  <h2>Chapter 10: The Grand 1-Second Odyssey (A Click's Journey)</h2>
+
+  <div class="callout callout-success">
+    <div class="callout-title">The Complete Timeline of One Click</div>
+    <ol>
+      <li><strong>0.00s:</strong> Interviewer clicks <code>https://club-management-app-326279554484.asia-south1.run.app/</code> in Chrome.</li>
+      <li><strong>0.05s:</strong> Google's Mumbai Edge Load Balancer terminates HTTPS (Port 443) and handles SSL encryption.</li>
+      <li><strong>0.10s:</strong> Cloud Run boots up our Docker container in RAM (cold start takes ~1-2s if idle; warm takes ~50ms).</li>
+      <li><strong>0.20s:</strong> Application presents <code>club-app-sa</code> IAM badge to Secret Manager and retrieves the database password.</li>
+      <li><strong>0.30s:</strong> Flask opens a private <strong>Unix Domain Socket</strong> directly into Cloud SQL over Google's internal network.</li>
+      <li><strong>0.40s:</strong> MySQL runs <code>SELECT * FROM ClubSummary;</code> and returns the 5 club rows.</li>
+      <li><strong>0.50s:</strong> Flask renders the Bootstrap 5 HTML template via Jinja2 and returns <strong>HTTP 200 OK</strong>.</li>
+      <li><strong>0.70s:</strong> The browser renders the live dashboard on screen.</li>
+    </ol>
+  </div>
+
+  <!-- CHAPTER 11 -->
+  <h2>Chapter 11: The 5-Minute Live Interview Demo Script</h2>
+
+  <div class="callout">
+    <div class="callout-title">Minute-by-Minute Live Presentation</div>
+    <ul>
+      <li><strong>Minute 1 (The Grand Opening):</strong> Open the live URL. Say: <em>"I deployed a production-grade College Club Management System on Google Cloud Run in Mumbai, backed by a managed Cloud SQL MySQL 8.0 database."</em></li>
+      <li><strong>Minute 2 (The Automatic Trigger):</strong> Navigate to <em>Memberships</em> ➔ <em>Add Membership</em>. Add a student to CSA. Say: <em>"Notice I don't calculate member counts in Python. An AFTER INSERT trigger in MySQL automatically incremented CSA's member count from 0 to 1 at the database engine level."</em></li>
+      <li><strong>Minute 3 (The Stored Procedure & Cursor):</strong> Navigate to <em>Stored Procedures</em> ➔ <em>sp_audit_club_counts</em>. Say: <em>"For complex data reconciliation, I built a stored procedure utilizing a MySQL CURSOR to iterate through clubs row-by-row, verifying and auto-repairing counts."</em></li>
+      <li><strong>Minute 4 (Security & Health):</strong> Click <em>Health & DB Status</em>. Say: <em>"Zero passwords exist in my code—credentials live in Secret Manager. The app connects to Cloud SQL via a private Unix Domain Socket with zero public internet exposure (0.0.0.0/0 blocked)."</em></li>
+      <li><strong>Minute 5 (Cost Optimization):</strong> Say: <em>"Cloud Run scales to zero when idle, costing ₹0 when inactive. I configured a ₹500 budget alert and full teardown automation in RESOURCES.md."</em></li>
+    </ul>
+  </div>
+
+  <div class="callout callout-warning">
+    <div class="callout-title">The #1 Trap Question: "Did you open your database to 0.0.0.0/0?"</div>
+    <p><strong>Your Answer:</strong> <em>"No, absolutely not. Exposing port 3306 to 0.0.0.0/0 is a major security vulnerability that invites brute-force attacks. Instead, I used Google Cloud's built-in Cloud SQL Proxy over an internal Unix domain socket. The database has zero external public IP access."</em></p>
+  </div>
+
+</body>
+</html>
