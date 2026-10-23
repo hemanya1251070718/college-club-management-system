@@ -29,3 +29,13 @@ htmlcov/
 *.swp
 Thumbs.db
 .DS_Store
+
+# Candidate Personal Study Guides & Demo Scripts (Keep Local, Exclude from Public Repo)
+learning.pdf
+learning.html
+complete_cloud_master_guide.pdf
+complete_master_guide.html
+build_complete_master_pdf.py
+docs/DEMO_SCRIPT.md
+docs/INTERVIEW_PREP.md
+
