@@ -46,3 +46,5 @@ docs/task_demo_hem.pdf
 docs/task_demo_hem.html
 docs/task1_master_guide.*
 build_task1_master_pdf.py
+docs/task2_master_guide.*
+build_task2_master_pdf.py
