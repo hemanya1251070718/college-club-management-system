@@ -3,33 +3,39 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>{% block title %}Club Management System{% endblock %} - Cloud Deployment</title>
+  <title>{% block title %}ClubHub Executive DBMS{% endblock %} - Cloud Deployment</title>
   <!-- Bootstrap 5 CSS -->
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
   <!-- Bootstrap Icons -->
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
-  <!-- Custom CSS -->
+  <!-- Custom Luxury Automotive Dark CSS -->
   <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
 </head>
 <body>
 
-  <!-- Top Navigation Bar -->
-  <nav class="navbar navbar-expand-lg navbar-dark bg-dark sticky-top shadow-sm">
+  <!-- 3D WebGL Ambient Particle Background Canvas -->
+  <canvas id="webgl-bg-canvas"></canvas>
+
+  <!-- Top Glassmorphism Navigation Bar -->
+  <nav class="navbar navbar-expand-lg navbar-dark sticky-top shadow-lg py-3">
     <div class="container-fluid px-4">
       <a class="navbar-brand d-flex align-items-center" href="{{ url_for('main.dashboard') }}">
-        <i class="bi bi-mortarboard-fill text-primary me-2 fs-4"></i>
-        <span>ClubHub</span>
+        <div class="p-2 rounded-3 me-2 d-flex align-items-center justify-content-center" style="background: linear-gradient(135deg, rgba(56, 189, 248, 0.2), rgba(37, 99, 235, 0.2)); border: 1px solid rgba(56, 189, 248, 0.4);">
+          <i class="bi bi-shield-shaded text-info fs-5"></i>
+        </div>
+        <span class="fw-bold tracking-tight text-white">ClubHub</span>
         <span class="brand-badge">GCP Live</span>
       </a>
-      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navMain">
+
+      <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navMain">
         <span class="navbar-toggler-icon"></span>
       </button>
 
       <div class="collapse navbar-collapse" id="navMain">
-        <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+        <ul class="navbar-nav me-auto mb-2 mb-lg-0 ms-lg-3 gap-1">
           <li class="nav-item">
             <a class="nav-link {% if request.endpoint == 'main.dashboard' %}active{% endif %}" href="{{ url_for('main.dashboard') }}">
-              <i class="bi bi-speedometer2 me-1"></i> Dashboard
+              <i class="bi bi-speedometer2 me-1"></i> Cockpit
             </a>
           </li>
           <li class="nav-item">
@@ -54,21 +60,22 @@
           </li>
           <li class="nav-item">
             <a class="nav-link {% if 'triggers' in request.path %}active{% endif %}" href="{{ url_for('main.list_triggers') }}">
-              <i class="bi bi-lightning-charge me-1"></i> Triggers
-              <span class="badge bg-warning text-dark ms-1" style="font-size: 0.65rem;">8 Triggers</span>
+              <i class="bi bi-lightning-charge-fill me-1 text-warning"></i> Triggers
+              <span class="badge bg-warning text-dark ms-1" style="font-size: 0.65rem;">8 Active</span>
             </a>
           </li>
           <li class="nav-item dropdown">
             <a class="nav-link dropdown-toggle {% if 'procedures' in request.path %}active{% endif %}" href="#" role="button" data-bs-toggle="dropdown">
-              <i class="bi bi-cpu me-1"></i> Stored Procedures
+              <i class="bi bi-cpu-fill me-1 text-info"></i> Stored Procedures
+              <span class="badge bg-info text-dark ms-1" style="font-size: 0.65rem;">8 Cursors</span>
             </a>
-            <ul class="dropdown-menu shadow">
+            <ul class="dropdown-menu shadow-lg">
               <li>
-                <a class="dropdown-item fw-semibold text-primary" href="{{ url_for('main.procedures_hub') }}">
+                <a class="dropdown-item fw-bold text-info" href="{{ url_for('main.procedures_hub') }}">
                   <i class="bi bi-grid-fill me-2"></i> All 8 Cursor Procedures Hub
                 </a>
               </li>
-              <li><hr class="dropdown-divider"></li>
+              <li><hr class="dropdown-divider border-secondary opacity-25"></li>
               <li>
                 <a class="dropdown-item" href="{{ url_for('main.proc_audit') }}">
                   <i class="bi bi-patch-check me-2"></i> Cursor 1: Audit Club Counts
@@ -83,59 +90,65 @@
           </li>
         </ul>
 
-        <div class="d-flex align-items-center">
-          <a href="{{ url_for('main.health') }}" class="btn btn-outline-success btn-sm d-flex align-items-center">
-            <span class="spinner-grow spinner-grow-sm text-success me-2" role="status" style="width: 0.5rem; height: 0.5rem;"></span>
-            <span>Health & DB Status</span>
+        <!-- Right System Status Indicators -->
+        <div class="d-flex align-items-center gap-2">
+          <a href="{{ url_for('main.health') }}" class="btn btn-outline-success btn-sm d-flex align-items-center px-3 py-2 rounded-pill" style="border-color: rgba(16, 185, 129, 0.4); background: rgba(16, 185, 129, 0.08);">
+            <span class="status-orb me-2"></span>
+            <span class="small fw-semibold text-success">Cloud SQL &bull; Live Socket</span>
           </a>
         </div>
       </div>
     </div>
   </nav>
 
-  <!-- Flash Messages -->
+  <!-- Flash System Messages -->
   <div class="container-fluid px-4 mt-3">
     {% with messages = get_flashed_messages(with_categories=true) %}
       {% if messages %}
         {% for category, message in messages %}
-          <div class="alert alert-{{ category }} alert-dismissible fade show shadow-sm" role="alert">
+          <div class="alert alert-{{ category }} alert-dismissible fade show shadow-lg d-flex align-items-center" role="alert">
             {% if category == 'success' %}
-              <i class="bi bi-check-circle-fill me-2"></i>
+              <i class="bi bi-check-circle-fill me-2 fs-5 text-success"></i>
             {% elif category == 'danger' %}
-              <i class="bi bi-exclamation-octagon-fill me-2"></i>
+              <i class="bi bi-exclamation-octagon-fill me-2 fs-5 text-danger"></i>
             {% elif category == 'warning' %}
-              <i class="bi bi-exclamation-triangle-fill me-2"></i>
+              <i class="bi bi-exclamation-triangle-fill me-2 fs-5 text-warning"></i>
             {% else %}
-              <i class="bi bi-info-circle-fill me-2"></i>
+              <i class="bi bi-info-circle-fill me-2 fs-5 text-info"></i>
             {% endif %}
-            {{ message }}
-            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            <div class="flex-grow-1 fw-medium">{{ message }}</div>
+            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="alert" aria-label="Close"></button>
           </div>
         {% endfor %}
       {% endif %}
     {% endwith %}
   </div>
 
-  <!-- Main Content Container -->
-  <main class="container-fluid px-4 py-3">
+  <!-- Main View Container -->
+  <main class="container-fluid px-4 py-4 flex-grow-1">
     {% block content %}{% endblock %}
   </main>
 
-  <!-- Footer -->
-  <footer class="footer mt-auto py-3 bg-white border-top">
+  <!-- Luxury Minimalist Automotive Footer -->
+  <footer class="footer mt-auto py-4">
     <div class="container-fluid px-4 d-flex flex-wrap justify-content-between align-items-center text-muted small">
-      <div>
-        <strong>VIT Pune College Club Management System</strong> &bull; Production DBMS
+      <div class="d-flex align-items-center gap-2">
+        <i class="bi bi-cpu text-info"></i>
+        <span><strong>VIT Pune Enterprise DBMS</strong> &bull; Production GCP Cloud Architecture</span>
       </div>
-      <div>
-        <span>Dual Connection Architecture (GCP Cloud SQL &bull; Local Proxy)</span>
+      <div class="d-flex gap-3 align-items-center">
+        <span class="badge bg-dark">Cloud Run 512MiB</span>
+        <span class="badge bg-dark">Cloud SQL MySQL 8.0</span>
+        <span class="badge bg-dark">Secret Manager v2</span>
       </div>
     </div>
   </footer>
 
+  <!-- Three.js Library for 3D Background -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
   <!-- Bootstrap 5 JS Bundle -->
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-  <!-- Custom JS -->
+  <!-- Custom 3D & Micro-Interaction Engine -->
   <script src="{{ url_for('static', filename='js/main.js') }}"></script>
 </body>
 </html>

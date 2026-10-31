@@ -1,77 +1,111 @@
 {% extends "base.html" %}
 
-{% block title %}8 Production Database Triggers{% endblock %}
+{% block title %}8 Production Database Triggers Architecture{% endblock %}
 
 {% block content %}
-<div class="d-flex justify-content-between align-items-center mb-4">
+<div class="d-flex flex-wrap justify-content-between align-items-center mb-4 gap-3">
   <div>
-    <h3 class="fw-bold mb-1"><i class="bi bi-lightning-charge-fill text-warning me-2"></i>8 Database Triggers Architecture</h3>
-    <p class="text-muted mb-0">Production DBMS evaluation: 8 non-identical triggers across 8 canonical domain tables with zero audit table overhead.</p>
-  </div>
-  <a href="{{ url_for('main.create_membership') }}" class="btn btn-warning text-dark fw-semibold">
-    <i class="bi bi-play-circle-fill me-1"></i> Test Trigger in UI
-  </a>
-</div>
-
-<!-- Architecture & Distribution Alert -->
-<div class="row g-3 mb-4">
-  <div class="col-md-3">
-    <div class="card p-3 border-primary border-start border-4 h-100 shadow-sm">
-      <h6 class="fw-bold text-primary mb-1">Member 1</h6>
-      <small class="text-muted">Triggers 1 & 2</small>
-      <div class="mt-2 small">Auto-Increment & Auto-Decrement Club Counts on Member Joins / Departures.</div>
+    <div class="d-flex align-items-center gap-2 mb-1">
+      <span class="badge bg-warning text-dark fw-bold">8 PRODUCTION TRIGGERS</span>
+      <span class="text-muted small">&bull; Declarative Integrity &amp; Automation</span>
     </div>
+    <h2 class="fw-bold mb-1 text-gradient">8 Database Triggers Architecture</h2>
+    <p class="text-secondary small mb-0">Production DBMS evaluation: 8 non-identical triggers across 8 canonical domain tables with zero audit table overhead.</p>
   </div>
-  <div class="col-md-3">
-    <div class="card p-3 border-success border-start border-4 h-100 shadow-sm">
-      <h6 class="fw-bold text-success mb-1">Member 2</h6>
-      <small class="text-muted">Triggers 3 & 4</small>
-      <div class="mt-2 small">Enforce Single President Rule & Dynamic Sync on Status Toggle (Active/Inactive).</div>
-    </div>
-  </div>
-  <div class="col-md-3">
-    <div class="card p-3 border-warning border-start border-4 h-100 shadow-sm">
-      <h6 class="fw-bold text-warning mb-1">Member 3</h6>
-      <small class="text-muted">Triggers 5 & 6</small>
-      <div class="mt-2 small">Block Registration on Completed Events & Verify Attendance Prior to Feedback.</div>
-    </div>
-  </div>
-  <div class="col-md-3">
-    <div class="card p-3 border-info border-start border-4 h-100 shadow-sm">
-      <h6 class="fw-bold text-info mb-1">Member 4</h6>
-      <small class="text-muted">Triggers 7 & 8</small>
-      <div class="mt-2 small">Auto-Progress Event to Ongoing on Attendance & Zero-Config Club Profile Provisioning.</div>
-    </div>
+  <div class="d-flex gap-2">
+    <a href="{{ url_for('main.create_membership') }}" class="btn btn-warning text-dark fw-semibold d-flex align-items-center gap-2">
+      <i class="bi bi-play-circle-fill"></i>
+      <span>Test Trigger in UI</span>
+    </a>
   </div>
 </div>
 
-<!-- Triggers Detailed Catalog -->
-<div class="card shadow-sm">
-  <div class="card-header bg-white py-3">
-    <h5 class="mb-0 fw-bold"><i class="bi bi-list-check me-2 text-primary"></i>Trigger Specifications & Live Verification</h5>
+<!-- Team Distribution 4-Pillar Grid -->
+<div class="row g-4 mb-4">
+  <div class="col-md-6 col-xl-3">
+    <div class="card p-4 h-100 tilt-card" style="border-left: 3px solid #38bdf8 !important;">
+      <div class="d-flex justify-content-between align-items-center mb-2">
+        <span class="badge bg-info text-dark">MEMBER 1</span>
+        <span class="text-muted small">Triggers 1 &amp; 2</span>
+      </div>
+      <h5 class="fw-bold text-white mb-2">Club Size Automation</h5>
+      <p class="text-secondary small mb-0">
+        Automatic increment and decrement of <code>Clubs.member_count</code> on membership joins and departures.
+      </p>
+    </div>
+  </div>
+
+  <div class="col-md-6 col-xl-3">
+    <div class="card p-4 h-100 tilt-card" style="border-left: 3px solid #10b981 !important;">
+      <div class="d-flex justify-content-between align-items-center mb-2">
+        <span class="badge bg-success text-white">MEMBER 2</span>
+        <span class="text-muted small">Triggers 3 &amp; 4</span>
+      </div>
+      <h5 class="fw-bold text-white mb-2">Governance &amp; Status</h5>
+      <p class="text-secondary small mb-0">
+        Enforces single-president rule via SQLSTATE 45000 and dynamic count sync on active/inactive toggle.
+      </p>
+    </div>
+  </div>
+
+  <div class="col-md-6 col-xl-3">
+    <div class="card p-4 h-100 tilt-card" style="border-left: 3px solid #f59e0b !important;">
+      <div class="d-flex justify-content-between align-items-center mb-2">
+        <span class="badge bg-warning text-dark">MEMBER 3</span>
+        <span class="text-muted small">Triggers 5 &amp; 6</span>
+      </div>
+      <h5 class="fw-bold text-white mb-2">Event Integrity &amp; Reviews</h5>
+      <p class="text-secondary small mb-0">
+        Rejects retrospective registration on past events and blocks unverified feedback submissions.
+      </p>
+    </div>
+  </div>
+
+  <div class="col-md-6 col-xl-3">
+    <div class="card p-4 h-100 tilt-card" style="border-left: 3px solid #a855f7 !important;">
+      <div class="d-flex justify-content-between align-items-center mb-2">
+        <span class="badge bg-purple text-white" style="background: rgba(168, 85, 247, 0.3); border: 1px solid #a855f7;">MEMBER 4</span>
+        <span class="text-muted small">Triggers 7 &amp; 8</span>
+      </div>
+      <h5 class="fw-bold text-white mb-2">Lifecycle &amp; Provisioning</h5>
+      <p class="text-secondary small mb-0">
+        Auto-progresses event status to Ongoing upon attendance and auto-provisions baseline ClubProfile.
+      </p>
+    </div>
+  </div>
+</div>
+
+<!-- Triggers Detailed HUD Catalog -->
+<div class="card shadow-lg">
+  <div class="card-header py-3 px-4 d-flex justify-content-between align-items-center">
+    <h5 class="mb-0 fw-bold text-white d-flex align-items-center gap-2">
+      <i class="bi bi-list-check text-warning"></i>
+      <span>Production Trigger Specifications &amp; Live Verification</span>
+    </h5>
+    <span class="badge bg-dark font-mono text-muted">8 Canonical Tables</span>
   </div>
   <div class="table-responsive">
     <table class="table table-hover align-middle mb-0">
-      <thead class="table-light">
+      <thead>
         <tr>
           <th style="width: 5%;">#</th>
           <th style="width: 25%;">Trigger Name</th>
-          <th style="width: 15%;">Timing & Table</th>
+          <th style="width: 15%;">Timing &amp; Table</th>
           <th style="width: 40%;">Enforced Business Rule</th>
-          <th style="width: 15%;" class="text-end">Test Action</th>
+          <th style="width: 15%;" class="text-end">Live Test</th>
         </tr>
       </thead>
       <tbody>
         <!-- Trigger 1 -->
         <tr>
-          <td><span class="badge bg-primary">1</span></td>
+          <td><span class="badge bg-info text-dark font-mono">1</span></td>
           <td>
-            <strong><code>trg_after_membership_insert_sync_count</code></strong>
+            <strong class="text-white font-mono">trg_after_membership_insert_sync_count</strong>
             <small class="d-block text-muted">Member 1</small>
           </td>
           <td>
-            <span class="badge bg-success-subtle text-success border border-success">AFTER INSERT</span>
-            <small class="d-block text-muted">ON <code>Memberships</code></small>
+            <span class="badge bg-success-subtle text-success">AFTER INSERT</span>
+            <small class="d-block text-muted mt-1 font-mono">Memberships</small>
           </td>
           <td>
             When a student joins a club with status <code>'Active'</code>, <code>Clubs.member_count</code> automatically increments by 1 in real time.
@@ -85,14 +119,14 @@
 
         <!-- Trigger 2 -->
         <tr>
-          <td><span class="badge bg-primary">2</span></td>
+          <td><span class="badge bg-info text-dark font-mono">2</span></td>
           <td>
-            <strong><code>trg_after_membership_delete_sync_count</code></strong>
+            <strong class="text-white font-mono">trg_after_membership_delete_sync_count</strong>
             <small class="d-block text-muted">Member 1</small>
           </td>
           <td>
-            <span class="badge bg-danger-subtle text-danger border border-danger">AFTER DELETE</span>
-            <small class="d-block text-muted">ON <code>Memberships</code></small>
+            <span class="badge bg-danger-subtle text-danger">AFTER DELETE</span>
+            <small class="d-block text-muted mt-1 font-mono">Memberships</small>
           </td>
           <td>
             When an active membership is deleted, <code>Clubs.member_count</code> automatically decrements by 1 directly in the base table.
@@ -106,35 +140,35 @@
 
         <!-- Trigger 3 -->
         <tr>
-          <td><span class="badge bg-success">3</span></td>
+          <td><span class="badge bg-success text-white font-mono">3</span></td>
           <td>
-            <strong><code>trg_prevent_multiple_presidents</code></strong>
+            <strong class="text-white font-mono">trg_prevent_multiple_presidents</strong>
             <small class="d-block text-muted">Member 2</small>
           </td>
           <td>
-            <span class="badge bg-warning-subtle text-dark border border-warning">BEFORE INSERT</span>
-            <small class="d-block text-muted">ON <code>Memberships</code></small>
+            <span class="badge bg-warning-subtle text-warning">BEFORE INSERT</span>
+            <small class="d-block text-muted mt-1 font-mono">Memberships</small>
           </td>
           <td>
             Enforces Club Bylaws: Aborts transaction via <code>SIGNAL SQLSTATE '45000'</code> if an attempt is made to insert a second active President for the same club.
           </td>
           <td class="text-end">
-            <a href="{{ url_for('main.create_membership') }}" class="btn btn-sm btn-outline-warning text-dark">
-              Try 2nd President
+            <a href="{{ url_for('main.create_membership') }}" class="btn btn-sm btn-outline-warning">
+              Test 2nd President
             </a>
           </td>
         </tr>
 
         <!-- Trigger 4 -->
         <tr>
-          <td><span class="badge bg-success">4</span></td>
+          <td><span class="badge bg-success text-white font-mono">4</span></td>
           <td>
-            <strong><code>trg_adjust_member_count_on_status_change</code></strong>
+            <strong class="text-white font-mono">trg_adjust_member_count_on_status_change</strong>
             <small class="d-block text-muted">Member 2</small>
           </td>
           <td>
-            <span class="badge bg-info-subtle text-info border border-info">AFTER UPDATE</span>
-            <small class="d-block text-muted">ON <code>Memberships</code></small>
+            <span class="badge bg-info-subtle text-info">AFTER UPDATE</span>
+            <small class="d-block text-muted mt-1 font-mono">Memberships</small>
           </td>
           <td>
             When a member's status is toggled between <code>Active</code> and <code>Inactive</code> (leave/reinstatement), <code>Clubs.member_count</code> is automatically incremented or decremented.
@@ -148,20 +182,20 @@
 
         <!-- Trigger 5 -->
         <tr>
-          <td><span class="badge bg-warning text-dark">5</span></td>
+          <td><span class="badge bg-warning text-dark font-mono">5</span></td>
           <td>
-            <strong><code>trg_prevent_registration_for_completed_event</code></strong>
+            <strong class="text-white font-mono">trg_prevent_registration_for_completed_event</strong>
             <small class="d-block text-muted">Member 3</small>
           </td>
           <td>
-            <span class="badge bg-warning-subtle text-dark border border-warning">BEFORE INSERT</span>
-            <small class="d-block text-muted">ON <code>EventRegistrations</code></small>
+            <span class="badge bg-warning-subtle text-warning">BEFORE INSERT</span>
+            <small class="d-block text-muted mt-1 font-mono">EventRegistrations</small>
           </td>
           <td>
             Rejects retrospective registrations for events that are already marked <code>'Completed'</code> or <code>'Cancelled'</code>.
           </td>
           <td class="text-end">
-            <a href="{{ url_for('main.list_events') }}" class="btn btn-sm btn-outline-warning text-dark">
+            <a href="{{ url_for('main.list_events') }}" class="btn btn-sm btn-outline-warning">
               Test on Events
             </a>
           </td>
@@ -169,14 +203,14 @@
 
         <!-- Trigger 6 -->
         <tr>
-          <td><span class="badge bg-warning text-dark">6</span></td>
+          <td><span class="badge bg-warning text-dark font-mono">6</span></td>
           <td>
-            <strong><code>trg_verify_feedback_registration</code></strong>
+            <strong class="text-white font-mono">trg_verify_feedback_registration</strong>
             <small class="d-block text-muted">Member 3</small>
           </td>
           <td>
-            <span class="badge bg-warning-subtle text-dark border border-warning">BEFORE INSERT</span>
-            <small class="d-block text-muted">ON <code>Feedback</code></small>
+            <span class="badge bg-warning-subtle text-warning">BEFORE INSERT</span>
+            <small class="d-block text-muted mt-1 font-mono">Feedback</small>
           </td>
           <td>
             Authenticity assurance: Intercepts event feedback submissions and verifies via cross-table check that the student was registered for that event.
@@ -190,14 +224,14 @@
 
         <!-- Trigger 7 -->
         <tr>
-          <td><span class="badge bg-info text-dark">7</span></td>
+          <td><span class="badge bg-purple text-white font-mono" style="background: #a855f7;">7</span></td>
           <td>
-            <strong><code>trg_auto_progress_event_on_attendance</code></strong>
+            <strong class="text-white font-mono">trg_auto_progress_event_on_attendance</strong>
             <small class="d-block text-muted">Member 4</small>
           </td>
           <td>
-            <span class="badge bg-info-subtle text-info border border-info">AFTER UPDATE</span>
-            <small class="d-block text-muted">ON <code>EventRegistrations</code></small>
+            <span class="badge bg-info-subtle text-info">AFTER UPDATE</span>
+            <small class="d-block text-muted mt-1 font-mono">EventRegistrations</small>
           </td>
           <td>
             When attendee status is marked <code>'Attended'</code> at the check-in desk, if the event was <code>'Planned'</code>, it automatically flips to <code>'Ongoing'</code>.
@@ -211,14 +245,14 @@
 
         <!-- Trigger 8 -->
         <tr>
-          <td><span class="badge bg-info text-dark">8</span></td>
+          <td><span class="badge bg-purple text-white font-mono" style="background: #a855f7;">8</span></td>
           <td>
-            <strong><code>trg_auto_create_club_profile</code></strong>
+            <strong class="text-white font-mono">trg_auto_create_club_profile</strong>
             <small class="d-block text-muted">Member 4</small>
           </td>
           <td>
-            <span class="badge bg-success-subtle text-success border border-success">AFTER INSERT</span>
-            <small class="d-block text-muted">ON <code>Clubs</code></small>
+            <span class="badge bg-success-subtle text-success">AFTER INSERT</span>
+            <small class="d-block text-muted mt-1 font-mono">Clubs</small>
           </td>
           <td>
             Zero-config provisioning: When a new club is created, automatically provisions baseline profile row with institutional email and Instagram handle in <code>ClubProfile</code>.
@@ -234,4 +268,3 @@
   </div>
 </div>
 {% endblock %}
-

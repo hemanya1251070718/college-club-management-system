@@ -1,51 +1,72 @@
 {% extends "base.html" %}
 
-{% block title %}8 Cursors & Stored Procedures Hub{% endblock %}
+{% block title %}8 Stored Procedures & Cursors Hub{% endblock %}
 
 {% block content %}
-<div class="d-flex justify-content-between align-items-center mb-4">
+<div class="d-flex flex-wrap justify-content-between align-items-center mb-4 gap-3">
   <div>
-    <h3 class="fw-bold mb-1"><i class="bi bi-cpu-fill text-primary me-2"></i>Stored Procedures & Database Cursors Hub</h3>
-    <p class="text-muted mb-0">Production DBMS evaluation: 8 advanced cursor procedures operating exclusively on 8 canonical base tables.</p>
+    <div class="d-flex align-items-center gap-2 mb-1">
+      <span class="badge bg-info text-dark fw-bold">8 PRODUCTION CURSORS</span>
+      <span class="text-muted small">&bull; Strict 8 Domain Tables Architecture</span>
+    </div>
+    <h2 class="fw-bold mb-1 text-gradient">Stored Procedures &amp; Database Cursors Hub</h2>
+    <p class="text-secondary small mb-0">High-performance stored procedures with cursor iterative processing operating on live Cloud SQL base tables.</p>
   </div>
-  <a href="{{ url_for('main.proc_student_clubs') }}" class="btn btn-outline-primary">
-    <i class="bi bi-journal-text me-1"></i> GetStudentClubs (Utility Procedure)
-  </a>
+  <div class="d-flex gap-2">
+    <a href="{{ url_for('main.proc_student_clubs') }}" class="btn btn-outline-info d-flex align-items-center gap-2">
+      <i class="bi bi-person-lines-fill"></i>
+      <span>GetStudentClubs</span>
+    </a>
+    <a href="{{ url_for('main.list_triggers') }}" class="btn btn-warning text-dark fw-semibold d-flex align-items-center gap-2">
+      <i class="bi bi-lightning-charge-fill"></i>
+      <span>8 Database Triggers</span>
+    </a>
+  </div>
 </div>
 
 {% if results is not none and proc_name %}
-<!-- Results Section -->
-<div class="card shadow-sm mb-4 border-primary">
-  <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center py-3">
-    <h5 class="mb-0 fw-bold">
-      <i class="bi bi-terminal-fill me-2"></i>Execution Results: <code>{{ proc_name }}</code>
-    </h5>
-    <span class="badge bg-light text-primary fw-semibold">{{ results|length }} rows returned</span>
+<!-- Dynamic Execution Telemetry Display -->
+<div class="card shadow-lg mb-5 border-info" style="border-width: 1px; box-shadow: 0 0 30px rgba(56, 189, 248, 0.2);">
+  <div class="card-header py-3 d-flex flex-wrap justify-content-between align-items-center" style="background: rgba(56, 189, 248, 0.08);">
+    <div class="d-flex align-items-center gap-2">
+      <span class="status-orb"></span>
+      <h5 class="mb-0 fw-bold text-white font-mono">
+        {{ proc_name }}
+      </h5>
+    </div>
+    <div class="d-flex align-items-center gap-2">
+      <span class="badge bg-success-subtle text-success px-3 py-2 fw-semibold">
+        <i class="bi bi-check2-circle me-1"></i>Executed Successfully
+      </span>
+      <span class="badge bg-dark px-3 py-2 fw-mono">{{ results|length }} rows returned</span>
+    </div>
   </div>
   <div class="card-body p-0">
     {% if results %}
     <div class="table-responsive">
-      <table class="table table-hover table-striped align-middle mb-0">
-        <thead class="table-light">
+      <table class="table table-hover align-middle mb-0">
+        <thead>
           <tr>
             {% for key in results[0].keys() %}
-            <th class="text-uppercase small">{{ key }}</th>
+            <th class="font-mono">{{ key }}</th>
             {% endfor %}
           </tr>
         </thead>
         <tbody>
           {% for row in results %}
           <tr>
-            {% for val in row.values() %}
+            {% for key, val in row.items() %}
             <td>
-              {% if val == 'OK' or val == 'FIXED' or 'ENROLLED' in (val|string) or 'PROMOTED' in (val|string) or 'TRANSITIONED' in (val|string) or 'ANONYMIZED' in (val|string) %}
+              {% if val == 'OK' or val == 'FIXED' or 'ENROLLED' in (val|string) or 'PROMOTED' in (val|string) or 'TRANSITIONED' in (val|string) or 'ANONYMIZED' in (val|string) or 'BUDGET UPDATED' in (val|string) %}
                 <span class="badge bg-success-subtle text-success border border-success">{{ val }}</span>
-              {% elif val == 'MISMATCH' or 'DEACTIVATED' in (val|string) or 'FLAGGED' in (val|string) %}
-                <span class="badge bg-warning-subtle text-dark border border-warning">{{ val }}</span>
+              {% elif val == 'MISMATCH' or 'DEACTIVATED' in (val|string) or 'FLAGGED' in (val|string) or 'QUALIFIED' in (val|string) %}
+                <span class="badge bg-warning-subtle text-warning border border-warning">{{ val }}</span>
               {% elif 'Cancelled' in (val|string) or 'REJECTED' in (val|string) %}
                 <span class="badge bg-danger-subtle text-danger border border-danger">{{ val }}</span>
+              {% elif 'CSI' in (val|string) or 'SWD' in (val|string) or 'EDC' in (val|string) or 'ZEPHYR' in (val|string) %}
+                <span class="badge bg-dark font-mono">{{ val }}</span>
               {% else %}
-                {{ val }}
+                <span class="{% if 'count' in key or 'budget' in key or 'rating' in key %}font-mono fw-semibold text-info{% endif %}">{{ val }}</span>
               {% endif %}
             </td>
             {% endfor %}
@@ -55,290 +76,280 @@
       </table>
     </div>
     {% else %}
-    <div class="p-4 text-center text-muted">
-      <i class="bi bi-check-circle fs-2 text-success d-block mb-2"></i>
-      Procedure executed successfully. No rows matched the criteria or qualified for update.
+    <div class="p-5 text-center text-muted">
+      <i class="bi bi-check-circle fs-1 text-success d-block mb-3"></i>
+      <h5 class="text-white fw-bold mb-1">Execution Complete</h5>
+      <p class="text-secondary small mb-0">Procedure processed cleanly with 0 active modifications needed.</p>
     </div>
     {% endif %}
   </div>
 </div>
 {% endif %}
 
-<!-- 8 Procedures Cards Grid -->
+<!-- 8 Production Procedures Cockpit Grid -->
 <div class="row g-4">
-  <!-- Member 1: Procedure 1 -->
-  <div class="col-lg-6">
-    <div class="card h-100 shadow-sm border-start border-4 border-primary">
-      <div class="card-body">
-        <div class="d-flex justify-content-between align-items-start mb-2">
-          <div>
-            <span class="badge bg-primary mb-1">Cursor 1 &bull; Member 1</span>
-            <h5 class="fw-bold mb-0">sp_audit_club_counts</h5>
-          </div>
-          <span class="badge bg-light text-dark border">Audit & Repair</span>
+
+  <!-- ================= MEMBER 1 ================= -->
+  <!-- Cursor 1 -->
+  <div class="col-xl-6">
+    <div class="card h-100 p-4 tilt-card" style="border-left: 3px solid #38bdf8 !important;">
+      <div class="d-flex justify-content-between align-items-start mb-2">
+        <div>
+          <span class="badge bg-info text-dark mb-2">CURSOR 1 &bull; MEMBER 1</span>
+          <h4 class="fw-bold mb-1 text-white">sp_audit_club_counts</h4>
         </div>
-        <p class="text-muted small">
-          Loops over every club using a cursor, compares denormalized <code>Clubs.member_count</code> against actual active <code>Memberships</code> rows, and repairs discrepancies.
-        </p>
-        <form method="POST" action="{{ url_for('main.execute_proc', proc_id='audit') }}" class="mt-3">
-          <div class="d-flex gap-2">
-            <button type="submit" name="p_fix" value="0" class="btn btn-outline-primary btn-sm flex-fill">
-              <i class="bi bi-search me-1"></i> Preview Only (p_fix = 0)
-            </button>
-            <button type="submit" name="p_fix" value="1" class="btn btn-primary btn-sm flex-fill">
-              <i class="bi bi-wrench me-1"></i> Fix Counts (p_fix = 1)
-            </button>
-          </div>
-        </form>
+        <span class="badge bg-dark">Audit &amp; Self-Repair</span>
       </div>
+      <p class="text-secondary small mb-4">
+        Iterates over all recognized clubs using a cursor, compares cached <code>Clubs.member_count</code> against actual active <code>Memberships</code> rows, and repairs drift.
+      </p>
+      <form method="POST" action="{{ url_for('main.execute_proc', proc_id='audit') }}" class="mt-auto">
+        <div class="d-flex gap-2">
+          <button type="submit" name="p_fix" value="0" class="btn btn-outline-primary flex-fill">
+            <i class="bi bi-search me-1"></i> Preview (p_fix = 0)
+          </button>
+          <button type="submit" name="p_fix" value="1" class="btn btn-primary flex-fill">
+            <i class="bi bi-wrench-adjustable me-1"></i> Repair Drift (p_fix = 1)
+          </button>
+        </div>
+      </form>
     </div>
   </div>
 
-  <!-- Member 1: Procedure 2 -->
-  <div class="col-lg-6">
-    <div class="card h-100 shadow-sm border-start border-4 border-primary">
-      <div class="card-body">
-        <div class="d-flex justify-content-between align-items-start mb-2">
-          <div>
-            <span class="badge bg-primary mb-1">Cursor 2 &bull; Member 1</span>
-            <h5 class="fw-bold mb-0">sp_recruitment_leads_and_auto_invite</h5>
-          </div>
-          <span class="badge bg-light text-dark border">Recruitment</span>
+  <!-- Cursor 2 -->
+  <div class="col-xl-6">
+    <div class="card h-100 p-4 tilt-card" style="border-left: 3px solid #38bdf8 !important;">
+      <div class="d-flex justify-content-between align-items-start mb-2">
+        <div>
+          <span class="badge bg-info text-dark mb-2">CURSOR 2 &bull; MEMBER 1</span>
+          <h4 class="fw-bold mb-1 text-white">sp_recruitment_leads_and_auto_invite</h4>
         </div>
-        <p class="text-muted small">
-          Iterates non-members who actively participate in events, determines their favorite club, and can auto-enroll them as active Volunteers.
-        </p>
-        <form method="POST" action="{{ url_for('main.execute_proc', proc_id='recruitment') }}" class="mt-3">
-          <div class="row g-2 align-items-center mb-2">
-            <div class="col-6">
-              <label class="form-label small mb-0 fw-semibold">Min Events Joined:</label>
-              <input type="number" name="p_min_events" class="form-control form-control-sm" value="2" min="1" required>
-            </div>
-          </div>
-          <div class="d-flex gap-2">
-            <button type="submit" name="p_auto_invite" value="0" class="btn btn-outline-primary btn-sm flex-fill">
-              <i class="bi bi-search me-1"></i> Preview Leads (p_auto = 0)
-            </button>
-            <button type="submit" name="p_auto_invite" value="1" class="btn btn-success btn-sm flex-fill">
-              <i class="bi bi-person-plus me-1"></i> Auto-Enroll (p_auto = 1)
-            </button>
-          </div>
-        </form>
+        <span class="badge bg-dark">Recruitment Engine</span>
       </div>
+      <p class="text-secondary small mb-3">
+        Identifies non-members actively participating in campus events, detects their preferred club by attendance frequency, and auto-enrolls them as active Volunteers.
+      </p>
+      <form method="POST" action="{{ url_for('main.execute_proc', proc_id='recruitment') }}" class="mt-auto">
+        <div class="row g-2 mb-3">
+          <div class="col-6">
+            <label class="form-label small text-secondary mb-1">Min Events Joined</label>
+            <input type="number" name="p_min_events" class="form-control" value="1" min="1" required>
+          </div>
+        </div>
+        <div class="d-flex gap-2">
+          <button type="submit" name="p_auto_invite" value="0" class="btn btn-outline-primary flex-fill">
+            <i class="bi bi-search me-1"></i> Preview Leads (0)
+          </button>
+          <button type="submit" name="p_auto_invite" value="1" class="btn btn-success flex-fill">
+            <i class="bi bi-person-plus-fill me-1"></i> Auto-Enroll (1)
+          </button>
+        </div>
+      </form>
     </div>
   </div>
 
-  <!-- Member 2: Procedure 3 -->
-  <div class="col-lg-6">
-    <div class="card h-100 shadow-sm border-start border-4 border-success">
-      <div class="card-body">
-        <div class="d-flex justify-content-between align-items-start mb-2">
-          <div>
-            <span class="badge bg-success mb-1">Cursor 3 &bull; Member 2</span>
-            <h5 class="fw-bold mb-0">sp_reconcile_event_budgets</h5>
-          </div>
-          <span class="badge bg-light text-dark border">Budget Finance</span>
+  <!-- ================= MEMBER 2 ================= -->
+  <!-- Cursor 3 -->
+  <div class="col-xl-6">
+    <div class="card h-100 p-4 tilt-card" style="border-left: 3px solid #10b981 !important;">
+      <div class="d-flex justify-content-between align-items-start mb-2">
+        <div>
+          <span class="badge bg-success text-white mb-2">CURSOR 3 &bull; MEMBER 2</span>
+          <h4 class="fw-bold mb-1 text-white">sp_reconcile_event_budgets</h4>
         </div>
-        <p class="text-muted small">
-          Scans all Completed events, aggregates attendee Feedback ratings, and allocates performance bonus budgets to top-rated events.
-        </p>
-        <form method="POST" action="{{ url_for('main.execute_proc', proc_id='budget') }}" class="mt-3">
-          <div class="row g-2 mb-2">
-            <div class="col-6">
-              <label class="form-label small mb-0 fw-semibold">Min Avg Rating:</label>
-              <input type="number" name="p_min_rating" class="form-control form-control-sm" value="4.50" step="0.1" min="1" max="5" required>
-            </div>
-            <div class="col-6">
-              <label class="form-label small mb-0 fw-semibold">Bonus %:</label>
-              <input type="number" name="p_bonus_pct" class="form-control form-control-sm" value="10.0" step="0.5" min="1" max="100" required>
-            </div>
-          </div>
-          <div class="d-flex gap-2">
-            <button type="submit" name="p_apply" value="0" class="btn btn-outline-success btn-sm flex-fill">
-              <i class="bi bi-search me-1"></i> Preview Bonus (p_apply = 0)
-            </button>
-            <button type="submit" name="p_apply" value="1" class="btn btn-success btn-sm flex-fill">
-              <i class="bi bi-cash-stack me-1"></i> Apply Bonus (p_apply = 1)
-            </button>
-          </div>
-        </form>
+        <span class="badge bg-dark">Financial Performance</span>
       </div>
+      <p class="text-secondary small mb-3">
+        Evaluates Feedback ratings for all Completed events, isolates top-rated initiatives (rating &ge; threshold), and commits financial performance bonus reconciliations.
+      </p>
+      <form method="POST" action="{{ url_for('main.execute_proc', proc_id='budget') }}" class="mt-auto">
+        <div class="row g-2 mb-3">
+          <div class="col-6">
+            <label class="form-label small text-secondary mb-1">Min Avg Rating</label>
+            <input type="number" name="p_min_rating" class="form-control" value="4.00" step="0.1" min="1" max="5" required>
+          </div>
+          <div class="col-6">
+            <label class="form-label small text-secondary mb-1">Bonus %</label>
+            <input type="number" name="p_bonus_pct" class="form-control" value="10.0" step="1" min="1" max="100" required>
+          </div>
+        </div>
+        <div class="d-flex gap-2">
+          <button type="submit" name="p_apply" value="0" class="btn btn-outline-success flex-fill">
+            <i class="bi bi-search me-1"></i> Preview Bonus (0)
+          </button>
+          <button type="submit" name="p_apply" value="1" class="btn btn-success flex-fill">
+            <i class="bi bi-cash-stack me-1"></i> Commit Bonus (1)
+          </button>
+        </div>
+      </form>
     </div>
   </div>
 
-  <!-- Member 2: Procedure 4 -->
-  <div class="col-lg-6">
-    <div class="card h-100 shadow-sm border-start border-4 border-success">
-      <div class="card-body">
-        <div class="d-flex justify-content-between align-items-start mb-2">
-          <div>
-            <span class="badge bg-success mb-1">Cursor 4 &bull; Member 2</span>
-            <h5 class="fw-bold mb-0">sp_close_past_events</h5>
-          </div>
-          <span class="badge bg-light text-dark border">Lifecycle</span>
+  <!-- Cursor 4 -->
+  <div class="col-xl-6">
+    <div class="card h-100 p-4 tilt-card" style="border-left: 3px solid #10b981 !important;">
+      <div class="d-flex justify-content-between align-items-start mb-2">
+        <div>
+          <span class="badge bg-success text-white mb-2">CURSOR 4 &bull; MEMBER 2</span>
+          <h4 class="fw-bold mb-1 text-white">sp_close_past_events</h4>
         </div>
-        <p class="text-muted small">
-          Identifies past scheduled events lingering in 'Planned'. Reconciles to 'Completed' if attendees attended, or 'Cancelled' if 0 attendees showed up.
-        </p>
-        <form method="POST" action="{{ url_for('main.execute_proc', proc_id='close_events') }}" class="mt-3">
-          <div class="row g-2 mb-2">
-            <div class="col-8">
-              <label class="form-label small mb-0 fw-semibold">Cutoff Date:</label>
-              <input type="date" name="p_cutoff_date" class="form-control form-control-sm" value="2026-10-31" required>
-            </div>
-          </div>
-          <div class="d-flex gap-2">
-            <button type="submit" name="p_apply" value="0" class="btn btn-outline-success btn-sm flex-fill">
-              <i class="bi bi-search me-1"></i> Preview Closure (p_apply = 0)
-            </button>
-            <button type="submit" name="p_apply" value="1" class="btn btn-success btn-sm flex-fill">
-              <i class="bi bi-check2-circle me-1"></i> Close Events (p_apply = 1)
-            </button>
-          </div>
-        </form>
+        <span class="badge bg-dark">Event Lifecycle</span>
       </div>
+      <p class="text-secondary small mb-3">
+        Scans past events lingering in 'Planned'. Reconciles status to 'Completed' if attendees attended, or flips to 'Cancelled' if zero attendance was recorded.
+      </p>
+      <form method="POST" action="{{ url_for('main.execute_proc', proc_id='close_events') }}" class="mt-auto">
+        <div class="row g-2 mb-3">
+          <div class="col-7">
+            <label class="form-label small text-secondary mb-1">Cutoff Date</label>
+            <input type="date" name="p_cutoff_date" class="form-control" value="2026-12-31" required>
+          </div>
+        </div>
+        <div class="d-flex gap-2">
+          <button type="submit" name="p_apply" value="0" class="btn btn-outline-success flex-fill">
+            <i class="bi bi-search me-1"></i> Preview Closure (0)
+          </button>
+          <button type="submit" name="p_apply" value="1" class="btn btn-success flex-fill">
+            <i class="bi bi-check2-circle me-1"></i> Close Events (1)
+          </button>
+        </div>
+      </form>
     </div>
   </div>
 
-  <!-- Member 3: Procedure 5 -->
-  <div class="col-lg-6">
-    <div class="card h-100 shadow-sm border-start border-4 border-warning">
-      <div class="card-body">
-        <div class="d-flex justify-content-between align-items-start mb-2">
-          <div>
-            <span class="badge bg-warning text-dark mb-1">Cursor 5 &bull; Member 3</span>
-            <h5 class="fw-bold mb-0">sp_deactivate_inactive_members</h5>
-          </div>
-          <span class="badge bg-light text-dark border">Discipline</span>
+  <!-- ================= MEMBER 3 ================= -->
+  <!-- Cursor 5 -->
+  <div class="col-xl-6">
+    <div class="card h-100 p-4 tilt-card" style="border-left: 3px solid #f59e0b !important;">
+      <div class="d-flex justify-content-between align-items-start mb-2">
+        <div>
+          <span class="badge bg-warning text-dark mb-2">CURSOR 5 &bull; MEMBER 3</span>
+          <h4 class="fw-bold mb-1 text-white">sp_deactivate_inactive_members</h4>
         </div>
-        <p class="text-muted small">
-          Scans active non-executive members, counts missed event registrations within their club, and sets chronic absentees to 'Inactive' while decrementing club count.
-        </p>
-        <form method="POST" action="{{ url_for('main.execute_proc', proc_id='deactivate') }}" class="mt-3">
-          <div class="row g-2 mb-2">
-            <div class="col-6">
-              <label class="form-label small mb-0 fw-semibold">Max Missed Events:</label>
-              <input type="number" name="p_max_missed_events" class="form-control form-control-sm" value="2" min="1" required>
-            </div>
-          </div>
-          <div class="d-flex gap-2">
-            <button type="submit" name="p_apply" value="0" class="btn btn-outline-warning text-dark btn-sm flex-fill">
-              <i class="bi bi-search me-1"></i> Audit Absentees (p_apply = 0)
-            </button>
-            <button type="submit" name="p_apply" value="1" class="btn btn-warning text-dark btn-sm flex-fill">
-              <i class="bi bi-person-x me-1"></i> Deactivate (p_apply = 1)
-            </button>
-          </div>
-        </form>
+        <span class="badge bg-dark">Attendance Governance</span>
       </div>
+      <p class="text-secondary small mb-3">
+        Enforces membership constitution: flags active non-executive members who registered but skipped host club events &ge; threshold, marking them Inactive.
+      </p>
+      <form method="POST" action="{{ url_for('main.execute_proc', proc_id='deactivate') }}" class="mt-auto">
+        <div class="row g-2 mb-3">
+          <div class="col-6">
+            <label class="form-label small text-secondary mb-1">Max Missed Events</label>
+            <input type="number" name="p_max_missed_events" class="form-control" value="1" min="1" required>
+          </div>
+        </div>
+        <div class="d-flex gap-2">
+          <button type="submit" name="p_apply" value="0" class="btn btn-outline-warning text-warning flex-fill">
+            <i class="bi bi-search me-1"></i> Audit Absentees (0)
+          </button>
+          <button type="submit" name="p_apply" value="1" class="btn btn-warning text-dark flex-fill">
+            <i class="bi bi-person-x-fill me-1"></i> Deactivate (1)
+          </button>
+        </div>
+      </form>
     </div>
   </div>
 
-  <!-- Member 3: Procedure 6 -->
-  <div class="col-lg-6">
-    <div class="card h-100 shadow-sm border-start border-4 border-warning">
-      <div class="card-body">
-        <div class="d-flex justify-content-between align-items-start mb-2">
-          <div>
-            <span class="badge bg-warning text-dark mb-1">Cursor 6 &bull; Member 3</span>
-            <h5 class="fw-bold mb-0">sp_award_active_contributors</h5>
-          </div>
-          <span class="badge bg-light text-dark border">Merit Promotion</span>
+  <!-- Cursor 6 -->
+  <div class="col-xl-6">
+    <div class="card h-100 p-4 tilt-card" style="border-left: 3px solid #f59e0b !important;">
+      <div class="d-flex justify-content-between align-items-start mb-2">
+        <div>
+          <span class="badge bg-warning text-dark mb-2">CURSOR 6 &bull; MEMBER 3</span>
+          <h4 class="fw-bold mb-1 text-white">sp_award_active_contributors</h4>
         </div>
-        <p class="text-muted small">
-          Evaluates event participation across all students. Promotes active regular Members with high attendance to 'Core Member'.
-        </p>
-        <form method="POST" action="{{ url_for('main.execute_proc', proc_id='promote') }}" class="mt-3">
-          <div class="row g-2 mb-2">
-            <div class="col-6">
-              <label class="form-label small mb-0 fw-semibold">Target Student:</label>
-              <input type="text" name="p_student_id" class="form-control form-control-sm" value="ALL" required>
-            </div>
-            <div class="col-6">
-              <label class="form-label small mb-0 fw-semibold">Min Attended:</label>
-              <input type="number" name="p_min_attended" class="form-control form-control-sm" value="3" min="1" required>
-            </div>
-          </div>
-          <div class="d-flex gap-2">
-            <button type="submit" name="p_apply" value="0" class="btn btn-outline-warning text-dark btn-sm flex-fill">
-              <i class="bi bi-search me-1"></i> Preview (p_apply = 0)
-            </button>
-            <button type="submit" name="p_apply" value="1" class="btn btn-warning text-dark btn-sm flex-fill">
-              <i class="bi bi-award me-1"></i> Promote (p_apply = 1)
-            </button>
-          </div>
-        </form>
+        <span class="badge bg-dark">Merit Leadership</span>
       </div>
+      <p class="text-secondary small mb-3">
+        Evaluates cross-campus attendance. Regular members with high verified participation (&ge; threshold) are promoted directly to 'Core Member' in Memberships.
+      </p>
+      <form method="POST" action="{{ url_for('main.execute_proc', proc_id='promote') }}" class="mt-auto">
+        <div class="row g-2 mb-3">
+          <div class="col-6">
+            <label class="form-label small text-secondary mb-1">Target Student</label>
+            <input type="text" name="p_student_id" class="form-control" value="ALL" required>
+          </div>
+          <div class="col-6">
+            <label class="form-label small text-secondary mb-1">Min Attended</label>
+            <input type="number" name="p_min_attended" class="form-control" value="1" min="1" required>
+          </div>
+        </div>
+        <div class="d-flex gap-2">
+          <button type="submit" name="p_apply" value="0" class="btn btn-outline-warning text-warning flex-fill">
+            <i class="bi bi-search me-1"></i> Preview Merit (0)
+          </button>
+          <button type="submit" name="p_apply" value="1" class="btn btn-warning text-dark flex-fill">
+            <i class="bi bi-trophy-fill me-1"></i> Promote to Core (1)
+          </button>
+        </div>
+      </form>
     </div>
   </div>
 
-  <!-- Member 4: Procedure 7 -->
-  <div class="col-lg-6">
-    <div class="card h-100 shadow-sm border-start border-4 border-info">
-      <div class="card-body">
-        <div class="d-flex justify-content-between align-items-start mb-2">
-          <div>
-            <span class="badge bg-info text-dark mb-1">Cursor 7 &bull; Member 4</span>
-            <h5 class="fw-bold mb-0">sp_senior_graduation_rollout</h5>
-          </div>
-          <span class="badge bg-light text-dark border">Alumni Transition</span>
+  <!-- ================= MEMBER 4 ================= -->
+  <!-- Cursor 7 -->
+  <div class="col-xl-6">
+    <div class="card h-100 p-4 tilt-card" style="border-left: 3px solid #a855f7 !important;">
+      <div class="d-flex justify-content-between align-items-start mb-2">
+        <div>
+          <span class="badge bg-purple text-white mb-2" style="background: rgba(168, 85, 247, 0.3); border: 1px solid #a855f7;">CURSOR 7 &bull; MEMBER 4</span>
+          <h4 class="fw-bold mb-1 text-white">sp_senior_graduation_rollout</h4>
         </div>
-        <p class="text-muted small">
-          At graduation, identifies active club memberships of final-year students (year_of_study = 4), transitions them to 'Inactive' Alumni, and updates club counts.
-        </p>
-        <form method="POST" action="{{ url_for('main.execute_proc', proc_id='grad') }}" class="mt-3">
-          <div class="row g-2 mb-2">
-            <div class="col-6">
-              <label class="form-label small mb-0 fw-semibold">Graduating Year:</label>
-              <input type="number" name="p_grad_year" class="form-control form-control-sm" value="4" min="1" max="4" required>
-            </div>
-          </div>
-          <div class="d-flex gap-2">
-            <button type="submit" name="p_apply" value="0" class="btn btn-outline-info text-dark btn-sm flex-fill">
-              <i class="bi bi-search me-1"></i> Preview Seniors (p_apply = 0)
-            </button>
-            <button type="submit" name="p_apply" value="1" class="btn btn-info text-dark btn-sm flex-fill">
-              <i class="bi bi-mortarboard me-1"></i> Transition Alumni (p_apply = 1)
-            </button>
-          </div>
-        </form>
+        <span class="badge bg-dark">Alumni Exit</span>
       </div>
+      <p class="text-secondary small mb-3">
+        Annual academic session transition: identifies active memberships held by final-year students (year_of_study = 4), transitions them to Alumni ('Inactive'), and updates counts.
+      </p>
+      <form method="POST" action="{{ url_for('main.execute_proc', proc_id='grad') }}" class="mt-auto">
+        <div class="row g-2 mb-3">
+          <div class="col-6">
+            <label class="form-label small text-secondary mb-1">Graduation Year</label>
+            <input type="number" name="p_grad_year" class="form-control" value="4" min="1" max="4" required>
+          </div>
+        </div>
+        <div class="d-flex gap-2">
+          <button type="submit" name="p_apply" value="0" class="btn btn-outline-info flex-fill">
+            <i class="bi bi-search me-1"></i> Preview Seniors (0)
+          </button>
+          <button type="submit" name="p_apply" value="1" class="btn btn-info text-dark flex-fill">
+            <i class="bi bi-mortarboard-fill me-1"></i> Transition Alumni (1)
+          </button>
+        </div>
+      </form>
     </div>
   </div>
 
-  <!-- Member 4: Procedure 8 -->
-  <div class="col-lg-6">
-    <div class="card h-100 shadow-sm border-start border-4 border-info">
-      <div class="card-body">
-        <div class="d-flex justify-content-between align-items-start mb-2">
-          <div>
-            <span class="badge bg-info text-dark mb-1">Cursor 8 &bull; Member 4</span>
-            <h5 class="fw-bold mb-0">sp_anonymize_sensitive_feedback</h5>
-          </div>
-          <span class="badge bg-light text-dark border">Privacy Protection</span>
+  <!-- Cursor 8 -->
+  <div class="col-xl-6">
+    <div class="card h-100 p-4 tilt-card" style="border-left: 3px solid #a855f7 !important;">
+      <div class="d-flex justify-content-between align-items-start mb-2">
+        <div>
+          <span class="badge bg-purple text-white mb-2" style="background: rgba(168, 85, 247, 0.3); border: 1px solid #a855f7;">CURSOR 8 &bull; MEMBER 4</span>
+          <h4 class="fw-bold mb-1 text-white">sp_anonymize_sensitive_feedback</h4>
         </div>
-        <p class="text-muted small">
-          Scans critical reviews (rating &le; threshold) and protects student identities by standardizing with <code>[PROTECTED ANONYMOUS REVIEW]</code> in Feedback.
-        </p>
-        <form method="POST" action="{{ url_for('main.execute_proc', proc_id='privacy') }}" class="mt-3">
-          <div class="row g-2 mb-2">
-            <div class="col-6">
-              <label class="form-label small mb-0 fw-semibold">Rating Threshold:</label>
-              <input type="number" name="p_low_rating_threshold" class="form-control form-control-sm" value="2" min="1" max="5" required>
-            </div>
-          </div>
-          <div class="d-flex gap-2">
-            <button type="submit" name="p_apply" value="0" class="btn btn-outline-info text-dark btn-sm flex-fill">
-              <i class="bi bi-search me-1"></i> Preview Critical (p_apply = 0)
-            </button>
-            <button type="submit" name="p_apply" value="1" class="btn btn-info text-dark btn-sm flex-fill">
-              <i class="bi bi-shield-check me-1"></i> Anonymize (p_apply = 1)
-            </button>
-          </div>
-        </form>
+        <span class="badge bg-dark">Privacy Protection</span>
       </div>
+      <p class="text-secondary small mb-3">
+        Student Grievance Protection Policy: iterates low-rating reviews (&le; threshold) and automatically replaces comments with protected standardized tags in Feedback.
+      </p>
+      <form method="POST" action="{{ url_for('main.execute_proc', proc_id='privacy') }}" class="mt-auto">
+        <div class="row g-2 mb-3">
+          <div class="col-6">
+            <label class="form-label small text-secondary mb-1">Rating Threshold</label>
+            <input type="number" name="p_low_rating_threshold" class="form-control" value="3" min="1" max="5" required>
+          </div>
+        </div>
+        <div class="d-flex gap-2">
+          <button type="submit" name="p_apply" value="0" class="btn btn-outline-info flex-fill">
+            <i class="bi bi-search me-1"></i> Audit Critical (0)
+          </button>
+          <button type="submit" name="p_apply" value="1" class="btn btn-info text-dark flex-fill">
+            <i class="bi bi-shield-lock-fill me-1"></i> Anonymize (1)
+          </button>
+        </div>
+      </form>
     </div>
   </div>
+
 </div>
 {% endblock %}
-
