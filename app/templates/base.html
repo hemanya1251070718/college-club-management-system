@@ -45,7 +45,6 @@
           <li class="nav-item">
             <a class="nav-link {% if 'memberships' in request.path %}active{% endif %}" href="{{ url_for('main.list_memberships') }}">
               <i class="bi bi-person-badge me-1"></i> Memberships
-              <span class="badge bg-warning text-dark ms-1" style="font-size: 0.65rem;">Trigger</span>
             </a>
           </li>
           <li class="nav-item">
@@ -53,19 +52,31 @@
               <i class="bi bi-calendar-event me-1"></i> Events
             </a>
           </li>
+          <li class="nav-item">
+            <a class="nav-link {% if 'triggers' in request.path %}active{% endif %}" href="{{ url_for('main.list_triggers') }}">
+              <i class="bi bi-lightning-charge me-1"></i> Triggers
+              <span class="badge bg-warning text-dark ms-1" style="font-size: 0.65rem;">8 Triggers</span>
+            </a>
+          </li>
           <li class="nav-item dropdown">
             <a class="nav-link dropdown-toggle {% if 'procedures' in request.path %}active{% endif %}" href="#" role="button" data-bs-toggle="dropdown">
               <i class="bi bi-cpu me-1"></i> Stored Procedures
             </a>
-            <ul class="dropdown-menu">
+            <ul class="dropdown-menu shadow">
               <li>
-                <a class="dropdown-item" href="{{ url_for('main.proc_student_clubs') }}">
-                  <i class="bi bi-journal-check me-2"></i> GetStudentClubs (Procedure)
+                <a class="dropdown-item fw-semibold text-primary" href="{{ url_for('main.procedures_hub') }}">
+                  <i class="bi bi-grid-fill me-2"></i> All 8 Cursor Procedures Hub
+                </a>
+              </li>
+              <li><hr class="dropdown-divider"></li>
+              <li>
+                <a class="dropdown-item" href="{{ url_for('main.proc_audit') }}">
+                  <i class="bi bi-patch-check me-2"></i> Cursor 1: Audit Club Counts
                 </a>
               </li>
               <li>
-                <a class="dropdown-item" href="{{ url_for('main.proc_audit') }}">
-                  <i class="bi bi-patch-check me-2"></i> sp_audit_club_counts (Cursor Procedure)
+                <a class="dropdown-item" href="{{ url_for('main.proc_student_clubs') }}">
+                  <i class="bi bi-journal-check me-2"></i> Baseline: GetStudentClubs
                 </a>
               </li>
             </ul>
@@ -105,25 +116,24 @@
     {% endwith %}
   </div>
 
-  <!-- Main Content Block -->
-  <main class="container-fluid px-4 py-3 flex-grow-1">
+  <!-- Main Content Container -->
+  <main class="container-fluid px-4 py-3">
     {% block content %}{% endblock %}
   </main>
 
   <!-- Footer -->
-  <footer class="footer py-3 mt-4">
-    <div class="container-fluid px-4 d-flex flex-wrap justify-content-between align-items-center">
+  <footer class="footer mt-auto py-3 bg-white border-top">
+    <div class="container-fluid px-4 d-flex flex-wrap justify-content-between align-items-center text-muted small">
       <div>
-        <strong>College Club Management System</strong> &bull; Cloud Deployment Task
+        <strong>VIT Pune College Club Management System</strong> &bull; Production DBMS
       </div>
       <div>
-        <span class="badge bg-secondary me-2">Flask 3.1 + MySQL 8.0</span>
-        <span class="badge bg-primary">Google Cloud Run</span>
+        <span>Dual Connection Architecture (GCP Cloud SQL &bull; Local Proxy)</span>
       </div>
     </div>
   </footer>
 
-  <!-- Bootstrap 5 Bundle JS -->
+  <!-- Bootstrap 5 JS Bundle -->
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
   <!-- Custom JS -->
   <script src="{{ url_for('static', filename='js/main.js') }}"></script>

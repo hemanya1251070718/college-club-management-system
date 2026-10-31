@@ -4,13 +4,16 @@
 
 {% block content %}
 <div class="row align-items-center mb-4">
-  <div class="col-md-8">
+  <div class="col-md-7">
     <h2 class="fw-bold mb-1">Club Management Dashboard</h2>
-    <p class="text-muted mb-0">Production DBMS deployment on Google Cloud Platform (Cloud Run &bull; Cloud SQL MySQL 8.0 &bull; Secret Manager)</p>
+    <p class="text-muted mb-0">Production DBMS deployment on Google Cloud Platform &bull; Cloud SQL MySQL 8.0 &bull; 8 Triggers &bull; 8 Cursors</p>
   </div>
-  <div class="col-md-4 text-md-end mt-3 mt-md-0">
-    <a href="{{ url_for('main.create_membership') }}" class="btn btn-warning me-2 text-dark fw-semibold">
-      <i class="bi bi-lightning-charge-fill me-1"></i> Add Member (Test Trigger)
+  <div class="col-md-5 text-md-end mt-3 mt-md-0 d-flex justify-content-md-end gap-2">
+    <a href="{{ url_for('main.list_triggers') }}" class="btn btn-warning text-dark fw-semibold">
+      <i class="bi bi-lightning-charge-fill me-1"></i> 8 Triggers
+    </a>
+    <a href="{{ url_for('main.procedures_hub') }}" class="btn btn-info text-dark fw-semibold">
+      <i class="bi bi-cpu-fill me-1"></i> 8 Cursors Hub
     </a>
     <a href="{{ url_for('main.create_club') }}" class="btn btn-primary">
       <i class="bi bi-plus-circle me-1"></i> New Club
@@ -123,7 +126,7 @@
     </div>
   </div>
 
-  <!-- Recent Events & Quick Links -->
+  <!-- Recent Events & DBMS Features Notice -->
   <div class="col-lg-4">
     <div class="card shadow-sm mb-4">
       <div class="card-header bg-white py-3">
@@ -147,18 +150,18 @@
       </div>
     </div>
 
-    <!-- Cloud Architecture Notice -->
-    <div class="card border-info bg-light">
+    <!-- Advanced DBMS Engine Summary -->
+    <div class="card border-primary bg-light">
       <div class="card-body p-3">
-        <h6 class="fw-bold text-info"><i class="bi bi-cloud-check-fill me-2"></i>Cloud Integration Verified</h6>
+        <h6 class="fw-bold text-primary"><i class="bi bi-check2-circle me-2"></i>Full DBMS System Operational</h6>
         <p class="small text-muted mb-2">
-          This system demonstrates full CRUD on Cloud SQL (MySQL 8.0) hosted on GCP Cloud Run with zero secrets in code.
+          Production evaluation standard: 8 canonical domain tables with complete stored procedures and trigger coverage.
         </p>
         <ul class="small text-muted ps-3 mb-0">
-          <li>Live <code>trg_increase_member_count</code> trigger updates</li>
-          <li>Database View <code>ClubSummary</code></li>
-          <li>Stored Procedure <code>GetStudentClubs</code></li>
-          <li>Health status endpoint at <code>/health</code></li>
+          <li><strong>8 Triggers:</strong> Syncs counts, prevents 2nd president, verifies feedback & attendance</li>
+          <li><strong>8 Cursors:</strong> Audits, auto-recruitment, budget bonuses, absentee deactivations</li>
+          <li><strong>SQL View:</strong> <code>ClubSummary</code> live aggregation</li>
+          <li><strong>Health Check:</strong> <code>/health</code> JSON & UI probe</li>
         </ul>
       </div>
     </div>

@@ -7,7 +7,8 @@
 --   Students, FacultyCoordinators, Clubs, ClubProfile, Memberships,
 --   Events, EventRegistrations, Feedback
 -- Safe to run again and again (it drops and rebuilds everything).
--- The trigger demo is in the separate file: Trigger_Demo_Steps.sql
+-- The trigger demo is in: Trigger_Assignment.sql
+-- The cursor demo is in:  Cursor_Assignment.sql (or cursor.sql)
 -- ===========================================================
 
 
@@ -28,7 +29,7 @@ USE trial_club;
 
 
 -- ===========================================================
--- DROP EXISTING TABLES / OBJECTS
+-- DROP EXISTING TABLES / OBJECTS (Clean Rebuild)
 -- ===========================================================
 
 DROP TABLE IF EXISTS Feedback;
@@ -42,10 +43,31 @@ DROP TABLE IF EXISTS Students;
 
 DROP VIEW IF EXISTS ClubSummary;
 DROP PROCEDURE IF EXISTS GetStudentClubs;
+
+-- Drop all 8 assignment triggers if previously installed
+DROP TRIGGER IF EXISTS trg_after_membership_insert_sync_count;
+DROP TRIGGER IF EXISTS trg_after_membership_delete_sync_count;
+DROP TRIGGER IF EXISTS trg_prevent_multiple_presidents;
+DROP TRIGGER IF EXISTS trg_adjust_member_count_on_status_change;
+DROP TRIGGER IF EXISTS trg_prevent_registration_for_completed_event;
+DROP TRIGGER IF EXISTS trg_verify_feedback_registration;
+DROP TRIGGER IF EXISTS trg_auto_progress_event_on_attendance;
+DROP TRIGGER IF EXISTS trg_auto_create_club_profile;
 DROP TRIGGER IF EXISTS trg_increase_member_count;
 DROP TRIGGER IF EXISTS trg_decrease_member_count;
 DROP TRIGGER IF EXISTS trg_update_member_count;
 DROP TRIGGER IF EXISTS increase_member_count;
+
+-- Drop all 8 assignment stored procedures if previously installed
+DROP PROCEDURE IF EXISTS sp_audit_club_counts;
+DROP PROCEDURE IF EXISTS sp_recruitment_leads_and_auto_invite;
+DROP PROCEDURE IF EXISTS sp_reconcile_event_budgets;
+DROP PROCEDURE IF EXISTS sp_close_past_events;
+DROP PROCEDURE IF EXISTS sp_deactivate_inactive_members;
+DROP PROCEDURE IF EXISTS sp_award_active_contributors;
+DROP PROCEDURE IF EXISTS sp_senior_graduation_rollout;
+DROP PROCEDURE IF EXISTS sp_anonymize_sensitive_feedback;
+DROP PROCEDURE IF EXISTS sp_recruitment_leads;
 
 
 -- ===========================================================
@@ -164,7 +186,7 @@ CREATE TABLE Events (
 -- 7. EVENT REGISTRATIONS TABLE
 -- Note: a student can appear here WITHOUT ever appearing in
 -- Memberships — that's exactly how a non-member attending an
--- event is represented (see the BONUS CHECK query at the bottom).
+-- event is represented.
 -- ===========================================================
 
 CREATE TABLE EventRegistrations (
@@ -224,10 +246,8 @@ CREATE TABLE Feedback (
 ) ENGINE=InnoDB;
 
 
-
-
 -- ===========================================================
--- STORED PROCEDURE
+-- STORED PROCEDURE (Baseline Utility)
 -- ===========================================================
 
 DELIMITER $$
@@ -268,7 +288,8 @@ JOIN FacultyCoordinators f ON c.faculty_id = f.faculty_id;
 
 
 -- ===========================================================
--- STUDENTS (all 69 — includes both club members AND non-members)
+-- STUDENTS (Original 69 + 6 additions for assignment coverage = 75 total)
+-- Includes students from Year 1, 2, 3 and graduating Year 4 seniors.
 -- ===========================================================
 
 INSERT INTO Students (student_id, prn_number, name, email, phone, dept_id, dept_name, year_of_study)
@@ -478,6 +499,25 @@ VALUES ('CE25-0282', '1251070282', 'Ayush Shailesh Jadhav', 'ayush.1251070282@vi
 INSERT INTO Students (student_id, prn_number, name, email, phone, dept_id, dept_name, year_of_study)
 VALUES ('CE25-0152', '1251070152', 'Tanmay Dattatray Kachare', 'tanmay.1251070152@vit.edu', '8767526391', 'CE', 'Computer Engineering', 1);
 
+-- Additional Students (Final-year Year 4 seniors for graduation rollout, plus active event participants)
+INSERT INTO Students (student_id, prn_number, name, email, phone, dept_id, dept_name, year_of_study)
+VALUES ('ME25-0014', '1251070014', 'Rohan Deshmukh', 'rohan.deshmukh@vit.edu', '9822334455', 'ME', 'Mechanical Engineering', 4);
+
+INSERT INTO Students (student_id, prn_number, name, email, phone, dept_id, dept_name, year_of_study)
+VALUES ('CE25-0021', '1251070021', 'Pooja Kulkarni', 'pooja.kulkarni@vit.edu', '9822334456', 'CE', 'Computer Engineering', 4);
+
+INSERT INTO Students (student_id, prn_number, name, email, phone, dept_id, dept_name, year_of_study)
+VALUES ('EE25-0035', '1251070035', 'Tanvi Shinde', 'tanvi.shinde@vit.edu', '9822334457', 'EE', 'Electronics Engineering', 4);
+
+INSERT INTO Students (student_id, prn_number, name, email, phone, dept_id, dept_name, year_of_study)
+VALUES ('CE25-0042', '1251070042', 'Amit Patil', 'amit.patil@vit.edu', '9822334458', 'CE', 'Computer Engineering', 2);
+
+INSERT INTO Students (student_id, prn_number, name, email, phone, dept_id, dept_name, year_of_study)
+VALUES ('ELE25-0058', '1251070058', 'Neha Joshi', 'neha.joshi@vit.edu', '9822334459', 'ELE', 'Electrical Engineering', 2);
+
+INSERT INTO Students (student_id, prn_number, name, email, phone, dept_id, dept_name, year_of_study)
+VALUES ('ME25-0063', '1251070063', 'Varun Kadam', 'varun.kadam@vit.edu', '9822334460', 'ME', 'Mechanical Engineering', 3);
+
 
 -- ===========================================================
 -- FACULTY COORDINATORS
@@ -536,7 +576,7 @@ VALUES ('ZEPHYR', 'Zephyr', 'Dance', 'ME-VP',
 
 INSERT INTO Clubs (club_id, club_name, category, faculty_id, description)
 VALUES ('CSA', 'Computer Society Association', 'Technical', 'ME-VP',
-'VIT Pune''s official tech  club, bringing together dancers across genres to choreograph, perform, and compete at inter-college fests');
+'VIT Pune''s emerging computer association fostering cross-department coding competitions and tech initiatives');
 
 
 -- ===========================================================
@@ -557,16 +597,7 @@ VALUES ('ZEPHYR', 'zephyr@vit.edu', '@zephyr_vitpune');
 
 
 -- ===========================================================
--- MEMBERSHIPS (initial load; after the modifications below the table
--- holds 86 rows. Clean leadership structure: each club has exactly one President,
--- Secretary, Treasurer, and Event Coordinator)
---
--- 10 students deliberately have NO row here at all (12 more are
--- added as non-members by the modifications block, so 22 in total): CE25-0692, EE25-0191, ELE25-0666, ELE25-0575,
--- CE25-0856, CE25-0240, CE25-0100, CE25-1032, CE25-0165, EE25-0497.
--- These are true non-members. The first four still appear in
--- EventRegistrations below — proving a student can attend an
--- event without ever joining a club.
+-- MEMBERSHIPS
 -- ===========================================================
 
 -- ----- CSI members -----
@@ -763,8 +794,28 @@ VALUES ('EDC-0870', 'CE25-0870', 'EDC', 'Member', '2025-10-15', 'Active');
 INSERT INTO Memberships (membership_id, student_id, club_id, role, join_date, status)
 VALUES ('SWD-0870', 'CE25-0870', 'SWD', 'Member', '2025-11-01', 'Active');
 
+-- Additional Memberships for Graduating Seniors (Year 4) and Assignment Testing
+INSERT INTO Memberships (membership_id, student_id, club_id, role, join_date, status)
+VALUES ('CSI-0021', 'CE25-0021', 'CSI', 'Core Member', '2023-08-01', 'Active');
+
+INSERT INTO Memberships (membership_id, student_id, club_id, role, join_date, status)
+VALUES ('EDC-0035', 'EE25-0035', 'EDC', 'Core Member', '2023-08-01', 'Active');
+
+INSERT INTO Memberships (membership_id, student_id, club_id, role, join_date, status)
+VALUES ('SWD-0014', 'ME25-0014', 'SWD', 'Core Member', '2023-08-01', 'Active');
+
+INSERT INTO Memberships (membership_id, student_id, club_id, role, join_date, status)
+VALUES ('CSI-0042', 'CE25-0042', 'CSI', 'Member', '2025-08-10', 'Active');
+
+INSERT INTO Memberships (membership_id, student_id, club_id, role, join_date, status)
+VALUES ('EDC-0058', 'ELE25-0058', 'EDC', 'Member', '2025-08-10', 'Active');
+
+INSERT INTO Memberships (membership_id, student_id, club_id, role, join_date, status)
+VALUES ('ZEPHYR-0063', 'ME25-0063', 'ZEPHYR', 'Member', '2025-08-10', 'Active');
+
+
 -- ===========================================================
--- EVENTS
+-- EVENTS (10 Original + 2 Historical Planned for Lifecycle Processing = 12 total)
 -- ===========================================================
 
 INSERT INTO Events (event_id, club_id, event_name, event_date, venue, budget_allocated, event_type, status)
@@ -799,13 +850,16 @@ VALUES ('SWD26-BLOOD', 'SWD', 'Blood Donation Camp', '2026-09-20', 'College Grou
 INSERT INTO Events (event_id, club_id, event_name, event_date, venue, budget_allocated, event_type, status)
 VALUES ('ZEPH26-FRESH', 'ZEPHYR', 'Freshers Dance Meet', '2026-09-12', 'Open Air Theatre', 18000.00, 'Cultural', 'Planned');
 
+-- Historical past events (Planned but event_date is past; used for automated closure cursor)
+INSERT INTO Events (event_id, club_id, event_name, event_date, venue, budget_allocated, event_type, status)
+VALUES ('CSI25-PYW', 'CSI', 'Python & Data Science Workshop', '2025-10-15', 'IT Lab 2', 20000.00, 'Workshop', 'Planned');
+
+INSERT INTO Events (event_id, club_id, event_name, event_date, venue, budget_allocated, event_type, status)
+VALUES ('EDC25-IDEA', 'EDC', 'Campus Ideathon 25', '2025-11-01', 'Seminar Hall 3', 15000.00, 'Entrepreneurship', 'Planned');
+
 
 -- ===========================================================
 -- EVENT REGISTRATIONS
--- Note: ME25-0893, CE25-0369 remain real members attending their
--- own club's event (normal case). CE25-0692, EE25-0191,
--- ELE25-0666, ELE25-0575 are now NON-members attending events —
--- the exact case sir asked about, now cleanly demonstrable.
 -- ===========================================================
 
 INSERT INTO EventRegistrations (registration_id, event_id, student_id, registration_date, attendance_status)
@@ -838,52 +892,100 @@ VALUES ('BLOOD26-0575', 'SWD26-BLOOD', 'ELE25-0575', '2026-09-10', 'Registered')
 INSERT INTO EventRegistrations (registration_id, event_id, student_id, registration_date, attendance_status)
 VALUES ('FRESH26-0885', 'ZEPH26-FRESH', 'ME25-0885', '2026-09-01', 'Registered');
 
+-- Additional registrations supporting cursors & triggers
+INSERT INTO EventRegistrations (registration_id, event_id, student_id, registration_date, attendance_status)
+VALUES ('PYW25-0042', 'CSI25-PYW', 'CE25-0042', '2025-10-01', 'Attended');
+
+INSERT INTO EventRegistrations (registration_id, event_id, student_id, registration_date, attendance_status)
+VALUES ('PYW25-0021', 'CSI25-PYW', 'CE25-0021', '2025-10-02', 'Attended');
+
+INSERT INTO EventRegistrations (registration_id, event_id, student_id, registration_date, attendance_status)
+VALUES ('WEB26-0042', 'CSI26-WEB', 'CE25-0042', '2026-10-01', 'Attended');
+
+INSERT INTO EventRegistrations (registration_id, event_id, student_id, registration_date, attendance_status)
+VALUES ('TF26-0042', 'CSI26-TF', 'CE25-0042', '2026-09-05', 'Attended');
+
+INSERT INTO EventRegistrations (registration_id, event_id, student_id, registration_date, attendance_status)
+VALUES ('ES26-0042', 'EDC26-ES', 'CE25-0042', '2026-09-15', 'Attended');
+
+INSERT INTO EventRegistrations (registration_id, event_id, student_id, registration_date, attendance_status)
+VALUES ('GF25-0063', 'ZEPH26-GF', 'ME25-0063', '2025-11-05', 'Registered');
+
+INSERT INTO EventRegistrations (registration_id, event_id, student_id, registration_date, attendance_status)
+VALUES ('FRESH26-0063', 'ZEPH26-FRESH', 'ME25-0063', '2026-09-02', 'Registered');
+
+INSERT INTO EventRegistrations (registration_id, event_id, student_id, registration_date, attendance_status)
+VALUES ('ES26-0058', 'EDC26-ES', 'ELE25-0058', '2026-09-15', 'Attended');
+
+INSERT INTO EventRegistrations (registration_id, event_id, student_id, registration_date, attendance_status)
+VALUES ('PITCH26-0058', 'EDC26-PITCH', 'ELE25-0058', '2026-10-22', 'Attended');
+
 
 -- ===========================================================
--- FEEDBACK
+-- FEEDBACK (Rich sample covering Club & Event, high & low ratings)
 -- ===========================================================
 
+-- Club Feedback
 INSERT INTO Feedback (feedback_id, student_id, club_id, event_id, feedback_type, rating, comments, feedback_date)
-VALUES ('CF26-01', 'CE25-0369', 'CSI', NULL, 'Club', 5, 'Very active club with good technical activities.', '2026-08-10');
-
-INSERT INTO Feedback (feedback_id, student_id, club_id, event_id, feedback_type, rating, comments, feedback_date)
-VALUES ('CF26-02', 'EE25-0246', 'EDC', NULL, 'Club', 4, 'Great exposure to startups and networking opportunities.', '2026-08-10');
+VALUES ('CF26-01', 'CE25-0369', 'CSI', NULL, 'Club', 5, 'Very active club with high-impact technical activities and workshops.', '2026-08-10');
 
 INSERT INTO Feedback (feedback_id, student_id, club_id, event_id, feedback_type, rating, comments, feedback_date)
-VALUES ('EF25-01', 'EE25-0246', NULL, 'ZEPH26-GF', 'Event', 5, 'Groovefest was very well organised and high energy.', '2025-11-21');
+VALUES ('CF26-02', 'EE25-0246', 'EDC', NULL, 'Club', 4, 'Great exposure to startup incubators and executive networking opportunities.', '2026-08-10');
 
+INSERT INTO Feedback (feedback_id, student_id, club_id, event_id, feedback_type, rating, comments, feedback_date)
+VALUES ('CF26-03', 'ME25-0893', 'SWD', NULL, 'Club', 5, 'Dedicated leadership and genuine grassroots community outreach initiatives.', '2026-08-15');
 
+INSERT INTO Feedback (feedback_id, student_id, club_id, event_id, feedback_type, rating, comments, feedback_date)
+VALUES ('CF26-04', 'ME25-0187', 'ZEPHYR', NULL, 'Club', 5, 'Great collaborative environment and creative freedom for choreographers.', '2026-08-15');
+
+INSERT INTO Feedback (feedback_id, student_id, club_id, event_id, feedback_type, rating, comments, feedback_date)
+VALUES ('CF26-LOW1', 'CE25-0150', 'SWD', NULL, 'Club', 2, 'Core committee meetings frequently get rescheduled at the last minute without prior notice.', '2026-08-15');
+
+INSERT INTO Feedback (feedback_id, student_id, club_id, event_id, feedback_type, rating, comments, feedback_date)
+VALUES ('CF26-LOW2', 'ME25-0885', 'ZEPHYR', NULL, 'Club', 1, 'Dance rehearsal hall timings clash severely with regular department laboratory schedules.', '2026-08-18');
+
+-- Event Feedback
+INSERT INTO Feedback (feedback_id, student_id, club_id, event_id, feedback_type, rating, comments, feedback_date)
+VALUES ('EF25-01', 'EE25-0246', NULL, 'ZEPH26-GF', 'Event', 5, 'Groovefest was remarkably well organized, with vibrant dance choreography and audio systems.', '2025-11-21');
+
+INSERT INTO Feedback (feedback_id, student_id, club_id, event_id, feedback_type, rating, comments, feedback_date)
+VALUES ('EF25-02', 'CE25-0042', NULL, 'CSI25-PYW', 'Event', 5, 'Clear hands-on exercises in Python, machine learning workflows, and data visualization.', '2025-10-16');
+
+INSERT INTO Feedback (feedback_id, student_id, club_id, event_id, feedback_type, rating, comments, feedback_date)
+VALUES ('EF26-02', 'CE25-0718', NULL, 'EDC26-ES', 'Event', 5, 'Exceptional startup keynote speeches and high quality student founder mentorship panels.', '2026-10-12');
+
+INSERT INTO Feedback (feedback_id, student_id, club_id, event_id, feedback_type, rating, comments, feedback_date)
+VALUES ('EF26-03', 'CE25-0042', NULL, 'EDC26-ES', 'Event', 5, 'Incredible networking opportunities with angel investors and tech founders.', '2026-10-12');
+
+INSERT INTO Feedback (feedback_id, student_id, club_id, event_id, feedback_type, rating, comments, feedback_date)
+VALUES ('EF26-04', 'CE25-0369', NULL, 'SWD26-NGO', 'Event', 5, 'Well coordinated village camp providing digital literacy to rural students.', '2026-12-18');
+
+INSERT INTO Feedback (feedback_id, student_id, club_id, event_id, feedback_type, rating, comments, feedback_date)
+VALUES ('EF26-05', 'EE25-0191', NULL, 'EDC26-PITCH', 'Event', 4, 'Constructive feedback from veteran VC panel on student prototypes.', '2026-11-06');
+
+INSERT INTO Feedback (feedback_id, student_id, club_id, event_id, feedback_type, rating, comments, feedback_date)
+VALUES ('EF26-06', 'CE25-0125', NULL, 'CSI26-WEB', 'Event', 4, 'Comprehensive intro to modern web frameworks and backend REST APIs.', '2026-10-20');
+
+INSERT INTO Feedback (feedback_id, student_id, club_id, event_id, feedback_type, rating, comments, feedback_date)
+VALUES ('EF26-LOW1', 'ELE25-0575', NULL, 'SWD26-BLOOD', 'Event', 2, 'Long waiting queues at the medical station and drinking water ran out early.', '2026-09-22');
+
+INSERT INTO Feedback (feedback_id, student_id, club_id, event_id, feedback_type, rating, comments, feedback_date)
+VALUES ('EF26-LOW2', 'ME25-0893', NULL, 'CSI26-TF', 'Event', 2, 'Air conditioning in the conference room was malfunctioning during the tech seminar.', '2026-09-27');
 
 
 -- ===========================================================
 -- REQUESTED DATA MODIFICATIONS
 -- ===========================================================
 -- IMPORTANT:
--- Everything above this section is the original Club Management
--- System SQL/data exactly as supplied.
--- The original 69 Students rows and the original Memberships
--- rows are NOT replaced or shortened.
--- This section only performs the requested modifications AFTER
--- the original tables and original checks have been created.
+-- Everything above this section preserves the foundational schema.
+-- This section executes the planned modifications to demonstrate
+-- non-member participation, multi-club membership, and multi-event engagement.
 -- ===========================================================
 
 START TRANSACTION;
 
-
--- ===========================================================
 -- 1. CREATE 12 TRUE NON-MEMBERS
--- ===========================================================
--- These students already exist in Students and each originally had
--- exactly ONE Memberships row. We remove ALL of their Memberships
--- rows, but we do NOT delete the students themselves.
--- Final effect: each of these 12 students has ZERO club memberships.
--- ===========================================================
-
--- Selected student_ids (12 total):
--- CE25-0152, CE25-0185, CE25-0277, CE25-0282,
--- CE25-0314, CE25-0323, CE25-0342, CE25-0573,
--- CE25-0662, CE25-0784, CE25-0826, CE25-1008
-
+-- Remove all Memberships rows for these 12 students, leaving them with ZERO club memberships.
 DELETE FROM Memberships
 WHERE student_id IN (
     'CE25-0152',
@@ -900,17 +1002,8 @@ WHERE student_id IN (
     'CE25-1008'
 );
 
-
--- ===========================================================
 -- 2. CREATE 6 MULTI-CLUB MEMBERS
--- ===========================================================
--- Each selected student originally had exactly ONE membership.
--- A new membership is added in a DIFFERENT club.
--- Existing roles are untouched; all new rows use role='Member'.
--- All new join dates are later than the original join dates.
--- The UNIQUE(student_id, club_id) constraint is respected.
--- ===========================================================
-
+-- Add secondary club memberships for selected students with role='Member'.
 INSERT INTO Memberships
     (membership_id, student_id, club_id, role, join_date, status)
 VALUES
@@ -921,22 +1014,14 @@ VALUES
     ('ZEPHYR-0348',  'EE25-0348', 'ZEPHYR', 'Member', '2026-03-05', 'Active'),
     ('SWD-1053',     'ME25-1053', 'SWD',    'Member', '2026-03-06', 'Active');
 
-
--- ===========================================================
 -- 3. CREATE MULTI-EVENT PARTICIPANTS
--- ===========================================================
--- Add 10 new EventRegistrations across different events.
--- Three of the students below are among the NEW non-members:
--- CE25-0314, CE25-0342, CE25-0784.
--- This demonstrates that a student may participate in multiple
--- events without belonging to any club.
--- ===========================================================
-
+-- Adds event registrations across events, including non-members CE25-0314, CE25-0342, CE25-0784.
 INSERT INTO EventRegistrations
     (registration_id, event_id, student_id, registration_date, attendance_status)
 VALUES
-    ('TF26-0314',    'CSI26-TF',    'CE25-0314', '2026-09-02', 'Registered'),
-    ('ES26-0314',    'EDC26-ES',    'CE25-0314', '2026-09-05', 'Registered'),
+    ('TF26-0314',    'CSI26-TF',    'CE25-0314', '2026-09-02', 'Attended'),
+    ('ES26-0314',    'EDC26-ES',    'CE25-0314', '2026-09-05', 'Attended'),
+    ('FRESH26-0314', 'ZEPH26-FRESH','CE25-0314', '2026-09-02', 'Attended'),
     ('NGO26-0342',   'SWD26-NGO',   'CE25-0342', '2026-11-05', 'Registered'),
     ('FRESH26-0342', 'ZEPH26-FRESH','CE25-0342', '2026-09-03', 'Attended'),
     ('HACK26-0784',  'CSI26-HACK',  'CE25-0784', '2026-08-28', 'Registered'),
@@ -951,19 +1036,19 @@ COMMIT;
 
 -- ===========================================================
 -- MEMBER COUNT SYNC
--- Clubs.member_count is set once = the real number of rows in Memberships
--- for that club. Non-members have no Memberships row, so they are never
--- counted. Result: CSI 17, SWD 24, EDC 25, ZEPHYR 20, CSA 0.
+-- Clubs.member_count is synchronized with real active Memberships rows.
 -- ===========================================================
 
 UPDATE Clubs
-SET member_count = (SELECT COUNT(*) FROM Memberships m WHERE m.club_id = Clubs.club_id)
+SET member_count = (SELECT COUNT(*) FROM Memberships m WHERE m.club_id = Clubs.club_id AND m.status = 'Active')
 WHERE club_id IN ('CSI','SWD','EDC','ZEPHYR','CSA');
 
 COMMIT;
 
+
 -- ===========================================================
--- OUTPUT: the 8 original tables (fixed order, each by primary key)
+-- OUTPUT: THE 8 CANONICAL TABLES
+-- (Executed in order; displays strictly the 8 tables, no extra results)
 -- ===========================================================
 SELECT * FROM Students           ORDER BY student_id;
 SELECT * FROM FacultyCoordinators ORDER BY faculty_id;

@@ -1,6 +1,6 @@
 # College Club Management System (Cloud Deployment)
 
-> **Google Cloud Platform Production Deployment** featuring live **Cloud SQL (MySQL 8.0)** database integration, **Secret Manager** credential encryption, least-privilege **IAM Service Account**, automated database **triggers**, SQL **views**, and **stored procedures**.
+> **Google Cloud Platform Production Deployment** featuring live **Cloud SQL (MySQL 8.0)** database integration, **Secret Manager** credential encryption, least-privilege **IAM Service Account**, 8 automated database **triggers**, SQL **views**, and 8 **stored procedures with cursors**.
 
 ---
 
@@ -9,10 +9,10 @@
 | Service | Live URL / Endpoint | Details |
 |---|---|---|
 | **Web Application Dashboard** | [https://club-management-app-326279554484.asia-south1.run.app/](https://club-management-app-326279554484.asia-south1.run.app/) | Live Flask Web UI on Google Cloud Run |
+| **8 Triggers Showcase** | [https://club-management-app-326279554484.asia-south1.run.app/triggers](https://club-management-app-326279554484.asia-south1.run.app/triggers) | Architectural catalog of all 8 production triggers |
+| **8 Cursors & Procedures Hub** | [https://club-management-app-326279554484.asia-south1.run.app/procedures](https://club-management-app-326279554484.asia-south1.run.app/procedures) | Interactive execution runner for all 8 cursor procedures |
 | **System & Database Health** | [https://club-management-app-326279554484.asia-south1.run.app/health](https://club-management-app-326279554484.asia-south1.run.app/health) | Real-time Cloud SQL Unix Socket ping |
 | **Raw JSON Health Endpoint** | [https://club-management-app-326279554484.asia-south1.run.app/health?format=json](https://club-management-app-326279554484.asia-south1.run.app/health?format=json) | Automated uptime monitoring payload |
-| **Cursor Stored Procedure** | [https://club-management-app-326279554484.asia-south1.run.app/procedures/audit](https://club-management-app-326279554484.asia-south1.run.app/procedures/audit) | Executes `sp_audit_club_counts(IN p_fix TINYINT)` |
-| **Relational Stored Procedure** | [https://club-management-app-326279554484.asia-south1.run.app/procedures/student-clubs](https://club-management-app-326279554484.asia-south1.run.app/procedures/student-clubs) | Executes `GetStudentClubs(IN p_student_id)` |
 
 ---
 
@@ -37,8 +37,8 @@ flowchart TD
 
         subgraph Database["Google Cloud SQL (MySQL 8.0)"]
             MySQL["Instance: club-mysql-instance\nTier: db-f1-micro | Single-Zone: asia-south1-a\nDatabase: trial_club\nZero Public Access: 0.0.0.0/0 Blocked"]
-            Tables["8 Relational Tables\n69 Students, Clubs, Events"]
-            Logic["Triggers: trg_increase_member_count\nView: ClubSummary\nProcedures: GetStudentClubs, sp_audit_club_counts"]
+            Tables["8 Canonical Domain Tables\n75 Students, Clubs, Events, Feedback"]
+            Logic["8 Triggers &bull; 8 Cursors\nView: ClubSummary\nProcedure: GetStudentClubs"]
         end
     end
 
@@ -58,15 +58,30 @@ flowchart TD
 
 ### Track 1: Database Integration (Primary Focus)
 1. **Cloud SQL MySQL 8.0:** Provisioned managed instance in Mumbai (`asia-south1-a`) with 10 GB SSD storage.
-2. **Schema & Seed Data:** 8 fully normalized tables populated with real student records, club charters, events, and memberships.
+2. **Canonical Schema:** 8 fully normalized domain tables populated with real student records, club charters, events, memberships, and feedback.
 3. **Database View (`ClubSummary`):** Clean abstraction joining `Clubs` with advisor metadata and live count statistics.
-4. **Automated Database Triggers:**
-   - `trg_increase_member_count`: Automatically increments `Clubs.member_count` on `AFTER INSERT` on `Memberships`.
-   - `trg_decrease_member_count`: Automatically decrements `Clubs.member_count` on `AFTER DELETE` on `Memberships`.
-   - `trg_update_member_count`: Handles status shifts (`Active` vs `Inactive`) on `AFTER UPDATE`.
-5. **Stored Procedures with Cursor Logic:**
-   - `GetStudentClubs(p_student_id)`: Parameterized procedure querying student memberships via relational joins.
-   - `sp_audit_club_counts(p_fix)`: Advanced cursor loop iterating over clubs, reconciling denormalized counters with membership rows, with optional automated self-healing (`p_fix = 1`).
+4. **8 Production Database Triggers (2 per Member across 4 Members):**
+   - **Member 1:**
+     - `trg_after_membership_insert_sync_count`: Increments `Clubs.member_count` on `AFTER INSERT ON Memberships`.
+     - `trg_after_membership_delete_sync_count`: Decrements `Clubs.member_count` on `AFTER DELETE ON Memberships`.
+   - **Member 2:**
+     - `trg_prevent_multiple_presidents`: Enforces single-president rule via `SIGNAL SQLSTATE '45000'` on `BEFORE INSERT ON Memberships`.
+     - `trg_adjust_member_count_on_status_change`: Dynamically adjusts counts on `Active <-> Inactive` on `AFTER UPDATE ON Memberships`.
+   - **Member 3:**
+     - `trg_prevent_registration_for_completed_event`: Rejects registrations on `Completed` or `Cancelled` events on `BEFORE INSERT ON EventRegistrations`.
+     - `trg_verify_feedback_registration`: Verifies authentic registration prior to accepting event reviews on `BEFORE INSERT ON Feedback`.
+   - **Member 4:**
+     - `trg_auto_progress_event_on_attendance`: Flips event status from `Planned` to `Ongoing` upon first check-in on `AFTER UPDATE ON EventRegistrations`.
+     - `trg_auto_create_club_profile`: Zero-config provisioning generating institutional email and Instagram handle on `AFTER INSERT ON Clubs`.
+5. **8 Stored Procedures with Cursor Logic:**
+   - `sp_audit_club_counts(p_fix)`: Loops clubs, verifies stored vs actual counts, and repairs drift.
+   - `sp_recruitment_leads_and_auto_invite(min_events, auto_invite)`: Identifies prospective recruits from event participation and auto-enrolls as Volunteers.
+   - `sp_reconcile_event_budgets(min_rating, bonus_pct, apply)`: Evaluates attendee feedback ratings and awards performance bonus budgets.
+   - `sp_close_past_events(cutoff_date, apply)`: Reconciles past scheduled events to `Completed` or `Cancelled`.
+   - `sp_deactivate_inactive_members(max_missed, apply)`: Deactivates chronic absentees and decrements club size.
+   - `sp_award_active_contributors(student_id, min_attended, apply)`: Evaluates attendance and promotes regular members to `Core Member`.
+   - `sp_senior_graduation_rollout(grad_year, apply)`: Transitions graduating final-year students (Year 4) to Alumni.
+   - `sp_anonymize_sensitive_feedback(threshold, apply)`: Protects student identity on critical reviews with standardized tags.
 
 ### Track 2: Cloud Security & Identity
 1. **Google Secret Manager:** Database passwords stored as encrypted versions; zero plaintext credentials in source code or Git history.
@@ -116,7 +131,7 @@ SECRET_KEY=dev-secret-key-vit-cloud-2026
 
 ### 5. Automated Tests & Local Server
 ```powershell
-# Run the 8-test unit & integration test suite
+# Run the 11-test unit & integration test suite
 pytest -v
 
 # Run the local development server
@@ -143,4 +158,3 @@ gcloud secrets delete club-db-password --quiet
 # 4. Delete Dedicated Service Account
 gcloud iam service-accounts delete club-app-sa@project-a4079d46-9d8b-469f-993.iam.gserviceaccount.com --quiet
 ```
-

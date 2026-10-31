@@ -56,6 +56,30 @@ def test_events_page_renders(client):
     assert response.status_code == 200
     assert b"Campus Events Management" in response.data
 
+def test_triggers_page_renders(client):
+    """Test triggers architecture and catalog page."""
+    response = client.get("/triggers")
+    assert response.status_code == 200
+    assert b"8 Database Triggers Architecture" in response.data
+    assert b"trg_after_membership_insert_sync_count" in response.data
+    assert b"trg_prevent_multiple_presidents" in response.data
+    assert b"trg_auto_create_club_profile" in response.data
+
+def test_procedures_hub_renders(client):
+    """Test stored procedures & cursors hub page."""
+    response = client.get("/procedures")
+    assert response.status_code == 200
+    assert b"Stored Procedures &amp; Database Cursors Hub" in response.data or b"Stored Procedures & Database Cursors Hub" in response.data
+    assert b"sp_audit_club_counts" in response.data
+    assert b"sp_recruitment_leads_and_auto_invite" in response.data
+    assert b"sp_reconcile_event_budgets" in response.data
+
+def test_execute_proc_endpoint(client):
+    """Test execution endpoint handles procedures gracefully even with disconnected DB."""
+    response = client.post("/procedures/execute/audit", data={"p_fix": "0"}, follow_redirects=True)
+    assert response.status_code == 200
+    assert b"sp_audit_club_counts" in response.data
+
 def test_custom_404_page(client):
     """Test 404 error handler suppresses server trace and renders custom template."""
     response = client.get("/this-route-does-not-exist")

@@ -25,7 +25,7 @@
           <th>Venue</th>
           <th>Budget</th>
           <th>Status</th>
-          <th class="text-center">Registrations</th>
+          <th class="text-center">Attendees</th>
           <th class="text-end">Actions</th>
         </tr>
       </thead>
@@ -55,10 +55,18 @@
             {% endif %}
           </td>
           <td class="text-center">
-            <span class="badge bg-info text-dark rounded-pill px-2">{{ ev.attendee_count }}</span>
+            <a href="{{ url_for('main.event_registrations', event_id=ev.event_id) }}" class="badge bg-info text-dark text-decoration-none rounded-pill px-2 py-1" title="View & Register Attendees">
+              <i class="bi bi-people-fill me-1"></i>{{ ev.attendee_count }}
+            </a>
           </td>
           <td class="text-end">
             <div class="btn-group btn-group-sm">
+              <a href="{{ url_for('main.event_registrations', event_id=ev.event_id) }}" class="btn btn-outline-primary" title="Attendees & Triggers 5 & 7">
+                <i class="bi bi-person-check"></i>
+              </a>
+              <a href="{{ url_for('main.event_feedback', event_id=ev.event_id) }}" class="btn btn-outline-warning text-dark" title="Feedback & Trigger 6">
+                <i class="bi bi-star"></i>
+              </a>
               <a href="{{ url_for('main.edit_event', event_id=ev.event_id) }}" class="btn btn-outline-secondary" title="Edit">
                 <i class="bi bi-pencil"></i>
               </a>

@@ -24,14 +24,14 @@ def health():
 def init_db_endpoint():
     """
     Self-healing database initialization endpoint.
-    Executes base schema, triggers, views, and procedures directly inside Cloud Run.
+    Executes base schema, 8 triggers, views, and 8 cursor procedures directly inside Cloud Run.
     """
     import load_schema
     try:
         load_schema.initialize_database()
         return jsonify({
             "status": "success",
-            "message": "Cloud SQL database successfully initialized with all tables, triggers, views, and procedures."
+            "message": "Cloud SQL database successfully initialized with 8 tables, 8 triggers, and 8 cursor procedures."
         }), 200
     except Exception as e:
         return jsonify({
@@ -138,7 +138,7 @@ def create_club():
 
         try:
             with conn.cursor() as cursor:
-                # Parameterized INSERT
+                # INSERT club (Trigger 8: trg_auto_create_club_profile auto-provisions profile row)
                 cursor.execute("""
                     INSERT INTO Clubs (club_id, club_name, category, faculty_id, description, member_count)
                     VALUES (%s, %s, %s, %s, %s, 0);
@@ -147,11 +147,14 @@ def create_club():
                 if official_email or instagram_handle:
                     cursor.execute("""
                         INSERT INTO ClubProfile (club_id, official_email, instagram_handle)
-                        VALUES (%s, %s, %s);
+                        VALUES (%s, %s, %s)
+                        ON DUPLICATE KEY UPDATE
+                            official_email = VALUES(official_email),
+                            instagram_handle = VALUES(instagram_handle);
                     """, (club_id, official_email or None, instagram_handle or None))
 
             conn.close()
-            flash(f"Club '{club_name}' created successfully!", "success")
+            flash(f"Club '{club_name}' created successfully! Database Trigger 8 (trg_auto_create_club_profile) auto-provisioned club profile.", "success")
             return redirect(url_for("main.list_clubs"))
         except Exception as e:
             flash(f"Error creating club: {str(e)}", "danger")
@@ -181,7 +184,6 @@ def edit_club(club_id):
 
         try:
             with conn.cursor() as cursor:
-                # Parameterized UPDATE
                 cursor.execute("""
                     UPDATE Clubs
                     SET club_name = %s, category = %s, faculty_id = %s, description = %s
@@ -365,7 +367,7 @@ def delete_student(student_id):
 
 
 # -------------------------------------------------------------
-# MEMBERSHIPS CRUD (SHOWCASES LIVE AUTOMATIC DATABASE TRIGGER)
+# MEMBERSHIPS CRUD (SHOWCASES LIVE AUTOMATIC DATABASE TRIGGERS)
 # -------------------------------------------------------------
 @main_bp.route("/memberships")
 def list_memberships():
@@ -423,25 +425,29 @@ def create_membership():
                 cursor.execute("SELECT member_count FROM Clubs WHERE club_id = %s;", (club_id,))
                 count_before = cursor.fetchone()["member_count"]
 
-                # INSERT - TRIGGER 'trg_increase_member_count' WILL FIRE AUTOMATICALLY!
+                # INSERT - TRIGGER 'trg_after_membership_insert_sync_count' and 'trg_prevent_multiple_presidents' FIRE!
                 cursor.execute("""
                     INSERT INTO Memberships (membership_id, student_id, club_id, role, join_date, status)
                     VALUES (%s, %s, %s, %s, %s, %s);
                 """, (membership_id, student_id, club_id, role, join_date, status))
 
-                # Check club member_count after insert to prove the trigger executed
+                # Check club member_count after insert to verify trigger execution
                 cursor.execute("SELECT member_count FROM Clubs WHERE club_id = %s;", (club_id,))
                 count_after = cursor.fetchone()["member_count"]
 
             conn.close()
             flash(
-                f"Membership created! Database Trigger 'trg_increase_member_count' fired: "
+                f"Membership created! Database Trigger 'trg_after_membership_insert_sync_count' fired: "
                 f"Club '{club_id}' member_count automatically increased from {count_before} to {count_after}.",
                 "success"
             )
             return redirect(url_for("main.list_memberships"))
         except Exception as e:
-            flash(f"Error creating membership (Trigger halted or duplicate entry): {str(e)}", "danger")
+            err_msg = str(e)
+            if "Integrity Violation: A club cannot have more than ONE active President" in err_msg:
+                flash("Trigger 3 Rejection (trg_prevent_multiple_presidents): A club cannot have more than ONE active President simultaneously.", "danger")
+            else:
+                flash(f"Error creating membership (Trigger halted or duplicate entry): {err_msg}", "danger")
 
     with conn.cursor() as cursor:
         cursor.execute("SELECT student_id, name, prn_number FROM Students ORDER BY name;")
@@ -462,13 +468,26 @@ def edit_membership(membership_id):
 
         try:
             with conn.cursor() as cursor:
+                cursor.execute("SELECT club_id, status FROM Memberships WHERE membership_id = %s;", (membership_id,))
+                old_row = cursor.fetchone()
+                club_id = old_row["club_id"]
+                old_status = old_row["status"]
+
+                # UPDATE - TRIGGER 'trg_adjust_member_count_on_status_change' fires on status change!
                 cursor.execute("""
                     UPDATE Memberships
                     SET role = %s, status = %s, join_date = %s
                     WHERE membership_id = %s;
                 """, (role, status, join_date, membership_id))
+
+                cursor.execute("SELECT member_count FROM Clubs WHERE club_id = %s;", (club_id,))
+                new_count = cursor.fetchone()["member_count"]
+
             conn.close()
-            flash("Membership updated successfully.", "success")
+            if old_status != status:
+                flash(f"Membership updated! Trigger 4 (trg_adjust_member_count_on_status_change) dynamically adjusted '{club_id}' count to {new_count}.", "success")
+            else:
+                flash("Membership updated successfully.", "success")
             return redirect(url_for("main.list_memberships"))
         except Exception as e:
             flash(f"Error updating membership: {str(e)}", "danger")
@@ -496,8 +515,7 @@ def delete_membership(membership_id):
     try:
         conn = get_db_connection()
         with conn.cursor() as cursor:
-            # Get club_id to demonstrate trigger decrement
-            cursor.execute("SELECT club_id FROM Memberships WHERE membership_id = %s;", (membership_id,))
+            cursor.execute("SELECT club_id, status FROM Memberships WHERE membership_id = %s;", (membership_id,))
             row = cursor.fetchone()
             if not row:
                 flash("Membership record not found.", "warning")
@@ -508,7 +526,7 @@ def delete_membership(membership_id):
             cursor.execute("SELECT member_count FROM Clubs WHERE club_id = %s;", (club_id,))
             count_before = cursor.fetchone()["member_count"]
 
-            # DELETE - TRIGGER 'trg_decrease_member_count' WILL FIRE AUTOMATICALLY!
+            # DELETE - TRIGGER 'trg_after_membership_delete_sync_count' WILL FIRE AUTOMATICALLY!
             cursor.execute("DELETE FROM Memberships WHERE membership_id = %s;", (membership_id,))
 
             cursor.execute("SELECT member_count FROM Clubs WHERE club_id = %s;", (club_id,))
@@ -516,7 +534,7 @@ def delete_membership(membership_id):
 
         conn.close()
         flash(
-            f"Membership removed! Database Trigger 'trg_decrease_member_count' fired: "
+            f"Membership removed! Database Trigger 'trg_after_membership_delete_sync_count' fired: "
             f"Club '{club_id}' member_count automatically decremented from {count_before} to {count_after}.",
             "info"
         )
@@ -630,6 +648,7 @@ def delete_event(event_id):
         with conn.cursor() as cursor:
             # Delete registrations first to respect foreign key
             cursor.execute("DELETE FROM EventRegistrations WHERE event_id = %s;", (event_id,))
+            cursor.execute("DELETE FROM Feedback WHERE event_id = %s;", (event_id,))
             cursor.execute("DELETE FROM Events WHERE event_id = %s;", (event_id,))
         conn.close()
         flash(f"Event '{event_id}' deleted successfully.", "info")
@@ -639,8 +658,276 @@ def delete_event(event_id):
 
 
 # -------------------------------------------------------------
-# DATABASE PROCEDURES & ANALYTICS FEATURES
+# EVENT REGISTRATIONS & ATTENDANCE (SHOWCASES TRIGGERS 5 & 7)
 # -------------------------------------------------------------
+@main_bp.route("/events/<event_id>/registrations")
+def event_registrations(event_id):
+    try:
+        conn = get_db_connection()
+        with conn.cursor() as cursor:
+            cursor.execute("""
+                SELECT e.*, c.club_name
+                FROM Events e
+                JOIN Clubs c ON e.club_id = c.club_id
+                WHERE e.event_id = %s;
+            """, (event_id,))
+            event = cursor.fetchone()
+
+            cursor.execute("""
+                SELECT er.registration_id, er.event_id, er.student_id, er.registration_date, er.attendance_status,
+                       s.name AS student_name, s.dept_name
+                FROM EventRegistrations er
+                JOIN Students s ON er.student_id = s.student_id
+                WHERE er.event_id = %s
+                ORDER BY er.registration_date DESC;
+            """, (event_id,))
+            registrations = cursor.fetchall()
+
+            cursor.execute("SELECT student_id, name FROM Students ORDER BY name;")
+            all_students = cursor.fetchall()
+        conn.close()
+
+        if not event:
+            flash("Event not found.", "warning")
+            return redirect(url_for("main.list_events"))
+
+        return render_template("events/registrations.html", event=event, registrations=registrations, all_students=all_students)
+    except Exception as e:
+        flash(f"Error loading registrations: {str(e)}", "danger")
+        return redirect(url_for("main.list_events"))
+
+
+@main_bp.route("/events/<event_id>/register", methods=["POST"])
+def register_for_event(event_id):
+    student_id = request.form.get("student_id", "").strip()
+    if not student_id:
+        flash("Please select a student to register.", "warning")
+        return redirect(url_for("main.event_registrations", event_id=event_id))
+
+    clean_sid = re.sub(r'[^A-Z0-9]', '', student_id)
+    clean_eid = re.sub(r'[^A-Z0-9]', '', event_id)
+    reg_id = f"REG-{clean_eid[:6]}-{clean_sid[:8]}"
+
+    try:
+        conn = get_db_connection()
+        with conn.cursor() as cursor:
+            # TRIGGER 5 (trg_prevent_registration_for_completed_event) WILL INTERCEPT!
+            cursor.execute("""
+                INSERT INTO EventRegistrations (registration_id, event_id, student_id, registration_date, attendance_status)
+                VALUES (%s, %s, %s, CURRENT_DATE, 'Registered');
+            """, (reg_id, event_id, student_id))
+        conn.close()
+        flash(f"Student '{student_id}' registered successfully for event '{event_id}'!", "success")
+    except Exception as e:
+        err_msg = str(e)
+        if "Cannot register for an event that is already Completed or Cancelled" in err_msg:
+            flash("Trigger 5 Rejection (trg_prevent_registration_for_completed_event): Cannot register for an event that is already Completed or Cancelled.", "danger")
+        else:
+            flash(f"Registration error: {err_msg}", "danger")
+
+    return redirect(url_for("main.event_registrations", event_id=event_id))
+
+
+@main_bp.route("/events/<event_id>/attendance/<reg_id>", methods=["POST"])
+def mark_attendance(event_id, reg_id):
+    try:
+        conn = get_db_connection()
+        with conn.cursor() as cursor:
+            cursor.execute("SELECT status FROM Events WHERE event_id = %s;", (event_id,))
+            status_before = cursor.fetchone()["status"]
+
+            # TRIGGER 7 (trg_auto_progress_event_on_attendance) FIRES on attendance update!
+            cursor.execute("""
+                UPDATE EventRegistrations
+                SET attendance_status = 'Attended'
+                WHERE registration_id = %s;
+            """, (reg_id,))
+
+            cursor.execute("SELECT status FROM Events WHERE event_id = %s;", (event_id,))
+            status_after = cursor.fetchone()["status"]
+        conn.close()
+
+        if status_before == 'Planned' and status_after == 'Ongoing':
+            flash(f"Attendance marked! Trigger 7 (trg_auto_progress_event_on_attendance) automatically progressed event status from 'Planned' to 'Ongoing'!", "success")
+        else:
+            flash("Attendance marked as Attended.", "success")
+    except Exception as e:
+        flash(f"Error marking attendance: {str(e)}", "danger")
+
+    return redirect(url_for("main.event_registrations", event_id=event_id))
+
+
+# -------------------------------------------------------------
+# EVENT FEEDBACK & REVIEWS (SHOWCASES TRIGGER 6 & CURSOR 8)
+# -------------------------------------------------------------
+@main_bp.route("/events/<event_id>/feedback")
+def event_feedback(event_id):
+    try:
+        conn = get_db_connection()
+        with conn.cursor() as cursor:
+            cursor.execute("""
+                SELECT e.*, c.club_name
+                FROM Events e
+                JOIN Clubs c ON e.club_id = c.club_id
+                WHERE e.event_id = %s;
+            """, (event_id,))
+            event = cursor.fetchone()
+
+            cursor.execute("""
+                SELECT f.*, s.name AS student_name
+                FROM Feedback f
+                JOIN Students s ON f.student_id = s.student_id
+                WHERE f.event_id = %s
+                ORDER BY f.feedback_date DESC;
+            """, (event_id,))
+            feedbacks = cursor.fetchall()
+
+            cursor.execute("SELECT student_id, name FROM Students ORDER BY name;")
+            all_students = cursor.fetchall()
+        conn.close()
+
+        if not event:
+            flash("Event not found.", "warning")
+            return redirect(url_for("main.list_events"))
+
+        return render_template("events/feedback.html", event=event, feedbacks=feedbacks, all_students=all_students)
+    except Exception as e:
+        flash(f"Error loading event feedback: {str(e)}", "danger")
+        return redirect(url_for("main.list_events"))
+
+
+@main_bp.route("/events/<event_id>/feedback/submit", methods=["POST"])
+def submit_event_feedback(event_id):
+    student_id = request.form.get("student_id", "").strip()
+    rating = request.form.get("rating", "5").strip()
+    comments = request.form.get("comments", "").strip()
+
+    if not student_id:
+        flash("Student selection is required for feedback.", "warning")
+        return redirect(url_for("main.event_feedback", event_id=event_id))
+
+    clean_sid = re.sub(r'[^A-Z0-9]', '', student_id)
+    clean_eid = re.sub(r'[^A-Z0-9]', '', event_id)
+    feedback_id = f"FB-{clean_eid[:6]}-{clean_sid[:8]}"
+
+    try:
+        conn = get_db_connection()
+        with conn.cursor() as cursor:
+            cursor.execute("SELECT club_id FROM Events WHERE event_id = %s;", (event_id,))
+            club_id = cursor.fetchone()["club_id"]
+
+            # TRIGGER 6 (trg_verify_feedback_registration) INTERCEPTS HERE!
+            cursor.execute("""
+                INSERT INTO Feedback (feedback_id, student_id, club_id, event_id, feedback_type, rating, comments, feedback_date)
+                VALUES (%s, %s, %s, %s, 'Event', %s, %s, CURRENT_DATE);
+            """, (feedback_id, student_id, club_id, event_id, int(rating), comments or None))
+        conn.close()
+        flash("Feedback review accepted and verified by Trigger 6!", "success")
+    except Exception as e:
+        err_msg = str(e)
+        if "Student must be registered for the event before submitting event feedback" in err_msg:
+            flash("Trigger 6 Rejection (trg_verify_feedback_registration): Student must be registered for the event before submitting event feedback.", "danger")
+        else:
+            flash(f"Feedback error: {err_msg}", "danger")
+
+    return redirect(url_for("main.event_feedback", event_id=event_id))
+
+
+# -------------------------------------------------------------
+# DATABASE TRIGGERS SHOWCASE
+# -------------------------------------------------------------
+@main_bp.route("/triggers")
+def list_triggers():
+    return render_template("triggers/list.html")
+
+
+# -------------------------------------------------------------
+# STORED PROCEDURES & CURSORS SUITE (8 CURSOR PROCEDURES)
+# -------------------------------------------------------------
+@main_bp.route("/procedures")
+def procedures_hub():
+    return render_template("procedures/index.html", results=None, proc_name=None)
+
+
+@main_bp.route("/procedures/execute/<proc_id>", methods=["POST"])
+def execute_proc(proc_id):
+    results = []
+    proc_name = ""
+    try:
+        conn = get_db_connection()
+        with conn.cursor() as cursor:
+            if proc_id == "audit":
+                p_fix = int(request.form.get("p_fix", 0))
+                cursor.callproc("sp_audit_club_counts", (p_fix,))
+                results = cursor.fetchall()
+                proc_name = f"sp_audit_club_counts(p_fix={p_fix})"
+                flash(f"Executed {proc_name}: {'Database repaired!' if p_fix == 1 else 'Preview audit complete.'}", "success")
+
+            elif proc_id == "recruitment":
+                p_min_events = int(request.form.get("p_min_events", 2))
+                p_auto_invite = int(request.form.get("p_auto_invite", 0))
+                cursor.callproc("sp_recruitment_leads_and_auto_invite", (p_min_events, p_auto_invite))
+                results = cursor.fetchall()
+                proc_name = f"sp_recruitment_leads_and_auto_invite(min_events={p_min_events}, auto_invite={p_auto_invite})"
+                flash(f"Executed {proc_name}: {'Leads auto-enrolled as Volunteers!' if p_auto_invite == 1 else 'Candidate leads identified.'}", "success")
+
+            elif proc_id == "budget":
+                p_min_rating = float(request.form.get("p_min_rating", 4.50))
+                p_bonus_pct = float(request.form.get("p_bonus_pct", 10.0))
+                p_apply = int(request.form.get("p_apply", 0))
+                cursor.callproc("sp_reconcile_event_budgets", (p_min_rating, p_bonus_pct, p_apply))
+                results = cursor.fetchall()
+                proc_name = f"sp_reconcile_event_budgets(min_rating={p_min_rating}, bonus={p_bonus_pct}%, apply={p_apply})"
+                flash(f"Executed {proc_name}: {'Performance budget bonuses committed!' if p_apply == 1 else 'Bonus preview calculated.'}", "success")
+
+            elif proc_id == "close_events":
+                p_cutoff_date = request.form.get("p_cutoff_date", "2026-10-31").strip()
+                p_apply = int(request.form.get("p_apply", 0))
+                cursor.callproc("sp_close_past_events", (p_cutoff_date, p_apply))
+                results = cursor.fetchall()
+                proc_name = f"sp_close_past_events(cutoff='{p_cutoff_date}', apply={p_apply})"
+                flash(f"Executed {proc_name}: {'Past events reconciled in Events table!' if p_apply == 1 else 'Closure preview ready.'}", "success")
+
+            elif proc_id == "deactivate":
+                p_max_missed_events = int(request.form.get("p_max_missed_events", 2))
+                p_apply = int(request.form.get("p_apply", 0))
+                cursor.callproc("sp_deactivate_inactive_members", (p_max_missed_events, p_apply))
+                results = cursor.fetchall()
+                proc_name = f"sp_deactivate_inactive_members(max_missed={p_max_missed_events}, apply={p_apply})"
+                flash(f"Executed {proc_name}: {'Chronic absentees deactivated in Memberships!' if p_apply == 1 else 'Absentee audit complete.'}", "success")
+
+            elif proc_id == "promote":
+                p_student_id = request.form.get("p_student_id", "ALL").strip() or "ALL"
+                p_min_attended = int(request.form.get("p_min_attended", 3))
+                p_apply = int(request.form.get("p_apply", 0))
+                cursor.callproc("sp_award_active_contributors", (p_student_id, p_min_attended, p_apply))
+                results = cursor.fetchall()
+                proc_name = f"sp_award_active_contributors(student='{p_student_id}', min_attended={p_min_attended}, apply={p_apply})"
+                flash(f"Executed {proc_name}: {'Active contributors promoted to Core Members!' if p_apply == 1 else 'Merit evaluation complete.'}", "success")
+
+            elif proc_id == "grad":
+                p_grad_year = int(request.form.get("p_grad_year", 4))
+                p_apply = int(request.form.get("p_apply", 0))
+                cursor.callproc("sp_senior_graduation_rollout", (p_grad_year, p_apply))
+                results = cursor.fetchall()
+                proc_name = f"sp_senior_graduation_rollout(grad_year={p_grad_year}, apply={p_apply})"
+                flash(f"Executed {proc_name}: {'Year 4 seniors transitioned to Alumni status!' if p_apply == 1 else 'Graduation preview ready.'}", "success")
+
+            elif proc_id == "privacy":
+                p_low_rating_threshold = int(request.form.get("p_low_rating_threshold", 2))
+                p_apply = int(request.form.get("p_apply", 0))
+                cursor.callproc("sp_anonymize_sensitive_feedback", (p_low_rating_threshold, p_apply))
+                results = cursor.fetchall()
+                proc_name = f"sp_anonymize_sensitive_feedback(threshold={p_low_rating_threshold}, apply={p_apply})"
+                flash(f"Executed {proc_name}: {'Critical reviews protected with anonymous standard tags!' if p_apply == 1 else 'Privacy audit preview complete.'}", "success")
+
+        conn.close()
+    except Exception as e:
+        flash(f"Error executing procedure: {str(e)}", "danger")
+
+    return render_template("procedures/index.html", results=results, proc_name=proc_name)
+
+
 @main_bp.route("/procedures/student-clubs")
 def proc_student_clubs():
     student_id = request.args.get("student_id", "").strip()
