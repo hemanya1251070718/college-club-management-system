@@ -1,56 +1,65 @@
 {% extends "base.html" %}
 
-{% block title %}System Health & Database Status{% endblock %}
+{% block title %}System Health &amp; Database Status{% endblock %}
 
 {% block content %}
-<div class="row justify-content-center">
-  <div class="col-lg-8">
-    <div class="card shadow-sm">
-      <div class="card-header bg-white py-3 d-flex justify-content-between align-items-center">
-        <h5 class="mb-0 fw-bold">
-          <i class="bi bi-activity text-primary me-2"></i>Service & Database Health
-        </h5>
+<div class="app-container">
+  <header class="inner-page-header">
+    <div class="inner-header-layout">
+      <div>
+        <h1 class="inner-page-title">Service &amp; Database Health</h1>
+        <p class="inner-page-subtitle">Real-time telemetry of Cloud SQL Unix socket connectivity and container execution environment.</p>
+      </div>
+      <div>
         {% if healthy %}
-          <span class="badge bg-success fs-6"><i class="bi bi-check-circle me-1"></i>STATUS: HEALTHY</span>
+          <span class="badge-status success" style="font-size: 13px; padding: 6px 14px;"><i class="bi bi-check-circle me-1"></i>STATUS: HEALTHY</span>
         {% else %}
-          <span class="badge bg-danger fs-6"><i class="bi bi-x-octagon me-1"></i>STATUS: UNHEALTHY</span>
+          <span class="badge-status danger" style="font-size: 13px; padding: 6px 14px;"><i class="bi bi-x-octagon me-1"></i>STATUS: UNHEALTHY</span>
         {% endif %}
       </div>
+    </div>
+  </header>
 
-      <div class="card-body p-4">
-        <div class="alert {% if healthy %}alert-success{% else %}alert-danger{% endif %} d-flex align-items-center" role="alert">
-          <i class="bi {% if healthy %}bi-check-circle-fill{% else %}bi-exclamation-triangle-fill{% endif %} fs-3 me-3"></i>
-          <div>
-            <strong>{{ msg }}</strong>
-            <div class="small">Endpoint: <code>GET /health</code> (Supports JSON via <code>Accept: application/json</code>)</div>
+  <div class="row justify-content-center">
+    <div class="col-lg-8">
+      <div class="tesla-card mb-4">
+        <div class="tesla-alert {% if healthy %}alert-success{% else %}alert-danger{% endif %} mb-4">
+          <div class="d-flex align-items-center gap-3">
+            <i class="bi {% if healthy %}bi-check-circle-fill text-success{% else %}bi-exclamation-triangle-fill text-danger{% endif %} fs-4"></i>
+            <div>
+              <strong class="text-white d-block">{{ msg }}</strong>
+              <small class="text-secondary">Endpoint: <code class="font-mono text-white">GET /health</code> (Supports JSON via <code class="font-mono text-white">Accept: application/json</code>)</small>
+            </div>
           </div>
         </div>
 
-        <h6 class="fw-bold text-uppercase text-muted mt-4 mb-3" style="font-size: 0.8rem; letter-spacing: 0.5px;">Connection Metadata</h6>
-        <div class="table-responsive">
-          <table class="table table-bordered align-middle">
+        <div class="table-surface-card mb-4">
+          <div class="p-3 border-bottom" style="border-color: var(--border) !important; background: var(--surface-2);">
+            <span class="text-secondary small text-uppercase fw-medium" style="letter-spacing: 0.05em; font-size: 11px;">Connection Metadata</span>
+          </div>
+          <table class="tesla-table">
             <tbody>
               <tr>
-                <th style="width: 35%; background-color: #f8fafc;">Database Engine</th>
-                <td><code>{{ details.version or 'Unavailable' }}</code></td>
+                <td style="width: 35%; color: var(--text-3);">Database Engine</td>
+                <td><code class="font-mono text-white">{{ details.version or 'Unavailable' }}</code></td>
               </tr>
               <tr>
-                <th style="background-color: #f8fafc;">Active Database Name</th>
-                <td><code>{{ details.database or 'None' }}</code></td>
+                <td style="color: var(--text-3);">Active Database Name</td>
+                <td><code class="font-mono text-white">{{ details.database or 'None' }}</code></td>
               </tr>
               <tr>
-                <th style="background-color: #f8fafc;">Connection Mode</th>
+                <td style="color: var(--text-3);">Connection Mode</td>
                 <td>
-                  <span class="badge {% if 'Unix Socket' in details.mode %}bg-primary{% else %}bg-secondary{% endif %}">
+                  <span class="badge-status {% if 'Unix Socket' in details.mode %}info{% else %}neutral{% endif %} font-mono">
                     {{ details.mode }}
                   </span>
                 </td>
               </tr>
               <tr>
-                <th style="background-color: #f8fafc;">Security & Cloud Run Integration</th>
+                <td style="color: var(--text-3);">Security &amp; Cloud Integration</td>
                 <td>
-                  <small class="text-muted">
-                    No database credentials in code. Password retrieved at runtime from Secret Manager.
+                  <small class="text-secondary">
+                    Zero hardcoded database credentials. Password resolved dynamically at runtime from GCP Secret Manager.
                   </small>
                 </td>
               </tr>
@@ -58,12 +67,12 @@
           </table>
         </div>
 
-        <div class="mt-4 text-end">
-          <a href="{{ url_for('main.health', format='json') }}" target="_blank" class="btn btn-outline-dark btn-sm">
+        <div class="d-flex justify-content-end gap-3">
+          <a href="{{ url_for('main.health', format='json') }}" target="_blank" class="btn-tesla-secondary" style="min-width: 160px;">
             <i class="bi bi-code-slash me-1"></i> Raw JSON Output
           </a>
-          <a href="{{ url_for('main.dashboard') }}" class="btn btn-primary btn-sm ms-2">
-            Back to Dashboard
+          <a href="{{ url_for('main.dashboard') }}" class="btn-tesla-primary" style="min-width: 180px;">
+            Back to Cockpit
           </a>
         </div>
       </div>

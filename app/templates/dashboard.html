@@ -1,202 +1,380 @@
 {% extends "base.html" %}
 
 {% block title %}Executive Cockpit Dashboard{% endblock %}
+{% block body_class %}has-scroll-snap{% endblock %}
 
 {% block content %}
-<!-- Executive Hero Telemetry Banner -->
-<div class="row align-items-center mb-5 g-4">
-  <div class="col-lg-7">
-    <div class="d-flex align-items-center gap-2 mb-2">
-      <span class="badge bg-info text-dark fw-bold">PRODUCTION CLOUD RUN</span>
-      <span class="badge bg-dark font-mono text-muted">asia-south1 &bull; Mumbai</span>
-      <span class="badge bg-success-subtle text-success"><i class="bi bi-shield-check me-1"></i>Zero Secret Leak</span>
-    </div>
-    <h1 class="display-5 fw-bold mb-2 text-gradient">ClubHub DBMS Cockpit</h1>
-    <p class="text-secondary mb-0 fs-6">
-      Enterprise College Club Architecture &bull; 8 Canonical Domain Tables &bull; 8 Real-time Triggers &bull; 8 Advanced Cursors
-    </p>
-  </div>
-  <div class="col-lg-5 text-lg-end d-flex flex-wrap justify-content-lg-end gap-2">
-    <a href="{{ url_for('main.procedures_hub') }}" class="btn btn-info text-dark d-flex align-items-center gap-2 px-3 py-2">
-      <i class="bi bi-cpu-fill"></i>
-      <span>8 Cursors Hub</span>
-    </a>
-    <a href="{{ url_for('main.list_triggers') }}" class="btn btn-warning text-dark d-flex align-items-center gap-2 px-3 py-2">
-      <i class="bi bi-lightning-charge-fill"></i>
-      <span>8 Triggers Suite</span>
-    </a>
-    <a href="{{ url_for('main.create_membership') }}" class="btn btn-primary d-flex align-items-center gap-2 px-3 py-2">
-      <i class="bi bi-person-plus-fill"></i>
-      <span>Add Member</span>
-    </a>
-  </div>
-</div>
+<div class="landing-scroll-container">
 
-<!-- Cockpit Key Metric Cards -->
-<div class="row g-4 mb-5">
-  <div class="col-sm-6 col-xl-3">
-    <div class="card p-4 stat-card h-100 tilt-card" style="border-left: 3px solid #38bdf8 !important;">
-      <div class="d-flex justify-content-between align-items-center mb-2">
-        <span class="text-secondary text-uppercase fw-bold small" style="letter-spacing: 0.08em;">Total Clubs</span>
-        <div class="p-2 rounded-3" style="background: rgba(56, 189, 248, 0.15); color: #38bdf8;">
-          <i class="bi bi-diagram-3-fill fs-5"></i>
+  <!-- =========================================================================
+       SECTION 1: HERO (Cockpit Landing & Selective WebGL Experience)
+       ========================================================================= -->
+  <section class="snap-section" id="hero">
+    <!-- WebGL Ambient Canvas (Exclusive to Landing Hero) -->
+    <canvas id="hero-webgl-canvas" class="section-visual-bg"></canvas>
+    <div class="section-overlay"></div>
+
+    <!-- Top: Headline & Subtitle -->
+    <div class="section-top-content hero-animate-title">
+      <div class="d-inline-flex align-items-center gap-2 mb-3 px-3 py-1 rounded-pill" style="background: rgba(47, 91, 234, 0.12); border: 1px solid rgba(79, 124, 255, 0.25);">
+        <span class="status-orb"></span>
+        <span class="text-uppercase fw-semibold font-mono" style="font-size: 11px; letter-spacing: 0.08em; color: var(--blue-400);">GCP Production Cluster &bull; Cloud Run</span>
+      </div>
+      <h1 class="section-title">ClubHub DBMS Cockpit</h1>
+      <p class="section-subtitle hero-animate-subtitle">
+        Enterprise College Club Architecture &bull; 8 Canonical Base Tables &bull; 8 Real-time Triggers &bull; 8 Advanced Cursors
+      </p>
+    </div>
+
+    <!-- Middle: Visual Spacer / Ambient Grid -->
+    <div class="section-middle-content">
+      <div class="text-center d-flex flex-wrap justify-content-center gap-3">
+        <div class="badge-status neutral font-mono">Cloud SQL MySQL 8.0</div>
+        <div class="badge-status neutral font-mono">Unix Socket VPC</div>
+        <div class="badge-status success font-mono">Secret Manager v2</div>
+        <div class="badge-status info font-mono">100% Academic DBMS Compliance</div>
+      </div>
+    </div>
+
+    <!-- Bottom: Tesla Dual CTAs & Animated Chevron -->
+    <div class="section-bottom-content hero-animate-cta">
+      <div class="cta-button-group">
+        <a href="{{ url_for('main.procedures_hub') }}" class="btn-tesla-primary">
+          Explore 8 Cursors Hub
+        </a>
+        <a href="{{ url_for('main.list_triggers') }}" class="btn-tesla-secondary">
+          8 Triggers Suite
+        </a>
+      </div>
+      <a href="#charters" class="scroll-chevron" aria-label="Scroll to Club Charters">
+        <i class="bi bi-chevron-down"></i>
+      </a>
+    </div>
+  </section>
+
+  <!-- =========================================================================
+       SECTION 2: CLUB CHARTERS (Live SQL View: ClubSummary)
+       ========================================================================= -->
+  <section class="snap-section" id="charters" style="background-color: var(--bg-1);">
+    <div class="section-visual-bg"></div>
+
+    <!-- Top: Headline & Subtitle -->
+    <div class="section-top-content reveal-on-scroll">
+      <h2 class="section-title">Club Charters &amp; Governance</h2>
+      <p class="section-subtitle">
+        Synchronized live view from SQL VIEW: <code class="font-mono text-white">ClubSummary</code> across academic departments
+      </p>
+    </div>
+
+    <!-- Middle: Live Table -->
+    <div class="section-middle-content reveal-on-scroll delay-1" style="max-width: 1180px;">
+      <div class="table-surface-card w-100">
+        <div class="table-responsive" style="max-height: 48vh;">
+          <table class="tesla-table">
+            <thead>
+              <tr>
+                <th>Club ID</th>
+                <th>Club Name</th>
+                <th>Category</th>
+                <th>Faculty Coordinator</th>
+                <th class="text-center">Enrolled Members</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for c in club_summaries %}
+              <tr>
+                <td><span class="badge-status neutral font-mono">{{ c.club_id }}</span></td>
+                <td class="fw-semibold text-white">{{ c.club_name }}</td>
+                <td><span class="badge-status neutral">{{ c.category }}</span></td>
+                <td><span class="text-secondary small">{{ c.faculty_coordinator or 'Assigned' }}</span></td>
+                <td class="text-center tabular-nums">
+                  <span class="badge-status info fw-semibold">{{ c.member_count }}</span>
+                </td>
+              </tr>
+              {% else %}
+              <tr>
+                <td colspan="5" class="text-center text-secondary py-4">No club charters recorded in database view.</td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
         </div>
       </div>
-      <div class="stat-number text-gradient-cyan">{{ total_clubs }}</div>
-      <div class="text-muted small mt-2">Active student charters</div>
     </div>
-  </div>
 
-  <div class="col-sm-6 col-xl-3">
-    <div class="card p-4 stat-card h-100 tilt-card" style="border-left: 3px solid #10b981 !important;">
-      <div class="d-flex justify-content-between align-items-center mb-2">
-        <span class="text-secondary text-uppercase fw-bold small" style="letter-spacing: 0.08em;">Students Directory</span>
-        <div class="p-2 rounded-3" style="background: rgba(16, 185, 129, 0.15); color: #10b981;">
-          <i class="bi bi-people-fill fs-5"></i>
-        </div>
+    <!-- Bottom: Dual CTAs -->
+    <div class="section-bottom-content reveal-on-scroll delay-2">
+      <div class="cta-button-group">
+        <a href="{{ url_for('main.list_clubs') }}" class="btn-tesla-primary">
+          Manage All Clubs
+        </a>
+        <a href="{{ url_for('main.create_club') }}" class="btn-tesla-secondary">
+          Add New Club
+        </a>
       </div>
-      <div class="stat-number text-white">{{ total_students }}</div>
-      <div class="text-muted small mt-2">Enrolled campus engineers</div>
+      <a href="#triggers" class="scroll-chevron" aria-label="Scroll to Triggers Architecture">
+        <i class="bi bi-chevron-down"></i>
+      </a>
     </div>
-  </div>
+  </section>
 
-  <div class="col-sm-6 col-xl-3">
-    <div class="card p-4 stat-card h-100 tilt-card" style="border-left: 3px solid #f59e0b !important;">
-      <div class="d-flex justify-content-between align-items-center mb-2">
-        <span class="text-secondary text-uppercase fw-bold small" style="letter-spacing: 0.08em;">Active Memberships</span>
-        <div class="p-2 rounded-3" style="background: rgba(245, 158, 11, 0.15); color: #f59e0b;">
-          <i class="bi bi-person-badge-fill fs-5"></i>
-        </div>
-      </div>
-      <div class="stat-number text-gradient-gold">{{ total_memberships }}</div>
-      <div class="text-muted small mt-2">Trigger-synchronized records</div>
+  <!-- =========================================================================
+       SECTION 3: 8 DATABASE TRIGGERS ENGINE
+       ========================================================================= -->
+  <section class="snap-section" id="triggers">
+    <div class="section-visual-bg"></div>
+
+    <!-- Top: Headline & Subtitle -->
+    <div class="section-top-content reveal-on-scroll">
+      <h2 class="section-title">8 Production Triggers Engine</h2>
+      <p class="section-subtitle">
+        Declarative database automation executing within Cloud SQL with zero audit table pollution
+      </p>
     </div>
-  </div>
 
-  <div class="col-sm-6 col-xl-3">
-    <div class="card p-4 stat-card h-100 tilt-card" style="border-left: 3px solid #8b5cf6 !important;">
-      <div class="d-flex justify-content-between align-items-center mb-2">
-        <span class="text-secondary text-uppercase fw-bold small" style="letter-spacing: 0.08em;">Campus Events</span>
-        <div class="p-2 rounded-3" style="background: rgba(139, 92, 246, 0.15); color: #8b5cf6;">
-          <i class="bi bi-calendar-event-fill fs-5"></i>
-        </div>
-      </div>
-      <div class="stat-number text-white">{{ total_events }}</div>
-      <div class="text-muted small mt-2">Tracked event lifecycles</div>
-    </div>
-  </div>
-</div>
-
-<div class="row g-4">
-  <!-- Database SQL View: ClubSummary Table -->
-  <div class="col-lg-8">
-    <div class="card h-100 shadow-lg">
-      <div class="card-header py-3 px-4 d-flex justify-content-between align-items-center">
-        <div>
-          <h5 class="mb-0 fw-bold text-white d-flex align-items-center gap-2">
-            <i class="bi bi-table text-info"></i>
-            <span>Club Overview &bull; Live Database View</span>
-          </h5>
-          <small class="text-muted">Populated directly from SQL VIEW: <code class="text-info font-mono">ClubSummary</code></small>
-        </div>
-        <a href="{{ url_for('main.list_clubs') }}" class="btn btn-sm btn-outline-primary">Manage Charters</a>
-      </div>
-      <div class="table-responsive">
-        <table class="table table-hover align-middle mb-0">
-          <thead>
-            <tr>
-              <th>Club ID</th>
-              <th>Club Name</th>
-              <th>Category</th>
-              <th>Faculty Coordinator</th>
-              <th class="text-center">Member Count</th>
-            </tr>
-          </thead>
-          <tbody>
-            {% for c in club_summaries %}
-            <tr>
-              <td><span class="badge bg-dark font-mono">{{ c.club_id }}</span></td>
-              <td class="fw-semibold text-white">{{ c.club_name }}</td>
-              <td><span class="badge bg-secondary-subtle">{{ c.category }}</span></td>
-              <td><span class="small text-secondary">{{ c.faculty_coordinator }}</span></td>
-              <td class="text-center">
-                <span class="badge bg-info text-dark fw-bold px-3 py-2 font-mono fs-6">{{ c.member_count }}</span>
-              </td>
-            </tr>
-            {% else %}
-            <tr>
-              <td colspan="5" class="text-center text-muted py-4">No clubs found in view.</td>
-            </tr>
-            {% endfor %}
-          </tbody>
-        </table>
-      </div>
-    </div>
-  </div>
-
-  <!-- Recent Events Telemetry & System Specs -->
-  <div class="col-lg-4">
-    <div class="card shadow-lg mb-4">
-      <div class="card-header py-3 px-4">
-        <h5 class="mb-0 fw-bold text-white d-flex align-items-center gap-2">
-          <i class="bi bi-calendar3 text-info"></i>
-          <span>Recent Event Operations</span>
-        </h5>
-      </div>
-      <div class="list-group list-group-flush">
-        {% for ev in recent_events %}
-        <div class="list-group-item d-flex justify-content-between align-items-start py-3 px-4">
-          <div>
-            <div class="fw-semibold text-white">{{ ev.event_name }}</div>
-            <small class="text-muted d-block mt-1">
-              <i class="bi bi-geo-alt me-1"></i>{{ ev.venue or 'TBA' }} &bull; <span class="text-secondary">{{ ev.club_name }}</span>
-            </small>
+    <!-- Middle: 4 Pillar Cards -->
+    <div class="section-middle-content reveal-on-scroll delay-1" style="max-width: 1200px;">
+      <div class="row g-3 w-100">
+        <div class="col-md-6 col-lg-3">
+          <div class="tesla-card h-100">
+            <span class="badge-status info mb-3">MEMBER 1 &bull; T1 &amp; T2</span>
+            <h4 class="text-white fw-medium mb-2" style="font-size: 16px;">Club Size Automation</h4>
+            <p class="text-secondary small mb-0">
+              Automatic sync of <code class="font-mono text-white">Clubs.member_count</code> on join/departure.
+            </p>
           </div>
-          {% if ev.status == 'Completed' %}
-            <span class="badge bg-success-subtle text-success">Completed</span>
-          {% elif ev.status == 'Ongoing' %}
-            <span class="badge bg-info-subtle text-info">Ongoing</span>
-          {% elif ev.status == 'Cancelled' %}
-            <span class="badge bg-danger-subtle text-danger">Cancelled</span>
-          {% else %}
-            <span class="badge bg-secondary-subtle">Planned</span>
-          {% endif %}
         </div>
-        {% else %}
-        <div class="list-group-item text-center text-muted py-3">No events recorded.</div>
-        {% endfor %}
+        <div class="col-md-6 col-lg-3">
+          <div class="tesla-card h-100">
+            <span class="badge-status success mb-3">MEMBER 2 &bull; T3 &amp; T4</span>
+            <h4 class="text-white fw-medium mb-2" style="font-size: 16px;">Single-President Rule</h4>
+            <p class="text-secondary small mb-0">
+              Enforces single active president per club via SQLSTATE 45000 exception handling.
+            </p>
+          </div>
+        </div>
+        <div class="col-md-6 col-lg-3">
+          <div class="tesla-card h-100">
+            <span class="badge-status warning mb-3">MEMBER 3 &bull; T5 &amp; T6</span>
+            <h4 class="text-white fw-medium mb-2" style="font-size: 16px;">Registration &amp; Feedback</h4>
+            <p class="text-secondary small mb-0">
+              Blocks retrospective joins on past events &amp; validates attendee review integrity.
+            </p>
+          </div>
+        </div>
+        <div class="col-md-6 col-lg-3">
+          <div class="tesla-card h-100">
+            <span class="badge-status neutral mb-3" style="color: var(--violet-400);">MEMBER 4 &bull; T7 &amp; T8</span>
+            <h4 class="text-white fw-medium mb-2" style="font-size: 16px;">Status &amp; Provisioning</h4>
+            <p class="text-secondary small mb-0">
+              Auto-advances event status on attendance and provisions default ClubProfile.
+            </p>
+          </div>
+        </div>
       </div>
-      <div class="card-footer py-3 text-center">
-        <a href="{{ url_for('main.list_events') }}" class="btn btn-sm btn-outline-secondary w-100">
-          Open Events Desk
+    </div>
+
+    <!-- Bottom: Dual CTAs -->
+    <div class="section-bottom-content reveal-on-scroll delay-2">
+      <div class="cta-button-group">
+        <a href="{{ url_for('main.list_triggers') }}" class="btn-tesla-primary">
+          Explore 8 Triggers Suite
+        </a>
+        <a href="{{ url_for('main.create_membership') }}" class="btn-tesla-secondary">
+          Test Trigger Live
+        </a>
+      </div>
+      <a href="#procedures" class="scroll-chevron" aria-label="Scroll to Procedures Hub">
+        <i class="bi bi-chevron-down"></i>
+      </a>
+    </div>
+  </section>
+
+  <!-- =========================================================================
+       SECTION 4: 8 STORED PROCEDURES & DATABASE CURSORS
+       ========================================================================= -->
+  <section class="snap-section" id="procedures" style="background-color: var(--bg-1);">
+    <div class="section-visual-bg"></div>
+
+    <!-- Top: Headline & Subtitle -->
+    <div class="section-top-content reveal-on-scroll">
+      <h2 class="section-title">8 Database Cursors Suite</h2>
+      <p class="section-subtitle">
+        High-performance stored procedures with iterative cursor evaluation on Cloud SQL base tables
+      </p>
+    </div>
+
+    <!-- Middle: 4 Cursor Cards -->
+    <div class="section-middle-content reveal-on-scroll delay-1" style="max-width: 1200px;">
+      <div class="row g-3 w-100">
+        <div class="col-md-6 col-lg-3">
+          <div class="tesla-card h-100">
+            <span class="badge-status info mb-3">CURSOR 1</span>
+            <h4 class="text-white fw-medium mb-2 font-mono" style="font-size: 14px;">sp_audit_club_counts</h4>
+            <p class="text-secondary small mb-0">
+              Cursor loops all clubs, checks count drift against active members, and self-repairs.
+            </p>
+          </div>
+        </div>
+        <div class="col-md-6 col-lg-3">
+          <div class="tesla-card h-100">
+            <span class="badge-status info mb-3">CURSOR 2</span>
+            <h4 class="text-white fw-medium mb-2 font-mono" style="font-size: 14px;">sp_recruitment_leads</h4>
+            <p class="text-secondary small mb-0">
+              Iterates active non-member attendees and auto-enrolls high-intent leads as Volunteers.
+            </p>
+          </div>
+        </div>
+        <div class="col-md-6 col-lg-3">
+          <div class="tesla-card h-100">
+            <span class="badge-status success mb-3">CURSOR 3</span>
+            <h4 class="text-white fw-medium mb-2 font-mono" style="font-size: 14px;">sp_reconcile_budgets</h4>
+            <p class="text-secondary small mb-0">
+              Scans event feedback ratings and allocates performance bonus budget to top initiatives.
+            </p>
+          </div>
+        </div>
+        <div class="col-md-6 col-lg-3">
+          <div class="tesla-card h-100">
+            <span class="badge-status success mb-3">CURSOR 4</span>
+            <h4 class="text-white fw-medium mb-2 font-mono" style="font-size: 14px;">sp_close_past_events</h4>
+            <p class="text-secondary small mb-0">
+              Reconciles past planned events to Completed or Cancelled based on recorded attendance.
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Bottom: Dual CTAs -->
+    <div class="section-bottom-content reveal-on-scroll delay-2">
+      <div class="cta-button-group">
+        <a href="{{ url_for('main.procedures_hub') }}" class="btn-tesla-primary">
+          Open 8 Cursors Hub
+        </a>
+        <a href="{{ url_for('main.proc_audit') }}" class="btn-tesla-secondary">
+          Run sp_audit_club_counts
+        </a>
+      </div>
+      <a href="#telemetry" class="scroll-chevron" aria-label="Scroll to Telemetry Metrics">
+        <i class="bi bi-chevron-down"></i>
+      </a>
+    </div>
+  </section>
+
+  <!-- =========================================================================
+       SECTION 5: REAL-TIME TELEMETRY & STATS
+       ========================================================================= -->
+  <section class="snap-section" id="telemetry">
+    <div class="section-visual-bg"></div>
+
+    <!-- Top: Headline & Subtitle -->
+    <div class="section-top-content reveal-on-scroll">
+      <h2 class="section-title">Real-Time DBMS Telemetry</h2>
+      <p class="section-subtitle">
+        Live database entity metrics evaluated dynamically across production Cloud SQL tables
+      </p>
+    </div>
+
+    <!-- Middle: 4 Key Metrics -->
+    <div class="section-middle-content reveal-on-scroll delay-1" style="max-width: 1100px;">
+      <div class="row g-4 w-100">
+        <div class="col-6 col-md-3">
+          <div class="tesla-card text-center py-4">
+            <span class="text-secondary small text-uppercase fw-medium" style="letter-spacing: 0.06em;">Total Clubs</span>
+            <div class="my-2 tabular-nums fw-medium" style="font-size: 44px; color: var(--text-1);" data-counter="{{ total_clubs }}">{{ total_clubs }}</div>
+            <span class="badge-status info">Charters</span>
+          </div>
+        </div>
+        <div class="col-6 col-md-3">
+          <div class="tesla-card text-center py-4">
+            <span class="text-secondary small text-uppercase fw-medium" style="letter-spacing: 0.06em;">Students Directory</span>
+            <div class="my-2 tabular-nums fw-medium" style="font-size: 44px; color: var(--text-1);" data-counter="{{ total_students }}">{{ total_students }}</div>
+            <span class="badge-status success">Enrolled</span>
+          </div>
+        </div>
+        <div class="col-6 col-md-3">
+          <div class="tesla-card text-center py-4">
+            <span class="text-secondary small text-uppercase fw-medium" style="letter-spacing: 0.06em;">Active Members</span>
+            <div class="my-2 tabular-nums fw-medium" style="font-size: 44px; color: var(--text-1);" data-counter="{{ total_memberships }}">{{ total_memberships }}</div>
+            <span class="badge-status warning">Trigger-Synced</span>
+          </div>
+        </div>
+        <div class="col-6 col-md-3">
+          <div class="tesla-card text-center py-4">
+            <span class="text-secondary small text-uppercase fw-medium" style="letter-spacing: 0.06em;">Campus Events</span>
+            <div class="my-2 tabular-nums fw-medium" style="font-size: 44px; color: var(--text-1);" data-counter="{{ total_events }}">{{ total_events }}</div>
+            <span class="badge-status neutral">Lifecycles</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Bottom: Dual CTAs -->
+    <div class="section-bottom-content reveal-on-scroll delay-2">
+      <div class="cta-button-group">
+        <a href="{{ url_for('main.list_students') }}" class="btn-tesla-primary">
+          Students Directory
+        </a>
+        <a href="{{ url_for('main.list_events') }}" class="btn-tesla-secondary">
+          Campus Events Desk
+        </a>
+      </div>
+      <a href="#infrastructure" class="scroll-chevron" aria-label="Scroll to Infrastructure Integrity">
+        <i class="bi bi-chevron-down"></i>
+      </a>
+    </div>
+  </section>
+
+  <!-- =========================================================================
+       SECTION 6: CLOUD INFRASTRUCTURE INTEGRITY
+       ========================================================================= -->
+  <section class="snap-section" id="infrastructure" style="background-color: var(--bg-1);">
+    <div class="section-visual-bg"></div>
+
+    <!-- Top: Headline & Subtitle -->
+    <div class="section-top-content reveal-on-scroll">
+      <h2 class="section-title">Production Cloud Infrastructure</h2>
+      <p class="section-subtitle">
+        High-availability containerized microservice deployed on Google Cloud Run paired with Cloud SQL
+      </p>
+    </div>
+
+    <!-- Middle: Architecture Specs -->
+    <div class="section-middle-content reveal-on-scroll delay-1" style="max-width: 900px;">
+      <div class="tesla-card w-100 p-4">
+        <div class="row g-4 text-start">
+          <div class="col-md-4">
+            <div class="text-secondary small text-uppercase fw-medium mb-1">Compute Service</div>
+            <div class="text-white fw-medium">Google Cloud Run</div>
+            <div class="text-secondary small mt-1">asia-south1 (Mumbai) &bull; 512MiB</div>
+          </div>
+          <div class="col-md-4">
+            <div class="text-secondary small text-uppercase fw-medium mb-1">Database Layer</div>
+            <div class="text-white fw-medium">Cloud SQL MySQL 8.0</div>
+            <div class="text-secondary small mt-1">Unix Socket Connector &bull; Zero TCP Exposure</div>
+          </div>
+          <div class="col-md-4">
+            <div class="text-secondary small text-uppercase fw-medium mb-1">Secret Storage</div>
+            <div class="text-white fw-medium">Secret Manager v2</div>
+            <div class="text-secondary small mt-1">Zero Plaintext Credentials in Source</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Bottom: Dual CTAs -->
+    <div class="section-bottom-content reveal-on-scroll delay-2">
+      <div class="cta-button-group">
+        <a href="{{ url_for('main.health') }}" class="btn-tesla-primary">
+          Verify System Health
+        </a>
+        <a href="#hero" class="btn-tesla-secondary">
+          Return to Cockpit Top
         </a>
       </div>
     </div>
+  </section>
 
-    <!-- Architectural Integrity Card -->
-    <div class="card p-4" style="background: linear-gradient(135deg, rgba(13, 19, 33, 0.95), rgba(15, 23, 42, 0.85)); border-color: rgba(56, 189, 248, 0.2);">
-      <div class="d-flex align-items-center gap-2 mb-2">
-        <span class="status-orb"></span>
-        <h6 class="fw-bold text-info mb-0">Production DBMS Verified</h6>
-      </div>
-      <p class="small text-secondary mb-3">
-        Engineered for real-world academic compliance: 8 strictly canonical domain tables without temporary or audit table pollution.
-      </p>
-      <div class="d-flex flex-column gap-2 small">
-        <div class="d-flex justify-content-between text-secondary">
-          <span>Triggers Coverage</span>
-          <span class="text-warning fw-semibold font-mono">8 Triggers (100%)</span>
-        </div>
-        <div class="d-flex justify-content-between text-secondary">
-          <span>Cursors Coverage</span>
-          <span class="text-info fw-semibold font-mono">8 Cursors (100%)</span>
-        </div>
-        <div class="d-flex justify-content-between text-secondary">
-          <span>Security Architecture</span>
-          <span class="text-success fw-semibold font-mono">Secret Manager &bull; Unix Socket</span>
-        </div>
-      </div>
-    </div>
-  </div>
 </div>
 {% endblock %}

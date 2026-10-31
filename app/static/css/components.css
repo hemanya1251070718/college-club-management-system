@@ -1,0 +1,854 @@
+/* ==========================================================================
+   COMPONENTS - PRESENTATION LAYER
+   Tesla Clean Structure & Interaction Architecture + Rich Dark Styling
+   ========================================================================== */
+
+/* --------------------------------------------------------------------------
+   Container & Layout
+   -------------------------------------------------------------------------- */
+.app-container {
+  max-width: var(--container-max);
+  margin-left: auto;
+  margin-right: auto;
+  padding-left: var(--gutter-desktop);
+  padding-right: var(--gutter-desktop);
+  width: 100%;
+}
+
+@media (max-width: 1024px) {
+  .app-container {
+    padding-left: var(--gutter-tablet);
+    padding-right: var(--gutter-tablet);
+  }
+}
+
+@media (max-width: 640px) {
+  .app-container {
+    padding-left: var(--gutter-mobile);
+    padding-right: var(--gutter-mobile);
+  }
+}
+
+/* --------------------------------------------------------------------------
+   Header (Tesla Pattern: 56px, Fixed, Transparent to Frosted on Scroll)
+   -------------------------------------------------------------------------- */
+.app-header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 56px;
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  background: transparent;
+  transition: background-color var(--dur-base) var(--ease-out),
+              backdrop-filter var(--dur-base) var(--ease-out),
+              border-color var(--dur-base) var(--ease-out);
+}
+
+.app-header.is-scrolled {
+  background: rgba(5, 6, 11, 0.78);
+  backdrop-filter: blur(16px) saturate(140%);
+  -webkit-backdrop-filter: blur(16px) saturate(140%);
+  border-bottom: 1px solid var(--border);
+}
+
+.header-inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  height: 100%;
+  max-width: var(--container-max);
+  margin: 0 auto;
+  padding: 0 var(--gutter-desktop);
+}
+
+.header-brand {
+  display: flex;
+  align-items: center;
+  text-decoration: none;
+  font-size: 16px;
+  font-weight: 500;
+  letter-spacing: -0.01em;
+  color: var(--text-1);
+}
+
+.brand-dot {
+  width: 6px;
+  height: 6px;
+  background-color: var(--blue-400);
+  border-radius: var(--radius-pill);
+  margin-right: 8px;
+  box-shadow: 0 0 8px var(--blue-400);
+}
+
+/* Primary Centered Nav */
+.header-nav {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-1);
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+@media (max-width: 1024px) {
+  .header-nav {
+    display: none;
+  }
+}
+
+.nav-pill-link {
+  display: inline-flex;
+  align-items: center;
+  font-size: 14px;
+  line-height: 16.8px;
+  font-weight: 500;
+  color: var(--text-1);
+  text-decoration: none;
+  padding: 6px 12px;
+  border-radius: var(--radius-btn);
+  transition: background-color var(--dur-fast) var(--ease-out),
+              color var(--dur-fast) var(--ease-out);
+}
+
+.nav-pill-link:hover,
+.nav-pill-link.is-active {
+  background: rgba(255, 255, 255, 0.08);
+  color: #FFFFFF;
+}
+
+.nav-pill-link.is-active {
+  border-bottom: 1px solid var(--blue-400);
+}
+
+/* Header Utilities */
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-2);
+}
+
+.menu-trigger-btn {
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid var(--border);
+  color: var(--text-1);
+  font-size: 14px;
+  font-weight: 500;
+  font-family: var(--font-sans);
+  padding: 6px 14px;
+  border-radius: var(--radius-btn);
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  transition: background-color var(--dur-fast) var(--ease-out),
+              border-color var(--dur-fast) var(--ease-out);
+}
+
+.menu-trigger-btn:hover {
+  background: rgba(255, 255, 255, 0.12);
+  border-color: var(--border-strong);
+}
+
+/* --------------------------------------------------------------------------
+   Tesla Side Menu Drawer
+   -------------------------------------------------------------------------- */
+.drawer-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(5, 6, 11, 0.7);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  z-index: 1050;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity var(--dur-base) var(--ease-out),
+              visibility var(--dur-base) var(--ease-out);
+}
+
+.drawer-backdrop.is-open {
+  opacity: 1;
+  visibility: visible;
+}
+
+.drawer-panel {
+  position: fixed;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  width: min(420px, 100vw);
+  background: var(--surface-2);
+  border-left: 1px solid var(--border);
+  z-index: 1060;
+  display: flex;
+  flex-direction: column;
+  padding: var(--sp-6) var(--sp-8);
+  transform: translateX(100%);
+  transition: transform 400ms cubic-bezier(0.16, 1, 0.3, 1);
+  overflow-y: auto;
+}
+
+.drawer-backdrop.is-open .drawer-panel {
+  transform: translateX(0);
+}
+
+.drawer-header {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: var(--sp-8);
+}
+
+.drawer-close-btn {
+  background: transparent;
+  border: none;
+  color: var(--text-2);
+  font-size: 20px;
+  cursor: pointer;
+  padding: 8px;
+  border-radius: var(--radius-btn);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: color var(--dur-fast) var(--ease-out), background var(--dur-fast);
+}
+
+.drawer-close-btn:hover {
+  color: var(--text-1);
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.drawer-nav-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-3);
+}
+
+.drawer-nav-link {
+  display: block;
+  font-size: 17px;
+  font-weight: 500;
+  color: var(--text-1);
+  text-decoration: none;
+  padding: 10px 14px;
+  border-radius: var(--radius-btn);
+  transition: background-color var(--dur-fast) var(--ease-out),
+              color var(--dur-fast) var(--ease-out);
+}
+
+.drawer-nav-link:hover {
+  background: rgba(255, 255, 255, 0.08);
+  color: #FFFFFF;
+}
+
+.drawer-subnav {
+  margin-top: var(--sp-8);
+  padding-top: var(--sp-6);
+  border-top: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-2);
+}
+
+.drawer-sublink {
+  font-size: 14px;
+  font-weight: 400;
+  color: var(--text-2);
+  text-decoration: none;
+  padding: 6px 14px;
+  border-radius: var(--radius-btn);
+  transition: color var(--dur-fast);
+}
+
+.drawer-sublink:hover {
+  color: var(--text-1);
+}
+
+/* --------------------------------------------------------------------------
+   Tesla Full-Viewport Scroll-Snap Sections (Landing Page)
+   -------------------------------------------------------------------------- */
+.landing-scroll-container {
+  scroll-behavior: smooth;
+}
+
+body.has-scroll-snap {
+  overflow-y: scroll;
+  scroll-snap-type: y mandatory;
+}
+
+.snap-section {
+  position: relative;
+  min-height: 100svh;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: center;
+  padding: 96px var(--gutter-desktop) 48px var(--gutter-desktop);
+  scroll-snap-align: start;
+  scroll-snap-stop: always;
+  overflow: hidden;
+  box-sizing: border-box;
+}
+
+/* Section Background & Gradient Overlays */
+.section-visual-bg {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  background: radial-gradient(circle at 50% 40%, rgba(47, 91, 234, 0.08) 0%, transparent 60%);
+}
+
+.section-overlay {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  pointer-events: none;
+  background: linear-gradient(180deg, rgba(5,6,11,0.7) 0%, rgba(5,6,11,0.2) 40%, rgba(5,6,11,0.85) 100%);
+}
+
+.section-top-content {
+  position: relative;
+  z-index: 10;
+  text-align: center;
+  max-width: 800px;
+  width: 100%;
+}
+
+.section-title {
+  font-size: 40px;
+  line-height: 48px;
+  font-weight: 500;
+  letter-spacing: -0.02em;
+  color: var(--text-1);
+  margin: 0 0 var(--sp-2) 0;
+}
+
+@media (max-width: 768px) {
+  .section-title {
+    font-size: 28px;
+    line-height: 34px;
+  }
+}
+
+.section-subtitle {
+  font-size: 17px;
+  line-height: 22px;
+  font-weight: 400;
+  color: var(--text-2);
+  margin: 0;
+}
+
+.section-middle-content {
+  position: relative;
+  z-index: 10;
+  width: 100%;
+  max-width: 1100px;
+  margin: auto 0;
+  display: flex;
+  justify-content: center;
+}
+
+.section-bottom-content {
+  position: relative;
+  z-index: 10;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+/* Tesla Dual CTA Group */
+.cta-button-group {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--sp-4);
+  width: 100%;
+  max-width: 640px;
+}
+
+@media (max-width: 640px) {
+  .cta-button-group {
+    flex-direction: column;
+    width: 100%;
+  }
+}
+
+/* --------------------------------------------------------------------------
+   Tesla-Style Buttons (40px Height, 4px Radius, 14px / 500)
+   -------------------------------------------------------------------------- */
+.btn-tesla-primary {
+  height: 40px;
+  min-width: 264px;
+  background-color: var(--blue-500);
+  color: #FFFFFF !important;
+  font-family: var(--font-sans);
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 40px;
+  text-align: center;
+  text-decoration: none;
+  border-radius: var(--radius-btn);
+  border: none;
+  padding: 0 24px;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: background-color var(--dur-fast) var(--ease-out),
+              box-shadow var(--dur-base) var(--ease-out);
+}
+
+.btn-tesla-primary:hover,
+.btn-tesla-primary:focus-visible {
+  background-color: var(--blue-600);
+  box-shadow: 0 0 16px rgba(47, 91, 234, 0.45);
+}
+
+.btn-tesla-secondary {
+  height: 40px;
+  min-width: 264px;
+  background-color: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  color: var(--text-1) !important;
+  font-family: var(--font-sans);
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 38px;
+  text-align: center;
+  text-decoration: none;
+  border-radius: var(--radius-btn);
+  padding: 0 24px;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  transition: background-color var(--dur-fast) var(--ease-out),
+              border-color var(--dur-fast) var(--ease-out);
+}
+
+.btn-tesla-secondary:hover,
+.btn-tesla-secondary:focus-visible {
+  background-color: rgba(255, 255, 255, 0.16);
+  border-color: rgba(255, 255, 255, 0.35);
+}
+
+@media (max-width: 640px) {
+  .btn-tesla-primary,
+  .btn-tesla-secondary {
+    min-width: 100%;
+    width: 100%;
+  }
+}
+
+/* Subtle Scroll Chevron Indicator */
+.scroll-chevron {
+  margin-top: var(--sp-4);
+  color: var(--text-3);
+  font-size: 20px;
+  animation: chevron-bounce 2s infinite ease-in-out;
+}
+
+@keyframes chevron-bounce {
+  0%, 20%, 50%, 80%, 100% { transform: translateY(0); }
+  40% { transform: translateY(6px); }
+  60% { transform: translateY(3px); }
+}
+
+/* --------------------------------------------------------------------------
+   Inner Page Header Band (Compact, Left-aligned, NOT 100vh)
+   -------------------------------------------------------------------------- */
+.inner-page-header {
+  padding-top: 80px;
+  padding-bottom: var(--sp-6);
+  border-bottom: 1px solid var(--border);
+  margin-bottom: var(--sp-8);
+}
+
+.inner-header-layout {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: var(--sp-4);
+}
+
+@media (max-width: 768px) {
+  .inner-header-layout {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}
+
+.inner-page-title {
+  font-size: 32px;
+  line-height: 38px;
+  font-weight: 500;
+  letter-spacing: -0.02em;
+  color: var(--text-1);
+  margin: 0 0 4px 0;
+}
+
+.inner-page-subtitle {
+  font-size: 14px;
+  line-height: 20px;
+  color: var(--text-2);
+  margin: 0;
+}
+
+/* --------------------------------------------------------------------------
+   Tables (No Zebra, 56px Rows, Hairline Separators, Sticky Frosted Header)
+   NO GLITCHY FLIPPING ANIMATIONS
+   -------------------------------------------------------------------------- */
+.table-surface-card {
+  background: var(--surface-1);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-card);
+  overflow: hidden;
+}
+
+.tesla-table {
+  width: 100%;
+  border-collapse: collapse;
+  color: var(--text-2);
+  margin-bottom: 0;
+}
+
+.tesla-table thead {
+  position: sticky;
+  top: 56px;
+  z-index: 10;
+  background: var(--surface-2);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+}
+
+.tesla-table th {
+  font-family: var(--font-sans);
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--text-3);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  padding: 14px 20px;
+  border-bottom: 1px solid var(--border);
+  white-space: nowrap;
+}
+
+.tesla-table td {
+  padding: 16px 20px;
+  border-bottom: 1px solid var(--border);
+  font-size: 14px;
+  line-height: 20px;
+  font-weight: 400;
+  color: var(--text-2);
+  vertical-align: middle;
+  transition: background-color var(--dur-fast);
+}
+
+.tesla-table tbody tr {
+  height: 56px;
+  transition: background-color var(--dur-fast) var(--ease-out);
+}
+
+.tesla-table tbody tr:hover td {
+  background: var(--surface-2);
+  color: var(--text-1);
+}
+
+.tabular-nums {
+  font-variant-numeric: tabular-nums;
+  font-family: var(--font-mono);
+}
+
+/* Ghost Action Icons */
+.btn-ghost-action {
+  background: transparent;
+  border: none;
+  color: var(--text-3);
+  padding: 6px 10px;
+  border-radius: var(--radius-btn);
+  cursor: pointer;
+  transition: color var(--dur-fast), background var(--dur-fast);
+}
+
+.btn-ghost-action:hover {
+  color: var(--text-1);
+  background: rgba(255, 255, 255, 0.08);
+}
+
+/* --------------------------------------------------------------------------
+   Cards (Surface-1, 1px Border, 12px Radius, Smooth Subtle Lift)
+   -------------------------------------------------------------------------- */
+.tesla-card {
+  background: var(--surface-1);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-card);
+  padding: var(--sp-6);
+  transition: border-color var(--dur-base) var(--ease-out),
+              transform var(--dur-base) var(--ease-out);
+}
+
+.tesla-card:hover {
+  border-color: var(--border-strong);
+  transform: translateY(-2px);
+}
+
+/* --------------------------------------------------------------------------
+   Forms (44px Height, Surface-1, 1px Border, 4px Radius)
+   -------------------------------------------------------------------------- */
+.tesla-form-control,
+.tesla-form-select {
+  height: 44px;
+  background-color: var(--surface-1);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-input);
+  color: var(--text-1);
+  font-family: var(--font-sans);
+  font-size: 14px;
+  padding: 0 14px;
+  width: 100%;
+  box-sizing: border-box;
+  transition: border-color var(--dur-fast), box-shadow var(--dur-fast);
+}
+
+.tesla-textarea {
+  min-height: 96px;
+  background-color: var(--surface-1);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-input);
+  color: var(--text-1);
+  font-family: var(--font-sans);
+  font-size: 14px;
+  padding: 12px 14px;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.tesla-form-control:focus,
+.tesla-form-select:focus,
+.tesla-textarea:focus {
+  border-color: var(--blue-400);
+  box-shadow: 0 0 0 2px rgba(79, 124, 255, 0.25);
+  outline: none;
+}
+
+.tesla-form-label {
+  display: block;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--text-2);
+  margin-bottom: var(--sp-2);
+}
+
+/* --------------------------------------------------------------------------
+   Badges / Status Pills (12% Tint Backgrounds)
+   -------------------------------------------------------------------------- */
+.badge-status {
+  display: inline-flex;
+  align-items: center;
+  font-size: 12px;
+  font-weight: 500;
+  padding: 3px 10px;
+  border-radius: var(--radius-pill);
+  line-height: 16px;
+}
+
+.badge-status.success {
+  background: var(--success-bg);
+  color: var(--success);
+  border: 1px solid var(--success-border);
+}
+
+.badge-status.warning {
+  background: var(--warning-bg);
+  color: var(--warning);
+  border: 1px solid var(--warning-border);
+}
+
+.badge-status.danger {
+  background: var(--danger-bg);
+  color: var(--danger);
+  border: 1px solid var(--danger-border);
+}
+
+.badge-status.info {
+  background: var(--info-bg);
+  color: var(--info);
+  border: 1px solid var(--info-border);
+}
+
+.badge-status.neutral {
+  background: rgba(255, 255, 255, 0.06);
+  color: var(--text-2);
+  border: 1px solid var(--border);
+}
+
+/* --------------------------------------------------------------------------
+   Alerts & Toast Notifications
+   -------------------------------------------------------------------------- */
+.tesla-alert {
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-btn);
+  padding: var(--sp-4) var(--sp-6);
+  color: var(--text-1);
+  margin-bottom: var(--sp-4);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4);
+}
+
+.tesla-alert.alert-success {
+  border-left: 3px solid var(--success);
+}
+
+.tesla-alert.alert-danger {
+  border-left: 3px solid var(--danger);
+}
+
+.tesla-alert.alert-warning {
+  border-left: 3px solid var(--warning);
+}
+
+.tesla-alert.alert-info {
+  border-left: 3px solid var(--info);
+}
+
+/* --------------------------------------------------------------------------
+   Minimal Quiet Footer
+   -------------------------------------------------------------------------- */
+.app-footer {
+  margin-top: auto;
+  border-top: 1px solid var(--border);
+  padding: var(--sp-6) 0;
+  background: var(--bg-0);
+}
+
+.footer-inner {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--sp-4);
+  font-size: 12px;
+  color: var(--text-3);
+}
+
+.footer-links {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-4);
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.footer-links a {
+  color: var(--text-3);
+  text-decoration: none;
+  transition: color var(--dur-fast);
+}
+
+.footer-links a:hover {
+  color: var(--text-1);
+}
+
+/* --------------------------------------------------------------------------
+   Bootstrap 5 Override Layer
+   Ensures no default light styles survive
+   -------------------------------------------------------------------------- */
+.card {
+  background-color: var(--surface-1) !important;
+  border: 1px solid var(--border) !important;
+  border-radius: var(--radius-card) !important;
+  color: var(--text-1) !important;
+}
+
+.card-header, .card-footer {
+  background-color: rgba(255, 255, 255, 0.02) !important;
+  border-color: var(--border) !important;
+}
+
+.table {
+  color: var(--text-2) !important;
+  border-color: var(--border) !important;
+}
+
+.table > :not(caption) > * > * {
+  background-color: transparent !important;
+  border-bottom-color: var(--border) !important;
+}
+
+.form-control, .form-select {
+  background-color: var(--surface-1) !important;
+  border-color: var(--border) !important;
+  color: var(--text-1) !important;
+  border-radius: var(--radius-input) !important;
+  min-height: 44px;
+}
+
+.form-control:focus, .form-select:focus {
+  border-color: var(--blue-400) !important;
+  box-shadow: 0 0 0 2px rgba(79, 124, 255, 0.25) !important;
+}
+
+.modal-content {
+  background-color: var(--surface-2) !important;
+  border: 1px solid var(--border-strong) !important;
+  border-radius: var(--radius-card) !important;
+  color: var(--text-1) !important;
+}
+
+.modal-backdrop.show {
+  opacity: 0.75 !important;
+  backdrop-filter: blur(8px) !important;
+}
+
+.dropdown-menu {
+  background-color: var(--surface-2) !important;
+  border: 1px solid var(--border) !important;
+  border-radius: var(--radius-card) !important;
+  box-shadow: 0 16px 32px rgba(0, 0, 0, 0.6) !important;
+  padding: var(--sp-2) !important;
+}
+
+.dropdown-item {
+  color: var(--text-2) !important;
+  border-radius: var(--radius-btn) !important;
+  padding: 8px 12px !important;
+  font-size: 14px !important;
+  transition: background-color var(--dur-fast), color var(--dur-fast) !important;
+}
+
+.dropdown-item:hover, .dropdown-item:focus {
+  background-color: rgba(255, 255, 255, 0.08) !important;
+  color: var(--text-1) !important;
+}
+
+.list-group, .list-group-item {
+  background-color: transparent !important;
+  border-color: var(--border) !important;
+  color: var(--text-2) !important;
+}
+
+.input-group-text {
+  background-color: var(--surface-2) !important;
+  border-color: var(--border) !important;
+  color: var(--text-2) !important;
+}
+
+select option {
+  background-color: var(--surface-2);
+  color: var(--text-1);
+}
+

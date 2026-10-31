@@ -1,144 +1,138 @@
 {% extends "base.html" %}
 
-{% block title %}Registrations & Attendees: {{ event.event_name }}{% endblock %}
+{% block title %}Registrations &amp; Attendees: {{ event.event_name }}{% endblock %}
 
 {% block content %}
-<div class="d-flex justify-content-between align-items-center mb-4">
-  <div>
-    <nav aria-label="breadcrumb">
-      <ol class="breadcrumb mb-1">
-        <li class="breadcrumb-item"><a href="{{ url_for('main.list_events') }}">Events</a></li>
-        <li class="breadcrumb-item active">{{ event.event_name }}</li>
-      </ol>
-    </nav>
-    <h3 class="fw-bold mb-0">Event Registrations & Attendance Desk</h3>
-    <p class="text-muted small">Demonstrating Triggers: <code>trg_prevent_registration_for_completed_event</code> &bull; <code>trg_auto_progress_event_on_attendance</code></p>
-  </div>
-  <div class="d-flex gap-2">
-    <a href="{{ url_for('main.event_feedback', event_id=event.event_id) }}" class="btn btn-outline-warning text-dark">
-      <i class="bi bi-star-fill me-1 text-warning"></i> Event Feedback (Trigger 6)
-    </a>
-    <a href="{{ url_for('main.list_events') }}" class="btn btn-outline-secondary">
-      <i class="bi bi-arrow-left me-1"></i> Back to Events
-    </a>
-  </div>
-</div>
-
-<!-- Event Info Card -->
-<div class="card p-3 mb-4 shadow-sm bg-white">
-  <div class="row align-items-center">
-    <div class="col-md-3">
-      <small class="text-muted d-block text-uppercase">Host Club</small>
-      <strong>{{ event.club_name }}</strong> (<code>{{ event.club_id }}</code>)
-    </div>
-    <div class="col-md-3">
-      <small class="text-muted d-block text-uppercase">Event Date & Venue</small>
-      <span>{{ event.event_date or 'TBA' }} &bull; {{ event.venue or 'TBA' }}</span>
-    </div>
-    <div class="col-md-3">
-      <small class="text-muted d-block text-uppercase">Current Status</small>
-      {% if event.status == 'Completed' %}
-        <span class="badge bg-success">Completed</span>
-      {% elif event.status == 'Ongoing' %}
-        <span class="badge bg-primary">Ongoing</span>
-      {% elif event.status == 'Cancelled' %}
-        <span class="badge bg-danger">Cancelled</span>
-      {% else %}
-        <span class="badge bg-secondary">Planned</span>
-      {% endif %}
-    </div>
-    <div class="col-md-3 text-md-end">
-      <small class="text-muted d-block text-uppercase">Registered Attendees</small>
-      <span class="fs-4 fw-bold text-primary">{{ registrations|length }}</span>
-    </div>
-  </div>
-</div>
-
-<div class="row g-4">
-  <!-- Register Student Form -->
-  <div class="col-lg-4">
-    <div class="card shadow-sm h-100">
-      <div class="card-header bg-white py-3">
-        <h5 class="mb-0 fw-bold"><i class="bi bi-person-plus-fill text-primary me-2"></i>Register Student</h5>
-        <small class="text-muted">Fires Trigger 5: blocks if event Completed/Cancelled</small>
+<div class="app-container">
+  <header class="inner-page-header">
+    <div class="inner-header-layout">
+      <div>
+        <h1 class="inner-page-title">Event Registrations &amp; Attendance Desk</h1>
+        <p class="inner-page-subtitle">Demonstrating Triggers: <code class="font-mono text-white">trg_prevent_registration_for_completed_event</code> &bull; <code class="font-mono text-white">trg_auto_progress_event_on_attendance</code></p>
       </div>
-      <div class="card-body">
+      <div class="d-flex gap-2">
+        <a href="{{ url_for('main.event_feedback', event_id=event.event_id) }}" class="btn-tesla-secondary">
+          <i class="bi bi-star-fill me-1 text-warning"></i> Event Feedback (Trigger 6)
+        </a>
+        <a href="{{ url_for('main.list_events') }}" class="btn-tesla-secondary">
+          <i class="bi bi-arrow-left me-1"></i> Back to Events
+        </a>
+      </div>
+    </div>
+  </header>
+
+  <!-- Event Summary Banner -->
+  <div class="tesla-card mb-4 p-4">
+    <div class="row align-items-center g-3">
+      <div class="col-md-3">
+        <small class="text-secondary d-block text-uppercase" style="font-size: 11px; letter-spacing: 0.05em;">Host Club</small>
+        <span class="text-white fw-medium">{{ event.club_name }}</span> (<code class="font-mono text-white">{{ event.club_id }}</code>)
+      </div>
+      <div class="col-md-3">
+        <small class="text-secondary d-block text-uppercase" style="font-size: 11px; letter-spacing: 0.05em;">Date &amp; Venue</small>
+        <span class="text-white tabular-nums">{{ event.event_date or 'TBA' }} &bull; {{ event.venue or 'TBA' }}</span>
+      </div>
+      <div class="col-md-3">
+        <small class="text-secondary d-block text-uppercase" style="font-size: 11px; letter-spacing: 0.05em;">Current Status</small>
+        {% if event.status == 'Completed' %}
+          <span class="badge-status success">Completed</span>
+        {% elif event.status == 'Ongoing' %}
+          <span class="badge-status info">Ongoing</span>
+        {% elif event.status == 'Cancelled' %}
+          <span class="badge-status danger">Cancelled</span>
+        {% else %}
+          <span class="badge-status neutral">Planned</span>
+        {% endif %}
+      </div>
+      <div class="col-md-3 text-md-end">
+        <small class="text-secondary d-block text-uppercase" style="font-size: 11px; letter-spacing: 0.05em;">Registered Attendees</small>
+        <span class="fw-medium tabular-nums" style="font-size: 28px; color: var(--text-1);">{{ registrations|length }}</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="row g-4">
+    <!-- Register Student Form -->
+    <div class="col-lg-4">
+      <div class="tesla-card h-100">
+        <h4 class="text-white fw-medium mb-1" style="font-size: 17px;">Register Student</h4>
+        <small class="text-secondary d-block mb-4">Fires Trigger 5: blocks if event is Completed/Cancelled</small>
+
         <form method="POST" action="{{ url_for('main.register_for_event', event_id=event.event_id) }}">
-          <div class="mb-3">
-            <label class="form-label fw-semibold">Select Student</label>
-            <select name="student_id" class="form-select" required>
+          <div class="mb-4">
+            <label class="tesla-form-label">Select Student *</label>
+            <select name="student_id" class="tesla-form-select" required>
               <option value="" disabled selected>Choose student...</option>
               {% for s in all_students %}
               <option value="{{ s.student_id }}">{{ s.name }} ({{ s.student_id }})</option>
               {% endfor %}
             </select>
           </div>
-          <button type="submit" class="btn btn-primary w-100">
-            <i class="bi bi-check-circle me-1"></i> Confirm Registration
+          <button type="submit" class="btn-tesla-primary w-100">
+            <i class="bi bi-check-circle me-2"></i> Confirm Registration
           </button>
         </form>
       </div>
     </div>
-  </div>
 
-  <!-- Registrations Table -->
-  <div class="col-lg-8">
-    <div class="card shadow-sm h-100">
-      <div class="card-header bg-white py-3 d-flex justify-content-between align-items-center">
-        <h5 class="mb-0 fw-bold"><i class="bi bi-people-fill text-primary me-2"></i>Registered Attendees</h5>
-        <small class="text-muted">Fires Trigger 7: Marking attendance flips Planned &rarr; Ongoing</small>
-      </div>
-      <div class="table-responsive">
-        <table class="table table-hover align-middle mb-0">
-          <thead class="table-light">
-            <tr>
-              <th>Reg ID</th>
-              <th>Student</th>
-              <th>Reg Date</th>
-              <th>Attendance</th>
-              <th class="text-end">Action</th>
-            </tr>
-          </thead>
-          <tbody>
-            {% for r in registrations %}
-            <tr>
-              <td><code>{{ r.registration_id }}</code></td>
-              <td>
-                <strong>{{ r.student_name }}</strong>
-                <small class="d-block text-muted">{{ r.student_id }} &bull; {{ r.dept_name }}</small>
-              </td>
-              <td><small>{{ r.registration_date }}</small></td>
-              <td>
-                {% if r.attendance_status == 'Attended' %}
-                  <span class="badge bg-success-subtle text-success border border-success"><i class="bi bi-check2 me-1"></i>Attended</span>
-                {% elif r.attendance_status == 'Absent' %}
-                  <span class="badge bg-danger-subtle text-danger border border-danger">Absent</span>
-                {% else %}
-                  <span class="badge bg-secondary-subtle text-secondary border">Registered</span>
-                {% endif %}
-              </td>
-              <td class="text-end">
-                {% if r.attendance_status != 'Attended' %}
-                <form method="POST" action="{{ url_for('main.mark_attendance', event_id=event.event_id, reg_id=r.registration_id) }}" class="d-inline">
-                  <button type="submit" class="btn btn-sm btn-outline-success" title="Mark Attended (Fires Trigger 7)">
-                    <i class="bi bi-check-lg me-1"></i> Mark Attended
-                  </button>
-                </form>
-                {% else %}
-                  <small class="text-success"><i class="bi bi-check-all me-1"></i>Checked In</small>
-                {% endif %}
-              </td>
-            </tr>
-            {% else %}
-            <tr>
-              <td colspan="5" class="text-center text-muted py-4">No students registered yet for this event.</td>
-            </tr>
-            {% endfor %}
-          </tbody>
-        </table>
+    <!-- Registrations Table -->
+    <div class="col-lg-8">
+      <div class="table-surface-card h-100">
+        <div class="p-3 border-bottom d-flex justify-content-between align-items-center" style="border-color: var(--border) !important; background: var(--surface-2);">
+          <span class="text-white fw-medium">Registered Attendees</span>
+          <small class="text-secondary">Trigger 7: Marking attendance flips Planned &rarr; Ongoing</small>
+        </div>
+        <div class="table-responsive">
+          <table class="tesla-table">
+            <thead>
+              <tr>
+                <th>Reg ID</th>
+                <th>Student</th>
+                <th>Reg Date</th>
+                <th>Attendance</th>
+                <th class="text-end">Action</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for r in registrations %}
+              <tr>
+                <td><span class="badge-status neutral font-mono">{{ r.registration_id }}</span></td>
+                <td>
+                  <strong class="text-white">{{ r.student_name }}</strong>
+                  <small class="d-block text-secondary">{{ r.student_id }} &bull; {{ r.dept_name }}</small>
+                </td>
+                <td class="tabular-nums"><small class="text-secondary">{{ r.registration_date }}</small></td>
+                <td>
+                  {% if r.attendance_status == 'Attended' %}
+                    <span class="badge-status success"><i class="bi bi-check2 me-1"></i>Attended</span>
+                  {% elif r.attendance_status == 'Absent' %}
+                    <span class="badge-status danger">Absent</span>
+                  {% else %}
+                    <span class="badge-status neutral">Registered</span>
+                  {% endif %}
+                </td>
+                <td class="text-end">
+                  {% if r.attendance_status != 'Attended' %}
+                  <form method="POST" action="{{ url_for('main.mark_attendance', event_id=event.event_id, reg_id=r.registration_id) }}" class="d-inline">
+                    <button type="submit" class="btn-ghost-action text-success" title="Mark Attended (Fires Trigger 7)">
+                      <i class="bi bi-check-lg me-1"></i> Mark Attended
+                    </button>
+                  </form>
+                  {% else %}
+                    <small class="text-success"><i class="bi bi-check-all me-1"></i>Checked In</small>
+                  {% endif %}
+                </td>
+              </tr>
+              {% else %}
+              <tr>
+                <td colspan="5" class="text-center text-secondary py-5">No students registered yet for this event.</td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
       </div>
     </div>
   </div>
 </div>
 {% endblock %}
-

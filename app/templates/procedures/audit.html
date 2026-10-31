@@ -3,71 +3,82 @@
 {% block title %}Cursor Procedure: sp_audit_club_counts{% endblock %}
 
 {% block content %}
-<div class="row justify-content-center">
-  <div class="col-lg-10">
-    <div class="card shadow-sm mb-4">
-      <div class="card-header bg-white py-3">
-        <h4 class="mb-1 fw-bold">
-          <i class="bi bi-patch-check-fill text-primary me-2"></i>Cursor Stored Procedure: <code>sp_audit_club_counts(IN p_fix TINYINT)</code>
-        </h4>
-        <p class="text-muted small mb-0">
-          Loops over every club one by one using a database <strong>CURSOR</strong> in MySQL, compares the denormalized <code>Clubs.member_count</code> against actual rows in <code>Memberships</code>, and reports or heals discrepancies.
-        </p>
+<div class="app-container">
+  <header class="inner-page-header">
+    <div class="inner-header-layout">
+      <div>
+        <div class="d-flex align-items-center gap-2 mb-2">
+          <span class="badge-status info">CURSOR 1</span>
+          <span class="text-secondary small">&bull; Automated Audit &amp; Self-Repair</span>
+        </div>
+        <h1 class="inner-page-title">sp_audit_club_counts</h1>
+        <p class="inner-page-subtitle">Loops over every club using a database cursor in MySQL, compares cached member counts against actual active rows, and self-repairs discrepancies.</p>
       </div>
+      <div>
+        <a href="{{ url_for('main.procedures_hub') }}" class="btn-tesla-secondary">
+          <i class="bi bi-arrow-left me-1"></i> Back to Hub
+        </a>
+      </div>
+    </div>
+  </header>
 
-      <div class="card-body p-4">
+  <div class="row justify-content-center">
+    <div class="col-lg-10">
+      <div class="tesla-card mb-4">
         <!-- Action Buttons -->
-        <div class="d-flex flex-wrap gap-2 mb-4">
+        <div class="d-flex flex-wrap gap-3 mb-4">
           <form method="POST" action="{{ url_for('main.proc_audit') }}">
             <input type="hidden" name="action" value="check">
-            <button type="submit" class="btn btn-primary">
-              <i class="bi bi-search me-1"></i> Run Audit (Check Only: p_fix = 0)
+            <button type="submit" class="btn-tesla-secondary">
+              <i class="bi bi-search me-2"></i> Run Audit (Check Only: p_fix = 0)
             </button>
           </form>
 
           <form method="POST" action="{{ url_for('main.proc_audit') }}">
             <input type="hidden" name="action" value="repair">
-            <button type="submit" class="btn btn-warning text-dark fw-semibold">
-              <i class="bi bi-wrench-adjustable-circle me-1"></i> Run Audit & Auto-Repair (p_fix = 1)
+            <button type="submit" class="btn-tesla-primary">
+              <i class="bi bi-wrench-adjustable-circle me-2"></i> Run Audit &amp; Repair (p_fix = 1)
             </button>
           </form>
         </div>
 
         {% if audit_results %}
-        <div class="table-responsive">
-          <table class="table table-bordered table-hover align-middle mb-0">
-            <thead class="table-light">
-              <tr>
-                <th>Club ID</th>
-                <th class="text-center">Stored Member Count</th>
-                <th class="text-center">Actual Rows in Memberships</th>
-                <th class="text-center">Audit Result</th>
-              </tr>
-            </thead>
-            <tbody>
-              {% for row in audit_results %}
-              <tr>
-                <td><span class="badge bg-dark">{{ row.club_id }}</span></td>
-                <td class="text-center fw-bold">{{ row.stored_count }}</td>
-                <td class="text-center fw-bold">{{ row.actual_count }}</td>
-                <td class="text-center">
-                  {% if row.result == 'OK' %}
-                    <span class="badge bg-success px-3 py-2"><i class="bi bi-check2-circle me-1"></i>OK (In Sync)</span>
-                  {% elif row.result == 'FIXED' %}
-                    <span class="badge bg-warning text-dark px-3 py-2"><i class="bi bi-tools me-1"></i>FIXED</span>
-                  {% else %}
-                    <span class="badge bg-danger px-3 py-2"><i class="bi bi-exclamation-triangle-fill me-1"></i>MISMATCH</span>
-                  {% endif %}
-                </td>
-              </tr>
-              {% endfor %}
-            </tbody>
-          </table>
+        <div class="table-surface-card">
+          <div class="table-responsive">
+            <table class="tesla-table">
+              <thead>
+                <tr>
+                  <th>Club ID</th>
+                  <th class="text-center">Stored Member Count</th>
+                  <th class="text-center">Actual Rows in Memberships</th>
+                  <th class="text-center">Audit Result</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for row in audit_results %}
+                <tr>
+                  <td><span class="badge-status neutral font-mono">{{ row.club_id }}</span></td>
+                  <td class="text-center tabular-nums fw-medium text-white">{{ row.stored_count }}</td>
+                  <td class="text-center tabular-nums fw-medium text-white">{{ row.actual_count }}</td>
+                  <td class="text-center">
+                    {% if row.result == 'OK' %}
+                      <span class="badge-status success"><i class="bi bi-check2-circle me-1"></i>OK (In Sync)</span>
+                    {% elif row.result == 'FIXED' %}
+                      <span class="badge-status warning"><i class="bi bi-tools me-1"></i>FIXED</span>
+                    {% else %}
+                      <span class="badge-status danger"><i class="bi bi-exclamation-triangle-fill me-1"></i>MISMATCH</span>
+                    {% endif %}
+                  </td>
+                </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
         </div>
         {% elif not error %}
-        <div class="alert alert-light border text-center py-4">
-          <i class="bi bi-info-circle text-muted fs-3 d-block mb-2"></i>
-          Click "Run Audit" above to execute the cursor stored procedure on the live database.
+        <div class="p-5 text-center text-secondary">
+          <i class="bi bi-info-circle text-secondary fs-3 d-block mb-2"></i>
+          Select "Run Audit" above to execute the cursor stored procedure on the live Cloud SQL database.
         </div>
         {% endif %}
       </div>

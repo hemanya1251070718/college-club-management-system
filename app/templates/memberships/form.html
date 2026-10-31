@@ -3,26 +3,37 @@
 {% block title %}{{ title }}{% endblock %}
 
 {% block content %}
-<div class="row justify-content-center">
-  <div class="col-lg-7">
-    <div class="card shadow-sm">
-      <div class="card-header bg-white py-3">
-        <h5 class="mb-0 fw-bold">{{ title }}</h5>
+<div class="app-container">
+  <header class="inner-page-header">
+    <div class="inner-header-layout">
+      <div>
+        <h1 class="inner-page-title">{{ title }}</h1>
+        <p class="inner-page-subtitle">Demonstrating automatic trigger synchronization for club member counts.</p>
       </div>
-      <div class="card-body p-4">
+      <div>
+        <a href="{{ url_for('main.list_memberships') }}" class="btn-tesla-secondary">
+          <i class="bi bi-arrow-left me-1"></i> Back to Memberships
+        </a>
+      </div>
+    </div>
+  </header>
+
+  <div class="row justify-content-center">
+    <div class="col-lg-8">
+      <div class="tesla-card">
         {% if not membership %}
-        <div class="alert alert-info py-2 small mb-4">
-          <i class="bi bi-info-circle-fill me-1"></i>
-          Submitting this form triggers <code>trg_increase_member_count</code> in MySQL automatically.
+        <div class="badge-status info mb-4 p-3 d-flex align-items-center gap-2" style="border-radius: 4px;">
+          <i class="bi bi-info-circle-fill"></i>
+          <span>Submitting this form triggers <code class="font-mono text-white">trg_increase_member_count</code> inside Cloud SQL automatically.</span>
         </div>
         {% endif %}
 
         <form method="POST">
-          <div class="row g-3">
+          <div class="row g-4">
             {% if not membership %}
             <div class="col-md-6">
-              <label class="form-label fw-semibold">Student *</label>
-              <select name="student_id" class="form-select" required>
+              <label class="tesla-form-label">Student *</label>
+              <select name="student_id" class="tesla-form-select" required>
                 <option value="" disabled selected>Select student...</option>
                 {% for s in students %}
                 <option value="{{ s.student_id }}">
@@ -32,8 +43,8 @@
               </select>
             </div>
             <div class="col-md-6">
-              <label class="form-label fw-semibold">Club *</label>
-              <select name="club_id" class="form-select" required>
+              <label class="tesla-form-label">Club *</label>
+              <select name="club_id" class="tesla-form-select" required>
                 <option value="" disabled selected>Select club...</option>
                 {% for c in clubs %}
                 <option value="{{ c.club_id }}">
@@ -44,18 +55,18 @@
             </div>
             {% else %}
             <div class="col-md-6">
-              <label class="form-label fw-semibold">Student</label>
-              <input type="text" class="form-control" value="{{ membership.student_name }} ({{ membership.student_id }})" readonly>
+              <label class="tesla-form-label">Student</label>
+              <input type="text" class="tesla-form-control" value="{{ membership.student_name }} ({{ membership.student_id }})" readonly>
             </div>
             <div class="col-md-6">
-              <label class="form-label fw-semibold">Club</label>
-              <input type="text" class="form-control" value="{{ membership.club_name }} ({{ membership.club_id }})" readonly>
+              <label class="tesla-form-label">Club</label>
+              <input type="text" class="tesla-form-control" value="{{ membership.club_name }} ({{ membership.club_id }})" readonly>
             </div>
             {% endif %}
 
             <div class="col-md-4">
-              <label class="form-label fw-semibold">Role *</label>
-              <select name="role" class="form-select" required>
+              <label class="tesla-form-label">Role *</label>
+              <select name="role" class="tesla-form-select" required>
                 {% for r in ['Member', 'Core Member', 'Volunteer', 'Event Coordinator', 'Treasurer', 'Secretary', 'President'] %}
                 <option value="{{ r }}" {% if membership and membership.role == r %}selected{% endif %}>{{ r }}</option>
                 {% endfor %}
@@ -63,25 +74,25 @@
             </div>
 
             <div class="col-md-4">
-              <label class="form-label fw-semibold">Join Date *</label>
-              <input type="date" name="join_date" class="form-control" value="{{ membership.join_date if membership and membership.join_date else '' }}" required>
+              <label class="tesla-form-label">Join Date *</label>
+              <input type="date" name="join_date" class="tesla-form-control tabular-nums" value="{{ membership.join_date if membership and membership.join_date else '' }}" required>
             </div>
 
             <div class="col-md-4">
-              <label class="form-label fw-semibold">Status *</label>
-              <select name="status" class="form-select" required>
+              <label class="tesla-form-label">Status *</label>
+              <select name="status" class="tesla-form-select" required>
                 <option value="Active" {% if not membership or membership.status == 'Active' %}selected{% endif %}>Active</option>
                 <option value="Inactive" {% if membership and membership.status == 'Inactive' %}selected{% endif %}>Inactive</option>
               </select>
             </div>
           </div>
 
-          <hr class="my-4">
+          <hr class="my-4" style="border-color: var(--border);">
 
-          <div class="d-flex justify-content-end gap-2">
-            <a href="{{ url_for('main.list_memberships') }}" class="btn btn-outline-secondary">Cancel</a>
-            <button type="submit" class="btn btn-warning text-dark fw-semibold">
-              <i class="bi bi-lightning-charge-fill me-1"></i> Save & Trigger Count
+          <div class="d-flex justify-content-end gap-3">
+            <a href="{{ url_for('main.list_memberships') }}" class="btn-tesla-secondary" style="min-width: 140px;">Cancel</a>
+            <button type="submit" class="btn-tesla-primary" style="min-width: 220px;">
+              <i class="bi bi-lightning-charge-fill me-2"></i> Save &amp; Trigger Count
             </button>
           </div>
         </form>

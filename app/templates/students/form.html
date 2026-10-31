@@ -3,50 +3,61 @@
 {% block title %}{{ title }}{% endblock %}
 
 {% block content %}
-<div class="row justify-content-center">
-  <div class="col-lg-7">
-    <div class="card shadow-sm">
-      <div class="card-header bg-white py-3">
-        <h5 class="mb-0 fw-bold">{{ title }}</h5>
+<div class="app-container">
+  <header class="inner-page-header">
+    <div class="inner-header-layout">
+      <div>
+        <h1 class="inner-page-title">{{ title }}</h1>
+        <p class="inner-page-subtitle">Enrolled student registration &amp; department affiliation record.</p>
       </div>
-      <div class="card-body p-4">
+      <div>
+        <a href="{{ url_for('main.list_students') }}" class="btn-tesla-secondary">
+          <i class="bi bi-arrow-left me-1"></i> Back to Directory
+        </a>
+      </div>
+    </div>
+  </header>
+
+  <div class="row justify-content-center">
+    <div class="col-lg-8">
+      <div class="tesla-card">
         <form method="POST">
-          <div class="row g-3">
+          <div class="row g-4">
             <div class="col-md-6">
-              <label class="form-label fw-semibold">Student ID *</label>
-              <input type="text" name="student_id" class="form-control text-uppercase" placeholder="e.g. CE25-0999" value="{{ student.student_id if student else '' }}" {% if student %}readonly{% endif %} required>
-              <small class="text-muted">Format: DeptYear-Roll</small>
+              <label class="tesla-form-label">Student ID *</label>
+              <input type="text" name="student_id" class="tesla-form-control font-mono text-uppercase" placeholder="e.g. CE25-0999" value="{{ student.student_id if student else '' }}" {% if student %}readonly{% endif %} required>
+              <small class="text-secondary mt-1 d-block" style="font-size: 12px;">Format: DeptYear-Roll</small>
             </div>
             <div class="col-md-6">
-              <label class="form-label fw-semibold">PRN Number *</label>
-              <input type="text" name="prn_number" class="form-control" placeholder="e.g. 1251070999" value="{{ student.prn_number if student else '' }}" {% if student %}readonly{% endif %} required>
+              <label class="tesla-form-label">PRN Number *</label>
+              <input type="text" name="prn_number" class="tesla-form-control font-mono" placeholder="e.g. 1251070999" value="{{ student.prn_number if student else '' }}" {% if student %}readonly{% endif %} required>
             </div>
 
             <div class="col-12">
-              <label class="form-label fw-semibold">Full Name *</label>
-              <input type="text" name="name" class="form-control" placeholder="e.g. Aarav Sharma" value="{{ student.name if student else '' }}" required>
+              <label class="tesla-form-label">Full Name *</label>
+              <input type="text" name="name" class="tesla-form-control" placeholder="e.g. Aarav Sharma" value="{{ student.name if student else '' }}" required>
             </div>
 
             <div class="col-md-6">
-              <label class="form-label fw-semibold">Email Address *</label>
-              <input type="email" name="email" class="form-control" placeholder="aarav.sharma@vit.edu" value="{{ student.email if student else '' }}" required>
+              <label class="tesla-form-label">Email Address *</label>
+              <input type="email" name="email" class="tesla-form-control" placeholder="aarav.sharma@vit.edu" value="{{ student.email if student else '' }}" required>
             </div>
             <div class="col-md-6">
-              <label class="form-label fw-semibold">Phone Number</label>
-              <input type="text" name="phone" class="form-control" placeholder="10-digit mobile" value="{{ student.phone if student and student.phone else '' }}">
+              <label class="tesla-form-label">Phone Number</label>
+              <input type="text" name="phone" class="tesla-form-control" placeholder="10-digit mobile" value="{{ student.phone if student and student.phone else '' }}">
             </div>
 
             <div class="col-md-4">
-              <label class="form-label fw-semibold">Dept Code *</label>
-              <input type="text" name="dept_id" class="form-control text-uppercase" placeholder="CE" value="{{ student.dept_id if student else '' }}" required>
+              <label class="tesla-form-label">Dept Code *</label>
+              <input type="text" name="dept_id" class="tesla-form-control font-mono text-uppercase" placeholder="CE" value="{{ student.dept_id if student else '' }}" required>
             </div>
             <div class="col-md-5">
-              <label class="form-label fw-semibold">Department Name *</label>
-              <input type="text" name="dept_name" class="form-control" placeholder="Computer Engineering" value="{{ student.dept_name if student else '' }}" required>
+              <label class="tesla-form-label">Department Name *</label>
+              <input type="text" name="dept_name" class="tesla-form-control" placeholder="Computer Engineering" value="{{ student.dept_name if student else '' }}" required>
             </div>
             <div class="col-md-3">
-              <label class="form-label fw-semibold">Year *</label>
-              <select name="year_of_study" class="form-select" required>
+              <label class="tesla-form-label">Year of Study *</label>
+              <select name="year_of_study" class="tesla-form-select" required>
                 <option value="1" {% if student and student.year_of_study == 1 %}selected{% endif %}>1st Year</option>
                 <option value="2" {% if student and student.year_of_study == 2 %}selected{% endif %}>2nd Year</option>
                 <option value="3" {% if student and student.year_of_study == 3 %}selected{% endif %}>3rd Year</option>
@@ -55,12 +66,12 @@
             </div>
           </div>
 
-          <hr class="my-4">
+          <hr class="my-4" style="border-color: var(--border);">
 
-          <div class="d-flex justify-content-end gap-2">
-            <a href="{{ url_for('main.list_students') }}" class="btn btn-outline-secondary">Cancel</a>
-            <button type="submit" class="btn btn-primary">
-              <i class="bi bi-save me-1"></i> Save Student
+          <div class="d-flex justify-content-end gap-3">
+            <a href="{{ url_for('main.list_students') }}" class="btn-tesla-secondary" style="min-width: 140px;">Cancel</a>
+            <button type="submit" class="btn-tesla-primary" style="min-width: 180px;">
+              <i class="bi bi-save me-2"></i> Save Student
             </button>
           </div>
         </form>

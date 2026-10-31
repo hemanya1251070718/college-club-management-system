@@ -3,46 +3,43 @@
 {% block title %}Feedback: {{ event.event_name }}{% endblock %}
 
 {% block content %}
-<div class="d-flex justify-content-between align-items-center mb-4">
-  <div>
-    <nav aria-label="breadcrumb">
-      <ol class="breadcrumb mb-1">
-        <li class="breadcrumb-item"><a href="{{ url_for('main.list_events') }}">Events</a></li>
-        <li class="breadcrumb-item active">{{ event.event_name }}</li>
-      </ol>
-    </nav>
-    <h3 class="fw-bold mb-0">Event Feedback & Review Cell</h3>
-    <p class="text-muted small">Demonstrating: <code>trg_verify_feedback_registration</code> (Trigger 6) &bull; <code>sp_anonymize_sensitive_feedback</code> (Cursor 8)</p>
-  </div>
-  <a href="{{ url_for('main.event_registrations', event_id=event.event_id) }}" class="btn btn-outline-secondary">
-    <i class="bi bi-people me-1"></i> View Registrations
-  </a>
-</div>
-
-<div class="row g-4">
-  <!-- Submit Feedback Form -->
-  <div class="col-lg-4">
-    <div class="card shadow-sm h-100">
-      <div class="card-header bg-white py-3">
-        <h5 class="mb-0 fw-bold"><i class="bi bi-chat-heart-fill text-warning me-2"></i>Submit Event Feedback</h5>
-        <small class="text-muted">Fires Trigger 6: blocks review if student was NOT registered!</small>
+<div class="app-container">
+  <header class="inner-page-header">
+    <div class="inner-header-layout">
+      <div>
+        <h1 class="inner-page-title">Event Feedback &amp; Review Cell</h1>
+        <p class="inner-page-subtitle">Demonstrating: <code class="font-mono text-white">trg_verify_feedback_registration</code> (Trigger 6) &bull; <code class="font-mono text-white">sp_anonymize_sensitive_feedback</code> (Cursor 8)</p>
       </div>
-      <div class="card-body">
+      <div>
+        <a href="{{ url_for('main.event_registrations', event_id=event.event_id) }}" class="btn-tesla-secondary">
+          <i class="bi bi-people me-1"></i> View Registrations
+        </a>
+      </div>
+    </div>
+  </header>
+
+  <div class="row g-4">
+    <!-- Submit Feedback Form -->
+    <div class="col-lg-4">
+      <div class="tesla-card h-100">
+        <h4 class="text-white fw-medium mb-1" style="font-size: 17px;">Submit Event Feedback</h4>
+        <small class="text-secondary d-block mb-4">Fires Trigger 6: blocks review if student was NOT registered!</small>
+
         <form method="POST" action="{{ url_for('main.submit_event_feedback', event_id=event.event_id) }}">
-          <div class="mb-3">
-            <label class="form-label fw-semibold">Student</label>
-            <select name="student_id" class="form-select" required>
+          <div class="mb-4">
+            <label class="tesla-form-label">Student *</label>
+            <select name="student_id" class="tesla-form-select" required>
               <option value="" disabled selected>Select student...</option>
               {% for s in all_students %}
               <option value="{{ s.student_id }}">{{ s.name }} ({{ s.student_id }})</option>
               {% endfor %}
             </select>
-            <div class="form-text small">Notice: Students registered for this event will succeed; unregistered students will trigger an SQL rejection error!</div>
+            <small class="text-secondary d-block mt-2" style="font-size: 12px;">Unregistered students will trigger a declarative SQL rejection error!</small>
           </div>
 
-          <div class="mb-3">
-            <label class="form-label fw-semibold">Rating (1 to 5 Stars)</label>
-            <select name="rating" class="form-select" required>
+          <div class="mb-4">
+            <label class="tesla-form-label">Rating (1 to 5 Stars) *</label>
+            <select name="rating" class="tesla-form-select" required>
               <option value="5">5 - Excellent</option>
               <option value="4">4 - Good</option>
               <option value="3">3 - Average</option>
@@ -51,69 +48,68 @@
             </select>
           </div>
 
-          <div class="mb-3">
-            <label class="form-label fw-semibold">Comments</label>
-            <textarea name="comments" class="form-control" rows="3" placeholder="Provide event feedback..."></textarea>
+          <div class="mb-4">
+            <label class="tesla-form-label">Comments</label>
+            <textarea name="comments" class="tesla-textarea" rows="3" placeholder="Provide event feedback..."></textarea>
           </div>
 
-          <button type="submit" class="btn btn-warning text-dark fw-semibold w-100">
-            <i class="bi bi-send-fill me-1"></i> Submit Review
+          <button type="submit" class="btn-tesla-primary w-100">
+            <i class="bi bi-send-fill me-2"></i> Submit Review
           </button>
         </form>
       </div>
     </div>
-  </div>
 
-  <!-- Existing Feedback Reviews -->
-  <div class="col-lg-8">
-    <div class="card shadow-sm h-100">
-      <div class="card-header bg-white py-3 d-flex justify-content-between align-items-center">
-        <h5 class="mb-0 fw-bold"><i class="bi bi-star-half text-warning me-2"></i>Event Reviews ({{ feedbacks|length }})</h5>
-        <a href="{{ url_for('main.procedures_hub') }}" class="btn btn-sm btn-outline-info text-dark">
-          <i class="bi bi-shield-lock me-1"></i> Run Anonymizer (Cursor 8)
-        </a>
-      </div>
-      <div class="card-body p-0">
-        {% if feedbacks %}
-        <div class="list-group list-group-flush">
-          {% for fb in feedbacks %}
-          <div class="list-group-item p-3">
-            <div class="d-flex justify-content-between align-items-center mb-1">
-              <div>
-                <strong>{{ fb.student_name }}</strong>
-                <small class="text-muted ms-1">({{ fb.student_id }})</small>
+    <!-- Existing Feedback Reviews -->
+    <div class="col-lg-8">
+      <div class="table-surface-card h-100">
+        <div class="p-3 border-bottom d-flex justify-content-between align-items-center" style="border-color: var(--border) !important; background: var(--surface-2);">
+          <span class="text-white fw-medium">Event Reviews ({{ feedbacks|length }})</span>
+          <a href="{{ url_for('main.procedures_hub') }}" class="badge-status info text-decoration-none">
+            <i class="bi bi-shield-lock me-1"></i> Run Anonymizer (Cursor 8)
+          </a>
+        </div>
+        <div>
+          {% if feedbacks %}
+            {% for fb in feedbacks %}
+            <div class="p-4 border-bottom" style="border-color: var(--border) !important;">
+              <div class="d-flex justify-content-between align-items-center mb-2">
+                <div>
+                  <strong class="text-white">{{ fb.student_name }}</strong>
+                  <small class="text-secondary ms-1">({{ fb.student_id }})</small>
+                </div>
+                <div class="d-flex align-items-center gap-1">
+                  {% for i in range(fb.rating) %}
+                    <i class="bi bi-star-fill text-warning" style="font-size: 12px;"></i>
+                  {% endfor %}
+                  {% for i in range(5 - fb.rating) %}
+                    <i class="bi bi-star text-secondary" style="font-size: 12px;"></i>
+                  {% endfor %}
+                  <small class="ms-1 fw-medium tabular-nums text-white">{{ fb.rating }}/5</small>
+                </div>
               </div>
-              <div>
-                {% for i in range(fb.rating) %}
-                  <i class="bi bi-star-fill text-warning"></i>
-                {% endfor %}
-                {% for i in range(5 - fb.rating) %}
-                  <i class="bi bi-star text-muted"></i>
-                {% endfor %}
-                <small class="ms-1 fw-bold">{{ fb.rating }}/5</small>
-              </div>
+              <p class="mb-2 text-secondary small">
+                {% if '[PROTECTED ANONYMOUS REVIEW]' in fb.comments %}
+                  <span class="badge-status info me-1">Protected Privacy</span>
+                  <span class="fst-italic text-secondary">{{ fb.comments }}</span>
+                {% else %}
+                  {{ fb.comments or 'No written comments.' }}
+                {% endif %}
+              </p>
+              <small class="text-secondary tabular-nums" style="font-size: 11px;">
+                <i class="bi bi-calendar3 me-1"></i>{{ fb.feedback_date }}
+              </small>
             </div>
-            <p class="mb-1 text-secondary">
-              {% if '[PROTECTED ANONYMOUS REVIEW]' in fb.comments %}
-                <span class="badge bg-info-subtle text-info border border-info me-1">Protected Privacy</span>
-                <span class="text-muted fst-italic">{{ fb.comments }}</span>
-              {% else %}
-                {{ fb.comments or 'No written comments.' }}
-              {% endif %}
-            </p>
-            <small class="text-muted"><i class="bi bi-calendar3 me-1"></i>{{ fb.feedback_date }}</small>
+            {% endfor %}
+          {% else %}
+          <div class="p-5 text-center text-secondary">
+            <i class="bi bi-chat-square-text fs-2 d-block mb-3 text-secondary"></i>
+            No feedback reviews submitted yet for this event.
           </div>
-          {% endfor %}
+          {% endif %}
         </div>
-        {% else %}
-        <div class="p-4 text-center text-muted">
-          <i class="bi bi-chat-square-text fs-2 d-block mb-2"></i>
-          No feedback reviews submitted yet for this event.
-        </div>
-        {% endif %}
       </div>
     </div>
   </div>
 </div>
 {% endblock %}
-

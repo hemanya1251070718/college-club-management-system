@@ -3,28 +3,39 @@
 {% block title %}{{ title }}{% endblock %}
 
 {% block content %}
-<div class="row justify-content-center">
-  <div class="col-lg-7">
-    <div class="card shadow-sm">
-      <div class="card-header bg-white py-3">
-        <h5 class="mb-0 fw-bold">{{ title }}</h5>
+<div class="app-container">
+  <header class="inner-page-header">
+    <div class="inner-header-layout">
+      <div>
+        <h1 class="inner-page-title">{{ title }}</h1>
+        <p class="inner-page-subtitle">Configure organization entity metadata and faculty coordinator governance.</p>
       </div>
-      <div class="card-body p-4">
+      <div>
+        <a href="{{ url_for('main.list_clubs') }}" class="btn-tesla-secondary">
+          <i class="bi bi-arrow-left me-1"></i> Back to Clubs
+        </a>
+      </div>
+    </div>
+  </header>
+
+  <div class="row justify-content-center">
+    <div class="col-lg-8">
+      <div class="tesla-card">
         <form method="POST">
-          <div class="row g-3">
+          <div class="row g-4">
             <div class="col-md-4">
-              <label class="form-label fw-semibold">Club ID *</label>
-              <input type="text" name="club_id" class="form-control text-uppercase" placeholder="e.g. CSI" value="{{ club.club_id if club else '' }}" {% if club %}readonly{% endif %} required>
-              <small class="text-muted">Unique short code (PK)</small>
+              <label class="tesla-form-label">Club ID *</label>
+              <input type="text" name="club_id" class="tesla-form-control font-mono text-uppercase" placeholder="e.g. CSI" value="{{ club.club_id if club else '' }}" {% if club %}readonly{% endif %} required>
+              <small class="text-secondary mt-1 d-block" style="font-size: 12px;">Unique short code (PK)</small>
             </div>
             <div class="col-md-8">
-              <label class="form-label fw-semibold">Club Name *</label>
-              <input type="text" name="club_name" class="form-control" placeholder="Computer Society of India" value="{{ club.club_name if club else '' }}" required>
+              <label class="tesla-form-label">Club Name *</label>
+              <input type="text" name="club_name" class="tesla-form-control" placeholder="Computer Society of India" value="{{ club.club_name if club else '' }}" required>
             </div>
 
             <div class="col-md-6">
-              <label class="form-label fw-semibold">Category *</label>
-              <select name="category" class="form-select" required>
+              <label class="tesla-form-label">Category *</label>
+              <select name="category" class="tesla-form-select" required>
                 <option value="" disabled {% if not club %}selected{% endif %}>Select category...</option>
                 <option value="Technical" {% if club and club.category == 'Technical' %}selected{% endif %}>Technical</option>
                 <option value="Cultural" {% if club and club.category == 'Cultural' %}selected{% endif %}>Cultural</option>
@@ -35,8 +46,8 @@
             </div>
 
             <div class="col-md-6">
-              <label class="form-label fw-semibold">Faculty Coordinator *</label>
-              <select name="faculty_id" class="form-select" required>
+              <label class="tesla-form-label">Faculty Coordinator *</label>
+              <select name="faculty_id" class="tesla-form-select" required>
                 <option value="" disabled {% if not club %}selected{% endif %}>Assign coordinator...</option>
                 {% for f in coordinators %}
                 <option value="{{ f.faculty_id }}" {% if club and club.faculty_id == f.faculty_id %}selected{% endif %}>
@@ -47,30 +58,30 @@
             </div>
 
             <div class="col-12">
-              <label class="form-label fw-semibold">Description</label>
-              <textarea name="description" class="form-control" rows="3" placeholder="Brief overview of the club's mission...">{{ club.description if club else '' }}</textarea>
+              <label class="tesla-form-label">Description</label>
+              <textarea name="description" class="tesla-textarea" rows="3" placeholder="Brief overview of the club's charter and mission...">{{ club.description if club else '' }}</textarea>
             </div>
 
             <div class="col-md-6">
-              <label class="form-label fw-semibold">Official Email</label>
-              <input type="email" name="official_email" class="form-control" placeholder="club@vit.edu" value="{{ club.official_email if club else '' }}">
+              <label class="tesla-form-label">Official Email</label>
+              <input type="email" name="official_email" class="tesla-form-control" placeholder="club@vit.edu" value="{{ club.official_email if club else '' }}">
             </div>
 
             <div class="col-md-6">
-              <label class="form-label fw-semibold">Instagram Handle</label>
-              <div class="input-group">
-                <span class="input-group-text">@</span>
-                <input type="text" name="instagram_handle" class="form-control" placeholder="vit_club" value="{{ club.instagram_handle if club else '' }}">
+              <label class="tesla-form-label">Instagram Handle</label>
+              <div class="d-flex align-items-center">
+                <span class="px-3 text-secondary d-flex align-items-center" style="height: 44px; background: var(--surface-2); border: 1px solid var(--border); border-right: none; border-radius: 4px 0 0 4px;">@</span>
+                <input type="text" name="instagram_handle" class="tesla-form-control" style="border-radius: 0 4px 4px 0;" placeholder="vit_club" value="{{ club.instagram_handle if club else '' }}">
               </div>
             </div>
           </div>
 
-          <hr class="my-4">
+          <hr class="my-4" style="border-color: var(--border);">
 
-          <div class="d-flex justify-content-end gap-2">
-            <a href="{{ url_for('main.list_clubs') }}" class="btn btn-outline-secondary">Cancel</a>
-            <button type="submit" class="btn btn-primary">
-              <i class="bi bi-save me-1"></i> Save Club
+          <div class="d-flex justify-content-end gap-3">
+            <a href="{{ url_for('main.list_clubs') }}" class="btn-tesla-secondary" style="min-width: 140px;">Cancel</a>
+            <button type="submit" class="btn-tesla-primary" style="min-width: 180px;">
+              <i class="bi bi-save me-2"></i> Save Club
             </button>
           </div>
         </form>
