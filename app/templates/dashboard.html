@@ -55,48 +55,60 @@
               <span>VIT Pune Campus, Central DBMS Registry</span>
             </div>
 
-            <!-- Card Item 1 (Saltbox House equivalent) -->
+            <!-- Card Item 1 (Canonical Project Club 1: CSI) -->
             <div class="tidewell-card-item">
               <div class="d-flex justify-content-between align-items-start">
                 <div>
-                  <h4 class="card-item-title">Google Developer Groups (GDG)</h4>
-                  <div class="card-item-meta">Academic Charter #1 &bull; Technical</div>
+                  <h4 class="card-item-title">{{ club_summaries[0].club_name if club_summaries else 'Computer Society of India (CSI)' }}</h4>
+                  <div class="card-item-meta">{{ club_summaries[0].category if club_summaries else 'Technical' }} &bull; {{ club_summaries[0].faculty_coordinator if club_summaries else 'Prof. Ashwini Sharma' }}</div>
                 </div>
                 <div class="card-item-rating">
-                  <span>4.98 ★</span>
-                  <small>rating</small>
+                  <span class="font-mono text-primary">{{ club_summaries[0].club_id if club_summaries else 'CSI' }}</span>
+                  <small>Charter #1</small>
                 </div>
               </div>
               <div class="card-item-schedule">
-                <div class="sched-date"><strong>Fri 14</strong> <small>Active Sem</small></div>
-                <div class="sched-badge">320 enrolled</div>
-                <div class="sched-date text-end"><strong>Sun 16</strong> <small>Review</small></div>
+                <div class="sched-date">
+                  <strong>{{ recent_events[0].event_name if recent_events else 'CSI TechFest 26' }}</strong>
+                  <small>{{ recent_events[0].event_date if recent_events else '2026-09-25' }}</small>
+                </div>
+                <div class="sched-badge">{{ club_summaries[0].member_count if club_summaries else 19 }} enrolled</div>
+                <div class="sched-date text-end">
+                  <strong>{{ recent_events[0].status if recent_events else 'Planned' }}</strong>
+                  <small>{{ recent_events[0].venue if recent_events else 'Conf Room' }}</small>
+                </div>
               </div>
             </div>
 
-            <!-- Card Item 2 (Driftwood Cabin equivalent) -->
+            <!-- Card Item 2 (Canonical Project Club 2: EDC) -->
             <div class="tidewell-card-item">
               <div class="d-flex justify-content-between align-items-start">
                 <div>
-                  <h4 class="card-item-title">Robotics &amp; AI Society</h4>
-                  <div class="card-item-meta">Academic Charter #2 &bull; Research</div>
+                  <h4 class="card-item-title">{{ club_summaries[1].club_name if club_summaries|length > 1 else 'Entrepreneurship Development Club (EDC)' }}</h4>
+                  <div class="card-item-meta">{{ club_summaries[1].category if club_summaries|length > 1 else 'Entrepreneurship' }} &bull; {{ club_summaries[1].faculty_coordinator if club_summaries|length > 1 else 'Prof. Rajesh Kulkarni' }}</div>
                 </div>
                 <div class="card-item-rating">
-                  <span>4.95 ★</span>
-                  <small>rating</small>
+                  <span class="font-mono text-warning">{{ club_summaries[1].club_id if club_summaries|length > 1 else 'EDC' }}</span>
+                  <small>Charter #2</small>
                 </div>
               </div>
               <div class="card-item-schedule">
-                <div class="sched-date"><strong>Sat 22</strong> <small>Symposium</small></div>
-                <div class="sched-badge">215 enrolled</div>
-                <div class="sched-date text-end"><strong>Mon 24</strong> <small>Audit</small></div>
+                <div class="sched-date">
+                  <strong>{{ recent_events[1].event_name if recent_events|length > 1 else 'E-Summit 26' }}</strong>
+                  <small>{{ recent_events[1].event_date if recent_events|length > 1 else '2026-10-10' }}</small>
+                </div>
+                <div class="sched-badge">{{ club_summaries[1].member_count if club_summaries|length > 1 else 27 }} enrolled</div>
+                <div class="sched-date text-end">
+                  <strong>{{ recent_events[1].status if recent_events|length > 1 else 'Completed' }}</strong>
+                  <small>{{ recent_events[1].venue if recent_events|length > 1 else 'Sharad Arena' }}</small>
+                </div>
               </div>
             </div>
 
-            <!-- Card Bottom Highlight Tag (Save 20% midweek equivalent) -->
+            <!-- Card Bottom Highlight Tag with Real DBMS Telemetry -->
             <div class="card-highlight-pill">
-              <i class="bi bi-lightning-charge-fill me-1"></i>
-              <span>8 Triggers &amp; 8 Cursors 100% Operational</span>
+              <i class="bi bi-activity me-1"></i>
+              <span>Live Telemetry: {{ total_clubs }} Charters &bull; {{ total_memberships }} Active Members &bull; {{ total_events }} Events</span>
             </div>
           </div>
         </div>
