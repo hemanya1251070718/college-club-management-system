@@ -34,9 +34,9 @@ document.addEventListener("DOMContentLoaded", () => {
     gpayRoleName.textContent = roleName || "Guest Evaluator";
     gpayDesc.textContent = description || "Access verified across canonical schema.";
 
-    // Restart SVG CSS Animations by re-cloning or class toggling
+    // Restart SVG CSS Animations by reflow
     gpayOverlay.classList.remove("is-active");
-    void gpayOverlay.offsetWidth; // Trigger reflow
+    void gpayOverlay.offsetWidth;
     gpayOverlay.classList.add("is-active");
     gpayOverlay.setAttribute("aria-hidden", "false");
 
@@ -49,11 +49,13 @@ document.addEventListener("DOMContentLoaded", () => {
       }
     }
 
-    // Auto dismiss after 1.8 seconds with smooth fade
+    // Auto dismiss after 1.8 seconds with smooth fade, then trigger callback/reload
     setTimeout(() => {
       gpayOverlay.classList.remove("is-active");
       gpayOverlay.setAttribute("aria-hidden", "true");
-      if (callback) callback();
+      if (callback) {
+        callback();
+      }
     }, 1800);
   }
 
@@ -91,23 +93,23 @@ document.addEventListener("DOMContentLoaded", () => {
       }
     });
 
-    // Role-Based UI Element Protection
-    const restrictedEls = document.querySelectorAll("[data-role-req]");
-    restrictedEls.forEach(el => {
-      const allowedRoles = (el.getAttribute("data-role-req") || "").split(",").map(r => r.trim());
-      // Guest and Admin always have full access for viva evaluation
-      if (role === "guest" || role === "admin" || allowedRoles.includes(role)) {
-        el.style.display = "";
-        el.removeAttribute("disabled");
-        el.classList.remove("opacity-50", "pointer-events-none");
+    // Handle Write & Edit Action Elements Across All Tables
+    const writeActions = document.querySelectorAll(".action-write-btn, [data-role-req]");
+    writeActions.forEach(el => {
+      if (role === "member") {
+        el.style.setProperty("display", "none", "important");
       } else {
-        if (el.tagName === "BUTTON" || el.tagName === "A" || el.classList.contains("btn-tesla-secondary")) {
-          el.setAttribute("disabled", "true");
-          el.classList.add("opacity-50");
-          el.title = `Protected: Requires ${allowedRoles.join(" or ")} role. (Switch role in header to test)`;
-        } else {
-          el.style.display = "none";
-        }
+        el.style.removeProperty("display");
+      }
+    });
+
+    // Handle Member Read-Only Locked Badges
+    const lockedBadges = document.querySelectorAll(".role-member-locked-badge");
+    lockedBadges.forEach(badge => {
+      if (role === "member") {
+        badge.style.removeProperty("display");
+      } else {
+        badge.style.setProperty("display", "none", "important");
       }
     });
   }
@@ -126,7 +128,12 @@ document.addEventListener("DOMContentLoaded", () => {
       .catch(() => ({ role: "guest", role_label: "Guest (Full Demo)" }))
       .then(data => {
         applyRoleUI("guest");
-        triggerGpayAnimation("Access Granted", "Guest Evaluator (Unrestricted)", "All 8 canonical tables, triggers, and cursors fully unlocked for demonstration!");
+        triggerGpayAnimation(
+          "Access Granted",
+          "Guest Evaluator (Unrestricted)",
+          "All 8 canonical tables, triggers, and cursors fully unlocked for demonstration!",
+          () => { window.location.reload(); }
+        );
       });
     });
   }
@@ -137,6 +144,8 @@ document.addEventListener("DOMContentLoaded", () => {
   personaCards.forEach(card => {
     card.addEventListener("click", () => {
       const selectedRole = card.getAttribute("data-role-select");
+      applyRoleUI(selectedRole); // Immediate real-time UI reflection
+
       fetch("/login", {
         method: "POST",
         headers: {
@@ -148,14 +157,24 @@ document.addEventListener("DOMContentLoaded", () => {
       .then(res => res.json())
       .catch(() => ({ role: selectedRole }))
       .then(data => {
-        applyRoleUI(selectedRole);
         const titles = {
           guest: "Guest Evaluator (Full Demo)",
           admin: "Super Admin / Principal",
           manager: "Faculty Coordinator",
           member: "Student Member"
         };
-        triggerGpayAnimation("Persona Activated", titles[selectedRole] || selectedRole, `Switched persona to ${titles[selectedRole]}. Access controls applied.`);
+        const descriptions = {
+          guest: "All tables, triggers, and cursors unlocked without restriction.",
+          admin: "Full administrative power, schema repairs, and delete authority.",
+          manager: "Authorized to manage student charters and campus events.",
+          member: "Read-only exploratory catalog view. Modification controls protected."
+        };
+        triggerGpayAnimation(
+          "Persona Activated",
+          titles[selectedRole] || selectedRole,
+          descriptions[selectedRole] || "Access controls applied.",
+          () => { window.location.reload(); }
+        );
       });
     });
   });
@@ -184,16 +203,25 @@ document.addEventListener("DOMContentLoaded", () => {
       .then(data => {
         if (data.status === "ok") {
           applyRoleUI(data.role);
-          triggerGpayAnimation("Verified & Authenticated", data.user_name || data.role_label, data.message || "Identity verified. Privileges elevated.");
+          triggerGpayAnimation(
+            "Verified & Authenticated",
+            data.user_name || data.role_label,
+            data.message || "Identity verified. Privileges elevated.",
+            () => { window.location.reload(); }
+          );
           loginForm.reset();
         } else {
           alert(data.message || "Invalid credentials. Use demo accounts: admin/admin123, faculty/faculty123, student/student123, or click Guest.");
         }
       })
       .catch(err => {
-        // Fallback for offline demo
         applyRoleUI("admin");
-        triggerGpayAnimation("Authenticated", "Admin Access", "Demo credentials accepted.");
+        triggerGpayAnimation(
+          "Authenticated",
+          "Admin Access",
+          "Demo credentials accepted.",
+          () => { window.location.reload(); }
+        );
       });
     });
   }

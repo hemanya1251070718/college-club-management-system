@@ -12,15 +12,21 @@
         <p class="inner-page-subtitle">Manage registered campus engineers across academic departments.</p>
       </div>
       <div>
-        <a href="{{ url_for('main.create_student') }}" class="btn-tesla-primary">
+        {% if current_role != 'member' %}
+        <a href="{{ url_for('main.create_student') }}" class="btn-tesla-primary action-write-btn glow-border-hover" data-role-req="admin,manager,guest">
           <i class="bi bi-person-plus me-2"></i> Add Student
         </a>
+        {% else %}
+        <span class="badge-status neutral px-3 py-2 role-member-locked-badge">
+          <i class="bi bi-lock me-1 text-warning"></i>Read-Only View (Student)
+        </span>
+        {% endif %}
       </div>
     </div>
   </header>
 
   <!-- Search & Filter Bar -->
-  <div class="tesla-card mb-4 p-3">
+  <div class="tesla-card mb-4 p-3 glow-border-hover">
     <form method="GET" action="{{ url_for('main.list_students') }}" class="row g-3 align-items-center">
       <div class="col-md-6">
         <input type="text" name="q" class="tesla-form-control" placeholder="Search by name, PRN, or student ID..." value="{{ search }}">
@@ -45,7 +51,7 @@
   </div>
 
   <!-- Students Data Table -->
-  <div class="table-surface-card">
+  <div class="table-surface-card glow-border-hover">
     <div class="table-responsive">
       <table class="tesla-table">
         <thead>
@@ -75,20 +81,26 @@
                 <a href="{{ url_for('main.proc_student_clubs', student_id=s.student_id) }}" class="btn-ghost-action text-info" title="View Enrolled Clubs via Stored Procedure">
                   <i class="bi bi-cpu"></i>
                 </a>
-                <a href="{{ url_for('main.edit_student', student_id=s.student_id) }}" class="btn-ghost-action" title="Edit Student">
+                {% if current_role != 'member' %}
+                <a href="{{ url_for('main.edit_student', student_id=s.student_id) }}" class="btn-ghost-action action-write-btn" data-role-req="admin,manager,guest" title="Edit Student">
                   <i class="bi bi-pencil"></i>
                 </a>
-                <form method="POST" action="{{ url_for('main.delete_student', student_id=s.student_id) }}" class="d-inline delete-form" data-entity="student">
+                {% if current_role in ['admin', 'guest'] %}
+                <form method="POST" action="{{ url_for('main.delete_student', student_id=s.student_id) }}" class="d-inline delete-form action-write-btn" data-role-req="admin,guest" data-entity="student">
                   <button type="submit" class="btn-ghost-action text-danger" title="Delete Student">
                     <i class="bi bi-trash"></i>
                   </button>
                 </form>
+                {% endif %}
+                {% else %}
+                <span class="text-secondary small font-mono opacity-60"><i class="bi bi-lock me-1"></i>Protected</span>
+                {% endif %}
               </div>
             </td>
           </tr>
           {% else %}
           <tr>
-            <td colspan="8" class="text-center text-secondary py-5">No students match your query.</td>
+            <td colspan="8" class="text-center text-secondary py-5">No students found matching your criteria.</td>
           </tr>
           {% endfor %}
         </tbody>

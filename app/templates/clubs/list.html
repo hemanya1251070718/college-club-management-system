@@ -12,15 +12,21 @@
         <p class="inner-page-subtitle">Browse, register, edit, and govern campus student charters &amp; faculty coordinators.</p>
       </div>
       <div>
-        <a href="{{ url_for('main.create_club') }}" class="btn-tesla-primary">
+        {% if current_role != 'member' %}
+        <a href="{{ url_for('main.create_club') }}" class="btn-tesla-primary action-write-btn glow-border-hover" data-role-req="admin,manager,guest">
           <i class="bi bi-plus-lg me-2"></i> Add New Club
         </a>
+        {% else %}
+        <span class="badge-status neutral px-3 py-2 role-member-locked-badge">
+          <i class="bi bi-lock me-1 text-warning"></i>Read-Only View (Student)
+        </span>
+        {% endif %}
       </div>
     </div>
   </header>
 
   <!-- Clean Tesla Table (Zero 3D Tilt Glitch, Sticky Frosted Header, Hairline Separators) -->
-  <div class="table-surface-card">
+  <div class="table-surface-card glow-border-hover">
     <div class="table-responsive">
       <table class="tesla-table">
         <thead>
@@ -55,16 +61,22 @@
               <span class="badge-status info fw-medium">{{ club.member_count }}</span>
             </td>
             <td class="text-end">
-              <div class="d-inline-flex gap-1">
+              {% if current_role != 'member' %}
+              <div class="d-inline-flex gap-1 action-write-btn" data-role-req="admin,manager,guest">
                 <a href="{{ url_for('main.edit_club', club_id=club.club_id) }}" class="btn-ghost-action" title="Edit Club">
                   <i class="bi bi-pencil"></i>
                 </a>
+                {% if current_role in ['admin', 'guest'] %}
                 <form method="POST" action="{{ url_for('main.delete_club', club_id=club.club_id) }}" class="d-inline delete-form" data-entity="club">
                   <button type="submit" class="btn-ghost-action text-danger" title="Delete Club">
                     <i class="bi bi-trash"></i>
                   </button>
                 </form>
+                {% endif %}
               </div>
+              {% else %}
+              <span class="text-secondary small font-mono opacity-60"><i class="bi bi-lock me-1"></i>Protected</span>
+              {% endif %}
             </td>
           </tr>
           {% else %}

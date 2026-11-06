@@ -1,6 +1,6 @@
 """
-ClubHub Enterprise DBMS - Authentication and Role Management (Demo Architecture)
-Provides flexible Role-Based Access Control (RBAC) designed for academic presentation & enterprise demonstration.
+ClubHub Enterprise DBMS - Authentication and Role Management (RBAC Engine)
+Provides Role-Based Access Control designed for academic evaluation & demonstration.
 Roles:
   - 'guest': Default unrestricted demo mode (all 8 triggers, 8 cursors, CRUD enabled for seamless evaluation)
   - 'admin': Principal / Super Admin / System Architect (full administrative power)
@@ -63,19 +63,36 @@ def get_current_user():
     """Retrieve active user display name."""
     return session.get("user_name", "Guest Evaluator (Demo)")
 
-def role_required(*allowed_roles):
+def write_required(redirect_endpoint="main.dashboard"):
     """
-    Decorator for sensitive route endpoints.
-    Always permits 'guest' and 'admin' so viva / presentations are never blocked!
+    Decorator for write endpoints (create, edit, delete).
+    Strictly denies 'member' role and redirects with a flash notification.
+    Always allows 'admin', 'manager', and 'guest'.
     """
     def decorator(view_func):
         @functools.wraps(view_func)
         def wrapper(*args, **kwargs):
             role = get_current_role()
-            if role in ["guest", "admin"] or role in allowed_roles:
-                return view_func(*args, **kwargs)
-            flash(f"Access Denied: Current role '{role}' is not authorized for this operation. Switch to Admin or Guest mode.", "warning")
-            return redirect(url_for("main.dashboard"))
+            if role == "member":
+                flash("Access Denied: Student Member role has read-only access. Switch to Faculty Coordinator, Super Admin, or Guest mode to edit or create.", "warning")
+                return redirect(url_for(redirect_endpoint))
+            return view_func(*args, **kwargs)
+        return wrapper
+    return decorator
+
+def execute_required(redirect_endpoint="main.procedures_hub"):
+    """
+    Decorator for stored procedure execution.
+    Denies 'member' role. Always permits 'admin' and 'guest'.
+    """
+    def decorator(view_func):
+        @functools.wraps(view_func)
+        def wrapper(*args, **kwargs):
+            role = get_current_role()
+            if role == "member":
+                flash("Access Denied: Student Member role is restricted from triggering raw stored procedure cursors. Switch to Super Admin or Guest mode.", "warning")
+                return redirect(url_for(redirect_endpoint))
+            return view_func(*args, **kwargs)
         return wrapper
     return decorator
 
@@ -120,6 +137,7 @@ def login():
         session["role"] = user_info["role"]
         session["user_name"] = user_info["name"]
         session["username"] = requested_role
+        session.modified = True
 
         if request.is_json or request.headers.get("X-Requested-With") == "XMLHttpRequest":
             return jsonify({
@@ -138,6 +156,7 @@ def login():
         session["role"] = user["role"]
         session["user_name"] = user["name"]
         session["username"] = username
+        session.modified = True
 
         if request.is_json or request.headers.get("X-Requested-With") == "XMLHttpRequest":
             return jsonify({
@@ -169,6 +188,7 @@ def guest_mode():
     session["role"] = "guest"
     session["user_name"] = "Guest Evaluator (Unrestricted Demo Mode)"
     session["username"] = "guest"
+    session.modified = True
     
     if request.is_json or request.headers.get("X-Requested-With") == "XMLHttpRequest":
         return jsonify({
@@ -188,5 +208,6 @@ def logout():
     session["role"] = "guest"
     session["user_name"] = "Guest Evaluator (Unrestricted Demo Mode)"
     session["username"] = "guest"
+    session.modified = True
     flash("Session reset to Guest Demo Mode.", "info")
     return redirect(url_for("main.dashboard"))

@@ -1,6 +1,7 @@
 import re
 from flask import Blueprint, render_template, request, redirect, url_for, flash, jsonify
 from app.db import get_db_connection, check_db_health
+from app.auth import write_required, execute_required, get_current_role
 
 main_bp = Blueprint("main", __name__)
 
@@ -120,6 +121,7 @@ def list_clubs():
 
 
 @main_bp.route("/clubs/new", methods=["GET", "POST"])
+@write_required("main.list_clubs")
 def create_club():
     conn = get_db_connection()
     if request.method == "POST":
@@ -168,6 +170,7 @@ def create_club():
 
 
 @main_bp.route("/clubs/<club_id>/edit", methods=["GET", "POST"])
+@write_required("main.list_clubs")
 def edit_club(club_id):
     conn = get_db_connection()
     if request.method == "POST":
@@ -225,6 +228,7 @@ def edit_club(club_id):
 
 
 @main_bp.route("/clubs/<club_id>/delete", methods=["POST"])
+@write_required("main.list_clubs")
 def delete_club(club_id):
     try:
         conn = get_db_connection()
@@ -279,6 +283,7 @@ def list_students():
 
 
 @main_bp.route("/students/new", methods=["GET", "POST"])
+@write_required("main.list_students")
 def create_student():
     if request.method == "POST":
         student_id = request.form.get("student_id", "").strip().upper()
@@ -311,6 +316,7 @@ def create_student():
 
 
 @main_bp.route("/students/<student_id>/edit", methods=["GET", "POST"])
+@write_required("main.list_students")
 def edit_student(student_id):
     conn = get_db_connection()
     if request.method == "POST":
@@ -347,6 +353,7 @@ def edit_student(student_id):
 
 
 @main_bp.route("/students/<student_id>/delete", methods=["POST"])
+@write_required("main.list_students")
 def delete_student(student_id):
     try:
         conn = get_db_connection()
@@ -402,6 +409,7 @@ def list_memberships():
 
 
 @main_bp.route("/memberships/new", methods=["GET", "POST"])
+@write_required("main.list_memberships")
 def create_membership():
     conn = get_db_connection()
     if request.method == "POST":
@@ -459,6 +467,7 @@ def create_membership():
 
 
 @main_bp.route("/memberships/<membership_id>/edit", methods=["GET", "POST"])
+@write_required("main.list_memberships")
 def edit_membership(membership_id):
     conn = get_db_connection()
     if request.method == "POST":
@@ -511,6 +520,7 @@ def edit_membership(membership_id):
 
 
 @main_bp.route("/memberships/<membership_id>/delete", methods=["POST"])
+@write_required("main.list_memberships")
 def delete_membership(membership_id):
     try:
         conn = get_db_connection()
@@ -567,6 +577,7 @@ def list_events():
 
 
 @main_bp.route("/events/new", methods=["GET", "POST"])
+@write_required("main.list_events")
 def create_event():
     conn = get_db_connection()
     if request.method == "POST":
@@ -603,6 +614,7 @@ def create_event():
 
 
 @main_bp.route("/events/<event_id>/edit", methods=["GET", "POST"])
+@write_required("main.list_events")
 def edit_event(event_id):
     conn = get_db_connection()
     if request.method == "POST":
@@ -642,6 +654,7 @@ def edit_event(event_id):
 
 
 @main_bp.route("/events/<event_id>/delete", methods=["POST"])
+@write_required("main.list_events")
 def delete_event(event_id):
     try:
         conn = get_db_connection()
@@ -850,6 +863,7 @@ def procedures_hub():
 
 
 @main_bp.route("/procedures/execute/<proc_id>", methods=["POST"])
+@execute_required("main.procedures_hub")
 def execute_proc(proc_id):
     results = []
     proc_name = ""

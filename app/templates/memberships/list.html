@@ -12,15 +12,21 @@
         <p class="inner-page-subtitle">Demonstrating MySQL Triggers: <code class="font-mono text-white">trg_increase_member_count</code> &bull; <code class="font-mono text-white">trg_decrease_member_count</code></p>
       </div>
       <div>
-        <a href="{{ url_for('main.create_membership') }}" class="btn-tesla-primary">
+        {% if current_role != 'member' %}
+        <a href="{{ url_for('main.create_membership') }}" class="btn-tesla-primary action-write-btn glow-border-hover" data-role-req="admin,manager,guest">
           <i class="bi bi-lightning-charge-fill me-2"></i> Enroll Member (Fires Trigger)
         </a>
+        {% else %}
+        <span class="badge-status neutral px-3 py-2 role-member-locked-badge">
+          <i class="bi bi-lock me-1 text-warning"></i>Read-Only View (Student)
+        </span>
+        {% endif %}
       </div>
     </div>
   </header>
 
   <!-- Trigger Technical Banner -->
-  <div class="tesla-card mb-4 p-4" style="border-left: 3px solid var(--warning);">
+  <div class="tesla-card mb-4 p-4 glow-border-hover" style="border-left: 3px solid var(--warning);">
     <div class="d-flex align-items-center gap-3">
       <i class="bi bi-lightning-charge-fill fs-3 text-warning"></i>
       <div>
@@ -33,7 +39,7 @@
   </div>
 
   <!-- Filter by Club -->
-  <div class="tesla-card mb-4 p-3">
+  <div class="tesla-card mb-4 p-3 glow-border-hover">
     <form method="GET" action="{{ url_for('main.list_memberships') }}" class="row g-3 align-items-center">
       <div class="col-md-9">
         <select name="club" class="tesla-form-select">
@@ -55,7 +61,7 @@
   </div>
 
   <!-- Memberships Data Table -->
-  <div class="table-surface-card">
+  <div class="table-surface-card glow-border-hover">
     <div class="table-responsive">
       <table class="tesla-table">
         <thead>
@@ -78,39 +84,45 @@
               <small class="text-secondary">{{ m.student_id }} &bull; {{ m.dept_name }}</small>
             </td>
             <td>
-              <span class="badge-status neutral">{{ m.club_name }}</span>
-              <small class="text-secondary d-block mt-1">Club Count: <strong class="text-white">{{ m.member_count }}</strong></small>
+              <div class="text-white">{{ m.club_name }}</div>
+              <small class="badge-status neutral font-mono" style="font-size: 11px;">{{ m.club_id }}</small>
             </td>
             <td>
               {% if m.role == 'President' %}
-                <span class="badge-status danger">{{ m.role }}</span>
-              {% elif m.role in ['Secretary', 'Treasurer'] %}
-                <span class="badge-status info">{{ m.role }}</span>
-              {% elif m.role == 'Core Member' %}
-                <span class="badge-status success">{{ m.role }}</span>
+                <span class="badge-status warning fw-semibold"><i class="bi bi-star-fill me-1"></i>President</span>
+              {% elif m.role == 'Lead' %}
+                <span class="badge-status info">Lead</span>
+              {% elif m.role == 'Coordinator' %}
+                <span class="badge-status success">Coordinator</span>
               {% else %}
                 <span class="badge-status neutral">{{ m.role }}</span>
               {% endif %}
             </td>
-            <td class="tabular-nums">{{ m.join_date or '-' }}</td>
+            <td><small class="text-secondary tabular-nums">{{ m.join_date }}</small></td>
             <td>
               {% if m.status == 'Active' %}
                 <span class="badge-status success">Active</span>
               {% else %}
-                <span class="badge-status neutral">Inactive</span>
+                <span class="badge-status neutral">{{ m.status }}</span>
               {% endif %}
             </td>
             <td class="text-end">
-              <div class="d-inline-flex gap-1">
+              {% if current_role != 'member' %}
+              <div class="d-inline-flex gap-1 action-write-btn" data-role-req="admin,manager,guest">
                 <a href="{{ url_for('main.edit_membership', membership_id=m.membership_id) }}" class="btn-ghost-action" title="Edit Membership">
                   <i class="bi bi-pencil"></i>
                 </a>
+                {% if current_role in ['admin', 'guest'] %}
                 <form method="POST" action="{{ url_for('main.delete_membership', membership_id=m.membership_id) }}" class="d-inline delete-form" data-entity="membership">
-                  <button type="submit" class="btn-ghost-action text-danger" title="Delete Membership (Fires trg_decrease_member_count)">
+                  <button type="submit" class="btn-ghost-action text-danger" title="Cancel Membership &amp; Fire Trigger 2">
                     <i class="bi bi-trash"></i>
                   </button>
                 </form>
+                {% endif %}
               </div>
+              {% else %}
+              <span class="text-secondary small font-mono opacity-60"><i class="bi bi-lock me-1"></i>Protected</span>
+              {% endif %}
             </td>
           </tr>
           {% else %}

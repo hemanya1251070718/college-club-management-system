@@ -103,3 +103,26 @@ def test_login_demo_persona_switch(client):
     response = client.post("/login", json={"role": "admin"})
     assert response.status_code == 200
     assert response.get_json()["role"] == "admin"
+
+
+def test_member_role_restrictions(client):
+    """Verify that Student Member role cannot edit, create, or delete clubs."""
+    with client.session_transaction() as sess:
+        sess["role"] = "member"
+        sess["user_name"] = "Aarav Deshmukh (Student Member)"
+
+    # Attempt to open Add Club form
+    res_create = client.get("/clubs/new", follow_redirects=False)
+    assert res_create.status_code == 302
+    assert "/clubs" in res_create.headers["Location"]
+
+    # Attempt to open Edit Club form
+    res_edit = client.get("/clubs/CSI/edit", follow_redirects=False)
+    assert res_edit.status_code == 302
+    assert "/clubs" in res_edit.headers["Location"]
+
+    # Switch back to guest
+    with client.session_transaction() as sess:
+        sess["role"] = "guest"
+    res_guest = client.get("/clubs")
+    assert res_guest.status_code == 200

@@ -12,15 +12,21 @@
         <p class="inner-page-subtitle">Organize, schedule, budget, and monitor events organized by college clubs.</p>
       </div>
       <div>
-        <a href="{{ url_for('main.create_event') }}" class="btn-tesla-primary">
+        {% if current_role != 'member' %}
+        <a href="{{ url_for('main.create_event') }}" class="btn-tesla-primary action-write-btn glow-border-hover" data-role-req="admin,manager,guest">
           <i class="bi bi-calendar-plus me-2"></i> New Event
         </a>
+        {% else %}
+        <span class="badge-status neutral px-3 py-2 role-member-locked-badge">
+          <i class="bi bi-lock me-1 text-warning"></i>Read-Only View (Student)
+        </span>
+        {% endif %}
       </div>
     </div>
   </header>
 
   <!-- Events Data Table -->
-  <div class="table-surface-card">
+  <div class="table-surface-card glow-border-hover">
     <div class="table-responsive">
       <table class="tesla-table">
         <thead>
@@ -74,20 +80,26 @@
                 <a href="{{ url_for('main.event_feedback', event_id=ev.event_id) }}" class="btn-ghost-action text-warning" title="Feedback &amp; Trigger 6">
                   <i class="bi bi-star"></i>
                 </a>
-                <a href="{{ url_for('main.edit_event', event_id=ev.event_id) }}" class="btn-ghost-action" title="Edit Event">
+                {% if current_role != 'member' %}
+                <a href="{{ url_for('main.edit_event', event_id=ev.event_id) }}" class="btn-ghost-action action-write-btn" data-role-req="admin,manager,guest" title="Edit Event">
                   <i class="bi bi-pencil"></i>
                 </a>
-                <form method="POST" action="{{ url_for('main.delete_event', event_id=ev.event_id) }}" class="d-inline delete-form" data-entity="event">
+                {% if current_role in ['admin', 'guest'] %}
+                <form method="POST" action="{{ url_for('main.delete_event', event_id=ev.event_id) }}" class="d-inline delete-form action-write-btn" data-role-req="admin,guest" data-entity="event">
                   <button type="submit" class="btn-ghost-action text-danger" title="Delete Event">
                     <i class="bi bi-trash"></i>
                   </button>
                 </form>
+                {% endif %}
+                {% else %}
+                <span class="text-secondary small font-mono opacity-60"><i class="bi bi-lock me-1"></i>Protected</span>
+                {% endif %}
               </div>
             </td>
           </tr>
           {% else %}
           <tr>
-            <td colspan="9" class="text-center text-secondary py-5">No events scheduled.</td>
+            <td colspan="9" class="text-center text-secondary py-5">No events found.</td>
           </tr>
           {% endfor %}
         </tbody>
