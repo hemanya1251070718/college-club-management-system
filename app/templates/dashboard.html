@@ -7,49 +7,146 @@
 <div class="landing-scroll-container">
 
   <!-- =========================================================================
-       SECTION 1: HERO (Cockpit Landing & Selective WebGL Experience)
+       SECTION 1: HERO (Tidewell-Inspired Sleek Fluted Dark Layout with Floating Card)
        ========================================================================= -->
-  <section class="snap-section" id="hero">
-    <!-- WebGL Ambient Canvas (Exclusive to Landing Hero) -->
-    <canvas id="hero-webgl-canvas" class="section-visual-bg"></canvas>
+  <section class="snap-section hero-tidewell-section" id="hero">
+    <!-- Fluted Background Mesh with Warm Radial Glow -->
+    <div class="hero-fluted-backdrop"></div>
+    <canvas id="hero-webgl-canvas" class="section-visual-bg opacity-30"></canvas>
     <div class="section-overlay"></div>
 
-    <!-- Top: Headline & Subtitle -->
-    <div class="section-top-content hero-animate-title">
-      <div class="d-inline-flex align-items-center gap-2 mb-3 px-3 py-1 rounded-pill" style="background: rgba(47, 91, 234, 0.12); border: 1px solid rgba(79, 124, 255, 0.25);">
-        <span class="status-orb"></span>
-        <span class="text-uppercase fw-semibold font-mono" style="font-size: 11px; letter-spacing: 0.08em; color: var(--blue-400);">GCP Production Cluster &bull; Cloud Run</span>
+    <div class="hero-tidewell-container">
+      <div class="row align-items-center g-4 w-100 my-auto">
+        
+        <!-- Left Column: Big Impactful Typography & CTAs (Matching Photo) -->
+        <div class="col-lg-7 text-start hero-animate-title">
+          <div class="d-inline-flex align-items-center gap-2 mb-3 px-3 py-1 rounded-pill hero-status-pill">
+            <span class="status-orb"></span>
+            <span class="text-uppercase fw-semibold font-mono" style="font-size: 11px; letter-spacing: 0.08em; color: var(--blue-400);">GCP Production Cluster &bull; Cloud Run</span>
+          </div>
+
+          <h1 class="hero-tidewell-headline">
+            Campus life that feels boundless.
+          </h1>
+
+          <p class="hero-tidewell-subtitle">
+            Autonomous DBMS architecture for student charters, faculty coordinators, 8 real-time triggers, and 8 analytical cursors running live on Google Cloud SQL.
+          </p>
+
+          <!-- Dual Pill Action Buttons with Border Glow Hover -->
+          <div class="d-flex flex-wrap align-items-center gap-3 pt-3 hero-animate-cta">
+            <a href="{{ url_for('main.procedures_hub') }}" class="btn-tidewell-primary glow-border-hover">
+              <span>Explore 8 Cursors</span>
+              <i class="bi bi-arrow-up-right"></i>
+            </a>
+            <a href="{{ url_for('main.list_triggers') }}" class="btn-tidewell-secondary glow-border-hover">
+              <span>8 Triggers Suite</span>
+              <i class="bi bi-arrow-up-right"></i>
+            </a>
+          </div>
+        </div>
+
+        <!-- Right Column: Floating Glass Schedule Card (Matching Reference Photo) -->
+        <div class="col-lg-5 hero-animate-card">
+          <div class="tidewell-glass-card glow-border-hover">
+            <!-- Card Location / Header -->
+            <div class="card-loc-header">
+              <i class="bi bi-geo-alt me-1 text-primary"></i>
+              <span>VIT Pune Campus, Central DBMS Registry</span>
+            </div>
+
+            <!-- Card Item 1 (Saltbox House equivalent) -->
+            <div class="tidewell-card-item">
+              <div class="d-flex justify-content-between align-items-start">
+                <div>
+                  <h4 class="card-item-title">Google Developer Groups (GDG)</h4>
+                  <div class="card-item-meta">Academic Charter #1 &bull; Technical</div>
+                </div>
+                <div class="card-item-rating">
+                  <span>4.98 ★</span>
+                  <small>rating</small>
+                </div>
+              </div>
+              <div class="card-item-schedule">
+                <div class="sched-date"><strong>Fri 14</strong> <small>Active Sem</small></div>
+                <div class="sched-badge">320 enrolled</div>
+                <div class="sched-date text-end"><strong>Sun 16</strong> <small>Review</small></div>
+              </div>
+            </div>
+
+            <!-- Card Item 2 (Driftwood Cabin equivalent) -->
+            <div class="tidewell-card-item">
+              <div class="d-flex justify-content-between align-items-start">
+                <div>
+                  <h4 class="card-item-title">Robotics &amp; AI Society</h4>
+                  <div class="card-item-meta">Academic Charter #2 &bull; Research</div>
+                </div>
+                <div class="card-item-rating">
+                  <span>4.95 ★</span>
+                  <small>rating</small>
+                </div>
+              </div>
+              <div class="card-item-schedule">
+                <div class="sched-date"><strong>Sat 22</strong> <small>Symposium</small></div>
+                <div class="sched-badge">215 enrolled</div>
+                <div class="sched-date text-end"><strong>Mon 24</strong> <small>Audit</small></div>
+              </div>
+            </div>
+
+            <!-- Card Bottom Highlight Tag (Save 20% midweek equivalent) -->
+            <div class="card-highlight-pill">
+              <i class="bi bi-lightning-charge-fill me-1"></i>
+              <span>8 Triggers &amp; 8 Cursors 100% Operational</span>
+            </div>
+          </div>
+        </div>
+
       </div>
-      <h1 class="section-title">ClubHub DBMS Cockpit</h1>
-      <p class="section-subtitle hero-animate-subtitle">
-        Enterprise College Club Architecture &bull; 8 Canonical Base Tables &bull; 8 Real-time Triggers &bull; 8 Advanced Cursors
-      </p>
+
+      <!-- Bottom Horizontal 5-Pillar Feature Strip (Matching Photo Footer Strip) -->
+      <div class="hero-feature-strip">
+        <div class="feature-strip-item">
+          <i class="bi bi-building"></i>
+          <div>
+            <strong>8 Canonical Tables</strong>
+            <span>Zero schema anomaly</span>
+          </div>
+        </div>
+        <div class="feature-strip-item">
+          <i class="bi bi-clock-history"></i>
+          <div>
+            <strong>Real-time ACID Triggers</strong>
+            <span>Sub-millisecond sync</span>
+          </div>
+        </div>
+        <div class="feature-strip-item">
+          <i class="bi bi-shield-check"></i>
+          <div>
+            <strong>Role-Based Security</strong>
+            <span>Guest, Faculty, Admin</span>
+          </div>
+        </div>
+        <div class="feature-strip-item">
+          <i class="bi bi-cpu"></i>
+          <div>
+            <strong>Analytical Cursors</strong>
+            <span>Batch reconciliation</span>
+          </div>
+        </div>
+        <div class="feature-strip-item">
+          <i class="bi bi-cloud-check"></i>
+          <div>
+            <strong>Cloud SQL MySQL 8.0</strong>
+            <span>99.99% Availability</span>
+          </div>
+        </div>
+      </div>
     </div>
 
-    <!-- Middle: Visual Spacer / Ambient Grid -->
-    <div class="section-middle-content">
-      <div class="text-center d-flex flex-wrap justify-content-center gap-3">
-        <div class="badge-status neutral font-mono">Cloud SQL MySQL 8.0</div>
-        <div class="badge-status neutral font-mono">Unix Socket VPC</div>
-        <div class="badge-status success font-mono">Secret Manager v2</div>
-        <div class="badge-status info font-mono">100% Academic DBMS Compliance</div>
-      </div>
-    </div>
-
-    <!-- Bottom: Tesla Dual CTAs & Animated Chevron -->
-    <div class="section-bottom-content hero-animate-cta">
-      <div class="cta-button-group">
-        <a href="{{ url_for('main.procedures_hub') }}" class="btn-tesla-primary">
-          Explore 8 Cursors Hub
-        </a>
-        <a href="{{ url_for('main.list_triggers') }}" class="btn-tesla-secondary">
-          8 Triggers Suite
-        </a>
-      </div>
-      <a href="#charters" class="scroll-chevron" aria-label="Scroll to Club Charters">
-        <i class="bi bi-chevron-down"></i>
-      </a>
-    </div>
+    <!-- Scroll Down Indicator -->
+    <a href="#charters" class="scroll-chevron" aria-label="Scroll to Club Charters">
+      <i class="bi bi-chevron-down"></i>
+    </a>
   </section>
 
   <!-- =========================================================================
@@ -68,7 +165,7 @@
 
     <!-- Middle: Live Table -->
     <div class="section-middle-content reveal-on-scroll delay-1" style="max-width: 1180px;">
-      <div class="table-surface-card w-100">
+      <div class="table-surface-card w-100 glow-border-hover">
         <div class="table-responsive" style="max-height: 48vh;">
           <table class="tesla-table">
             <thead>
@@ -105,10 +202,10 @@
     <!-- Bottom: Dual CTAs -->
     <div class="section-bottom-content reveal-on-scroll delay-2">
       <div class="cta-button-group">
-        <a href="{{ url_for('main.list_clubs') }}" class="btn-tesla-primary">
+        <a href="{{ url_for('main.list_clubs') }}" class="btn-tesla-primary glow-border-hover">
           Manage All Clubs
         </a>
-        <a href="{{ url_for('main.create_club') }}" class="btn-tesla-secondary">
+        <a href="{{ url_for('main.create_club') }}" class="btn-tesla-secondary glow-border-hover" data-role-req="admin,manager,guest">
           Add New Club
         </a>
       </div>
@@ -136,7 +233,7 @@
     <div class="section-middle-content reveal-on-scroll delay-1" style="max-width: 1200px;">
       <div class="row g-3 w-100">
         <div class="col-md-6 col-lg-3">
-          <div class="tesla-card h-100">
+          <div class="tesla-card h-100 glow-border-hover">
             <span class="badge-status info mb-3">MEMBER 1 &bull; T1 &amp; T2</span>
             <h4 class="text-white fw-medium mb-2" style="font-size: 16px;">Club Size Automation</h4>
             <p class="text-secondary small mb-0">
@@ -145,7 +242,7 @@
           </div>
         </div>
         <div class="col-md-6 col-lg-3">
-          <div class="tesla-card h-100">
+          <div class="tesla-card h-100 glow-border-hover">
             <span class="badge-status success mb-3">MEMBER 2 &bull; T3 &amp; T4</span>
             <h4 class="text-white fw-medium mb-2" style="font-size: 16px;">Single-President Rule</h4>
             <p class="text-secondary small mb-0">
@@ -154,7 +251,7 @@
           </div>
         </div>
         <div class="col-md-6 col-lg-3">
-          <div class="tesla-card h-100">
+          <div class="tesla-card h-100 glow-border-hover">
             <span class="badge-status warning mb-3">MEMBER 3 &bull; T5 &amp; T6</span>
             <h4 class="text-white fw-medium mb-2" style="font-size: 16px;">Registration &amp; Feedback</h4>
             <p class="text-secondary small mb-0">
@@ -163,7 +260,7 @@
           </div>
         </div>
         <div class="col-md-6 col-lg-3">
-          <div class="tesla-card h-100">
+          <div class="tesla-card h-100 glow-border-hover">
             <span class="badge-status neutral mb-3" style="color: var(--violet-400);">MEMBER 4 &bull; T7 &amp; T8</span>
             <h4 class="text-white fw-medium mb-2" style="font-size: 16px;">Status &amp; Provisioning</h4>
             <p class="text-secondary small mb-0">
@@ -177,10 +274,10 @@
     <!-- Bottom: Dual CTAs -->
     <div class="section-bottom-content reveal-on-scroll delay-2">
       <div class="cta-button-group">
-        <a href="{{ url_for('main.list_triggers') }}" class="btn-tesla-primary">
+        <a href="{{ url_for('main.list_triggers') }}" class="btn-tesla-primary glow-border-hover">
           Explore 8 Triggers Suite
         </a>
-        <a href="{{ url_for('main.create_membership') }}" class="btn-tesla-secondary">
+        <a href="{{ url_for('main.create_membership') }}" class="btn-tesla-secondary glow-border-hover" data-role-req="admin,manager,guest">
           Test Trigger Live
         </a>
       </div>
@@ -208,7 +305,7 @@
     <div class="section-middle-content reveal-on-scroll delay-1" style="max-width: 1200px;">
       <div class="row g-3 w-100">
         <div class="col-md-6 col-lg-3">
-          <div class="tesla-card h-100">
+          <div class="tesla-card h-100 glow-border-hover">
             <span class="badge-status info mb-3">CURSOR 1</span>
             <h4 class="text-white fw-medium mb-2 font-mono" style="font-size: 14px;">sp_audit_club_counts</h4>
             <p class="text-secondary small mb-0">
@@ -217,7 +314,7 @@
           </div>
         </div>
         <div class="col-md-6 col-lg-3">
-          <div class="tesla-card h-100">
+          <div class="tesla-card h-100 glow-border-hover">
             <span class="badge-status info mb-3">CURSOR 2</span>
             <h4 class="text-white fw-medium mb-2 font-mono" style="font-size: 14px;">sp_recruitment_leads</h4>
             <p class="text-secondary small mb-0">
@@ -226,7 +323,7 @@
           </div>
         </div>
         <div class="col-md-6 col-lg-3">
-          <div class="tesla-card h-100">
+          <div class="tesla-card h-100 glow-border-hover">
             <span class="badge-status success mb-3">CURSOR 3</span>
             <h4 class="text-white fw-medium mb-2 font-mono" style="font-size: 14px;">sp_reconcile_budgets</h4>
             <p class="text-secondary small mb-0">
@@ -235,7 +332,7 @@
           </div>
         </div>
         <div class="col-md-6 col-lg-3">
-          <div class="tesla-card h-100">
+          <div class="tesla-card h-100 glow-border-hover">
             <span class="badge-status success mb-3">CURSOR 4</span>
             <h4 class="text-white fw-medium mb-2 font-mono" style="font-size: 14px;">sp_close_past_events</h4>
             <p class="text-secondary small mb-0">
@@ -249,10 +346,10 @@
     <!-- Bottom: Dual CTAs -->
     <div class="section-bottom-content reveal-on-scroll delay-2">
       <div class="cta-button-group">
-        <a href="{{ url_for('main.procedures_hub') }}" class="btn-tesla-primary">
+        <a href="{{ url_for('main.procedures_hub') }}" class="btn-tesla-primary glow-border-hover">
           Open 8 Cursors Hub
         </a>
-        <a href="{{ url_for('main.proc_audit') }}" class="btn-tesla-secondary">
+        <a href="{{ url_for('main.proc_audit') }}" class="btn-tesla-secondary glow-border-hover" data-role-req="admin,guest">
           Run sp_audit_club_counts
         </a>
       </div>
@@ -280,28 +377,28 @@
     <div class="section-middle-content reveal-on-scroll delay-1" style="max-width: 1100px;">
       <div class="row g-4 w-100">
         <div class="col-6 col-md-3">
-          <div class="tesla-card text-center py-4">
+          <div class="tesla-card text-center py-4 glow-border-hover">
             <span class="text-secondary small text-uppercase fw-medium" style="letter-spacing: 0.06em;">Total Clubs</span>
             <div class="my-2 tabular-nums fw-medium" style="font-size: 44px; color: var(--text-1);" data-counter="{{ total_clubs }}">{{ total_clubs }}</div>
             <span class="badge-status info">Charters</span>
           </div>
         </div>
         <div class="col-6 col-md-3">
-          <div class="tesla-card text-center py-4">
+          <div class="tesla-card text-center py-4 glow-border-hover">
             <span class="text-secondary small text-uppercase fw-medium" style="letter-spacing: 0.06em;">Students Directory</span>
             <div class="my-2 tabular-nums fw-medium" style="font-size: 44px; color: var(--text-1);" data-counter="{{ total_students }}">{{ total_students }}</div>
             <span class="badge-status success">Enrolled</span>
           </div>
         </div>
         <div class="col-6 col-md-3">
-          <div class="tesla-card text-center py-4">
+          <div class="tesla-card text-center py-4 glow-border-hover">
             <span class="text-secondary small text-uppercase fw-medium" style="letter-spacing: 0.06em;">Active Members</span>
             <div class="my-2 tabular-nums fw-medium" style="font-size: 44px; color: var(--text-1);" data-counter="{{ total_memberships }}">{{ total_memberships }}</div>
             <span class="badge-status warning">Trigger-Synced</span>
           </div>
         </div>
         <div class="col-6 col-md-3">
-          <div class="tesla-card text-center py-4">
+          <div class="tesla-card text-center py-4 glow-border-hover">
             <span class="text-secondary small text-uppercase fw-medium" style="letter-spacing: 0.06em;">Campus Events</span>
             <div class="my-2 tabular-nums fw-medium" style="font-size: 44px; color: var(--text-1);" data-counter="{{ total_events }}">{{ total_events }}</div>
             <span class="badge-status neutral">Lifecycles</span>
@@ -313,10 +410,10 @@
     <!-- Bottom: Dual CTAs -->
     <div class="section-bottom-content reveal-on-scroll delay-2">
       <div class="cta-button-group">
-        <a href="{{ url_for('main.list_students') }}" class="btn-tesla-primary">
+        <a href="{{ url_for('main.list_students') }}" class="btn-tesla-primary glow-border-hover">
           Students Directory
         </a>
-        <a href="{{ url_for('main.list_events') }}" class="btn-tesla-secondary">
+        <a href="{{ url_for('main.list_events') }}" class="btn-tesla-secondary glow-border-hover">
           Campus Events Desk
         </a>
       </div>
@@ -342,7 +439,7 @@
 
     <!-- Middle: Architecture Specs -->
     <div class="section-middle-content reveal-on-scroll delay-1" style="max-width: 900px;">
-      <div class="tesla-card w-100 p-4">
+      <div class="tesla-card w-100 p-4 glow-border-hover">
         <div class="row g-4 text-start">
           <div class="col-md-4">
             <div class="text-secondary small text-uppercase fw-medium mb-1">Compute Service</div>
@@ -366,10 +463,10 @@
     <!-- Bottom: Dual CTAs -->
     <div class="section-bottom-content reveal-on-scroll delay-2">
       <div class="cta-button-group">
-        <a href="{{ url_for('main.health') }}" class="btn-tesla-primary">
+        <a href="{{ url_for('main.health') }}" class="btn-tesla-primary glow-border-hover">
           Verify System Health
         </a>
-        <a href="#hero" class="btn-tesla-secondary">
+        <a href="#hero" class="btn-tesla-secondary glow-border-hover">
           Return to Cockpit Top
         </a>
       </div>

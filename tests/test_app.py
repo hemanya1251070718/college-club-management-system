@@ -85,3 +85,21 @@ def test_custom_404_page(client):
     response = client.get("/this-route-does-not-exist")
     assert response.status_code == 404
     assert b"Resource Not Found" in response.data
+
+
+def test_guest_mode_endpoint(client):
+    """Test the one-click /guest endpoint for unrestricted demo access."""
+    response = client.get("/guest", follow_redirects=True)
+    assert response.status_code == 200
+    # JSON access
+    res_json = client.get("/api/auth/status")
+    assert res_json.status_code == 200
+    data = res_json.get_json()
+    assert data["role"] == "guest"
+    assert data["meta"]["can_execute_procs"] is True
+
+def test_login_demo_persona_switch(client):
+    """Test switching demo personas via /login."""
+    response = client.post("/login", json={"role": "admin"})
+    assert response.status_code == 200
+    assert response.get_json()["role"] == "admin"

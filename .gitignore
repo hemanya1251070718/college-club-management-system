@@ -48,3 +48,6 @@ docs/task1_master_guide.*
 build_task1_master_pdf.py
 docs/task2_master_guide.*
 build_task2_master_pdf.py
+
+.vercel
+.env*

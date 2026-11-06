@@ -164,3 +164,4 @@
     renderer.setSize(canvas.clientWidth, canvas.clientHeight);
   }, { passive: true });
 })();
+

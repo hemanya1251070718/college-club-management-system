@@ -7,109 +7,143 @@
   <meta name="color-scheme" content="dark">
   <title>{% block title %}ClubHub Executive DBMS{% endblock %} - Cloud Deployment</title>
 
-  <!-- Self-hosted Inter Font Substitute (Variable 400, 500) & JetBrains Mono -->
+  <!-- Self-hosted Inter Font (Variable 400, 500) & JetBrains Mono -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 
   <!-- Bootstrap 5 Baseline CSS -->
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
   <!-- Bootstrap Icons -->
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
 
-  <!-- Design System Tokens & Components (Tesla-Style Dark Theme) -->
+  <!-- Design System Tokens & Components (Tesla-Style Dark Theme + Tidewell Aesthetic) -->
   <link rel="stylesheet" href="{{ url_for('static', filename='css/tokens.css') }}">
   <link rel="stylesheet" href="{{ url_for('static', filename='css/components.css') }}">
   <link rel="stylesheet" href="{{ url_for('static', filename='css/motion.css') }}">
 </head>
-<body class="{% block body_class %}{% endblock %}">
+<body class="{% block body_class %}{% endblock %}" data-user-role="{{ current_role|default('guest') }}">
 
   <!-- Accessible Skip-to-Content Link -->
   <a href="#main-content" class="visually-hidden-focusable p-3 bg-primary text-white position-absolute top-0 start-0 z-3">
     Skip to main content
   </a>
 
-  <!-- Fixed 56px Tesla Header (Transparent to Frosted on Scroll) -->
+  <!-- Fixed Tidewell-Inspired Header (Frosted Pill Navigation & Utility Cluster) -->
   <header class="app-header" role="banner">
     <div class="header-inner">
-      <!-- Left: Wordmark Logo -->
-      <a class="header-brand" href="{{ url_for('main.dashboard') }}">
-        <span class="brand-dot"></span>
-        <span>ClubHub</span>
+      <!-- Left: Brand Wordmark with Curved Wave Icon -->
+      <a class="header-brand" href="{{ url_for('main.dashboard') }}" title="ClubHub Enterprise DBMS">
+        <span class="brand-tilde">~</span>
+        <span class="brand-name">ClubHub</span>
       </a>
 
-      <!-- Center: Primary Navigation Pills -->
+      <!-- Center: Frosted Pill Navigation Capsule (Matching Attached Photo) -->
       <nav class="d-none d-lg-flex" aria-label="Main Navigation">
-        <ul class="header-nav">
+        <ul class="header-nav-pill-container">
           <li>
             <a class="nav-pill-link {% if request.endpoint == 'main.dashboard' %}is-active{% endif %}" href="{{ url_for('main.dashboard') }}">
-              Cockpit
+              {% if request.endpoint == 'main.dashboard' %}<span class="active-dot"></span>{% endif %}
+              <span>Cockpit</span>
             </a>
           </li>
           <li>
             <a class="nav-pill-link {% if 'clubs' in request.path %}is-active{% endif %}" href="{{ url_for('main.list_clubs') }}">
-              Clubs
+              {% if 'clubs' in request.path %}<span class="active-dot"></span>{% endif %}
+              <span>Clubs</span>
             </a>
           </li>
           <li>
             <a class="nav-pill-link {% if 'students' in request.path %}is-active{% endif %}" href="{{ url_for('main.list_students') }}">
-              Students
+              {% if 'students' in request.path %}<span class="active-dot"></span>{% endif %}
+              <span>Students</span>
             </a>
           </li>
           <li>
             <a class="nav-pill-link {% if 'memberships' in request.path %}is-active{% endif %}" href="{{ url_for('main.list_memberships') }}">
-              Memberships
+              {% if 'memberships' in request.path %}<span class="active-dot"></span>{% endif %}
+              <span>Memberships</span>
             </a>
           </li>
           <li>
             <a class="nav-pill-link {% if 'events' in request.path %}is-active{% endif %}" href="{{ url_for('main.list_events') }}">
-              Events
+              {% if 'events' in request.path %}<span class="active-dot"></span>{% endif %}
+              <span>Events</span>
             </a>
           </li>
-          <li>
+          <li data-role-req="admin,manager,guest">
             <a class="nav-pill-link {% if 'triggers' in request.path %}is-active{% endif %}" href="{{ url_for('main.list_triggers') }}">
-              Triggers
+              {% if 'triggers' in request.path %}<span class="active-dot"></span>{% endif %}
+              <span>Triggers</span>
             </a>
           </li>
-          <li>
+          <li data-role-req="admin,guest">
             <a class="nav-pill-link {% if 'procedures' in request.path %}is-active{% endif %}" href="{{ url_for('main.procedures_hub') }}">
-              Procedures
+              {% if 'procedures' in request.path %}<span class="active-dot"></span>{% endif %}
+              <span>Procedures</span>
             </a>
           </li>
         </ul>
       </nav>
 
-      <!-- Right: Utility Status & Menu Trigger -->
+      <!-- Right: Role Control, Small Guest Button, Telemetry Clock, and Menu Trigger -->
       <div class="header-actions">
-        <a href="{{ url_for('main.health') }}" class="nav-pill-link d-none d-sm-inline-flex" title="Cloud SQL Socket Health &amp; Telemetry">
-          <span class="status-orb me-2"></span>
-          <span>Health</span>
+        <!-- Top Right Small Guest Button (Immediate Unrestricted Demo Access for Professor/Sir) -->
+        <button id="guest-quick-btn" class="btn-guest-pill" type="button" title="One-Click Full Demo Access for Faculty Evaluation">
+          <span class="guest-orb"></span>
+          <span class="guest-label">Guest</span>
+        </button>
+
+        <!-- Role Badge & Switcher Modal Trigger -->
+        <button id="role-switcher-btn" class="btn-role-badge" type="button" data-bs-toggle="modal" data-bs-target="#roleModal" title="Switch User Role Persona">
+          <i class="bi bi-person-badge"></i>
+          <span id="current-role-badge-text">{{ role_meta.title|default('Guest (Full Demo)') }}</span>
+        </button>
+
+        <!-- Telemetry Circular Button (Clock Icon as in Reference Photo) -->
+        <a href="{{ url_for('main.health') }}" class="btn-circle-utility d-none d-sm-inline-flex" title="Cloud SQL Socket Health &amp; Telemetry">
+          <i class="bi bi-clock"></i>
         </a>
-        <button class="menu-trigger-btn" type="button" aria-label="Open Navigation Menu" aria-expanded="false">
-          <span>Menu</span>
+
+        <!-- Menu Drawer Circular Button (Two Bar Hamburger as in Reference Photo) -->
+        <button class="btn-circle-utility menu-trigger-btn" type="button" aria-label="Open Navigation Menu" aria-expanded="false">
+          <i class="bi bi-list"></i>
         </button>
       </div>
     </div>
   </header>
 
-  <!-- Slide-in Side Navigation Drawer (Full Height, Surface-2, Focus Trap) -->
+  <!-- Slide-in Side Navigation Drawer (Full Height, Surface-2) -->
   <div class="drawer-backdrop" aria-hidden="true">
     <aside class="drawer-panel" role="dialog" aria-modal="true" aria-label="Main Site Drawer">
       <div class="drawer-header">
+        <div class="d-flex align-items-center gap-2">
+          <span class="brand-tilde">~</span>
+          <span class="text-white fw-bold">ClubHub DBMS</span>
+        </div>
         <button class="drawer-close-btn" type="button" aria-label="Close navigation menu">
           <i class="bi bi-x-lg"></i>
         </button>
       </div>
 
+      <div class="drawer-user-info mb-4 p-3 rounded" style="background: rgba(255,255,255,0.04); border: 1px solid var(--border);">
+        <div class="d-flex align-items-center justify-content-between mb-2">
+          <span class="text-secondary small text-uppercase font-mono" style="font-size: 11px;">Active Persona</span>
+          <span class="badge-status success small font-mono" id="drawer-active-role-badge">{{ current_role|upper }}</span>
+        </div>
+        <div class="text-white fw-medium small mb-1" id="drawer-user-name">{{ current_user_name }}</div>
+        <div class="text-secondary" style="font-size: 12px;">{{ role_meta.description }}</div>
+      </div>
+
       <nav aria-label="Side Drawer Menu">
         <ul class="drawer-nav-list">
-          <li><a class="drawer-nav-link" href="{{ url_for('main.dashboard') }}">Cockpit Dashboard</a></li>
-          <li><a class="drawer-nav-link" href="{{ url_for('main.list_clubs') }}">Clubs Management</a></li>
-          <li><a class="drawer-nav-link" href="{{ url_for('main.list_students') }}">Students Directory</a></li>
-          <li><a class="drawer-nav-link" href="{{ url_for('main.list_memberships') }}">Memberships &amp; Triggers</a></li>
-          <li><a class="drawer-nav-link" href="{{ url_for('main.list_events') }}">Campus Events</a></li>
-          <li><a class="drawer-nav-link" href="{{ url_for('main.list_triggers') }}">8 Database Triggers</a></li>
-          <li><a class="drawer-nav-link" href="{{ url_for('main.procedures_hub') }}">8 Stored Procedures Hub</a></li>
+          <li><a class="drawer-nav-link" href="{{ url_for('main.dashboard') }}"><i class="bi bi-speedometer2 me-2 text-primary"></i>Cockpit Dashboard</a></li>
+          <li><a class="drawer-nav-link" href="{{ url_for('main.list_clubs') }}"><i class="bi bi-diagram-3 me-2 text-info"></i>Clubs Management</a></li>
+          <li><a class="drawer-nav-link" href="{{ url_for('main.list_students') }}"><i class="bi bi-people me-2 text-success"></i>Students Directory</a></li>
+          <li><a class="drawer-nav-link" href="{{ url_for('main.list_memberships') }}"><i class="bi bi-card-checklist me-2 text-warning"></i>Memberships &amp; Triggers</a></li>
+          <li><a class="drawer-nav-link" href="{{ url_for('main.list_events') }}"><i class="bi bi-calendar-event me-2 text-primary"></i>Campus Events</a></li>
+          <li data-role-req="admin,manager,guest"><a class="drawer-nav-link" href="{{ url_for('main.list_triggers') }}"><i class="bi bi-lightning-charge me-2 text-warning"></i>8 Database Triggers</a></li>
+          <li data-role-req="admin,guest"><a class="drawer-nav-link" href="{{ url_for('main.procedures_hub') }}"><i class="bi bi-cpu me-2 text-info"></i>8 Stored Procedures Hub</a></li>
         </ul>
 
         <div class="drawer-subnav">
@@ -124,10 +158,126 @@
     </aside>
   </div>
 
+  <!-- Role Switching & Login Modal -->
+  <div class="modal fade" id="roleModal" tabindex="-1" aria-labelledby="roleModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" style="max-width: 500px;">
+      <div class="modal-content border-0 text-white" style="background: var(--surface-2); border-radius: 20px; box-shadow: 0 24px 60px rgba(0,0,0,0.8); border: 1px solid var(--border-strong);">
+        
+        <div class="modal-header border-0 pb-0 pt-4 px-4">
+          <div>
+            <h5 class="modal-title fw-bold text-white mb-1" id="roleModalLabel">Role &amp; Identity Governance</h5>
+            <p class="text-secondary small mb-0">Select a demonstration persona or sign in with credentials</p>
+          </div>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+
+        <div class="modal-body px-4 py-3">
+          
+          <!-- One Click Quick Switch Personas for Live Viva Demonstration -->
+          <div class="mb-3">
+            <label class="text-secondary text-uppercase fw-semibold mb-2" style="font-size: 11px; letter-spacing: 0.08em;">Instant Demo Personas (1-Click Switch)</label>
+            <div class="d-flex flex-column gap-2">
+              
+              <!-- Guest Unrestricted -->
+              <button class="role-persona-card active-persona" data-role-select="guest" type="button">
+                <div class="d-flex align-items-center justify-content-between mb-1">
+                  <span class="fw-semibold text-white"><i class="bi bi-shield-check text-success me-2"></i>Guest Evaluator (Recommended)</span>
+                  <span class="badge-status success small">Full Demo</span>
+                </div>
+                <div class="text-secondary small">100% Unrestricted access to all 8 triggers, 8 cursors, and CRUD actions.</div>
+              </button>
+
+              <!-- Super Admin -->
+              <button class="role-persona-card" data-role-select="admin" type="button">
+                <div class="d-flex align-items-center justify-content-between mb-1">
+                  <span class="fw-semibold text-white"><i class="bi bi-shield-lock text-primary me-2"></i>Super Admin / Principal</span>
+                  <span class="badge-status info small">Admin</span>
+                </div>
+                <div class="text-secondary small">Full DBMS authority, audit repairs, schema re-init, and raw procedure runner.</div>
+              </button>
+
+              <!-- Faculty Coordinator -->
+              <button class="role-persona-card" data-role-select="manager" type="button">
+                <div class="d-flex align-items-center justify-content-between mb-1">
+                  <span class="fw-semibold text-white"><i class="bi bi-person-workspace text-warning me-2"></i>Faculty Coordinator</span>
+                  <span class="badge-status warning small">Coordinator</span>
+                </div>
+                <div class="text-secondary small">Charter management &amp; event execution. Low-level schema triggers protected.</div>
+              </button>
+
+              <!-- Student Member -->
+              <button class="role-persona-card" data-role-select="member" type="button">
+                <div class="d-flex align-items-center justify-content-between mb-1">
+                  <span class="fw-semibold text-white"><i class="bi bi-mortarboard text-secondary me-2"></i>Student Member</span>
+                  <span class="badge-status neutral small">Member</span>
+                </div>
+                <div class="text-secondary small">Exploratory read-only access. Modification controls visually restricted.</div>
+              </button>
+
+            </div>
+          </div>
+
+          <!-- Divider -->
+          <div class="d-flex align-items-center gap-2 my-3">
+            <hr class="flex-grow-1 border-secondary opacity-25">
+            <span class="text-secondary small text-uppercase font-mono" style="font-size: 10px;">Or Sign In</span>
+            <hr class="flex-grow-1 border-secondary opacity-25">
+          </div>
+
+          <!-- Credential Login Form -->
+          <form id="login-form">
+            <div class="mb-2">
+              <label for="login-username" class="form-label text-secondary small mb-1">Username</label>
+              <input type="text" class="form-control text-white" id="login-username" placeholder="e.g. admin, faculty, student" style="background: var(--surface-1); border-color: var(--border);">
+            </div>
+            <div class="mb-3">
+              <label for="login-password" class="form-label text-secondary small mb-1">Password</label>
+              <input type="password" class="form-control text-white" id="login-password" placeholder="e.g. admin123" style="background: var(--surface-1); border-color: var(--border);">
+            </div>
+            <button type="submit" class="btn-tesla-primary w-100 py-2">
+              <i class="bi bi-box-arrow-in-right me-1"></i> Authenticate Persona
+            </button>
+          </form>
+
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Google Pay Style Rainbow Circular Success Animation Overlay -->
+  <div id="gpay-success-overlay" class="gpay-overlay" aria-hidden="true">
+    <div class="gpay-card">
+      <div class="gpay-animation-box">
+        <svg class="gpay-svg" viewBox="0 0 120 120">
+          <defs>
+            <!-- Animated Rotating Rainbow Gradient -->
+            <linearGradient id="gpayRainbowGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" stop-color="#FF3366" />
+              <stop offset="20%" stop-color="#FF9933" />
+              <stop offset="40%" stop-color="#FFFF33" />
+              <stop offset="60%" stop-color="#33FF66" />
+              <stop offset="80%" stop-color="#33CCFF" />
+              <stop offset="100%" stop-color="#9933FF" />
+            </linearGradient>
+          </defs>
+          <!-- Background track -->
+          <circle class="gpay-circle-bg" cx="60" cy="60" r="50"></circle>
+          <!-- Animated Rainbow Stroke -->
+          <circle class="gpay-circle-rainbow" cx="60" cy="60" r="50"></circle>
+          <!-- Checkmark Stroke -->
+          <polyline class="gpay-checkmark" points="36,60 52,76 84,44"></polyline>
+        </svg>
+      </div>
+      <div class="gpay-title" id="gpay-title">Authenticated</div>
+      <div class="gpay-role" id="gpay-role-name">Guest (Full Demo)</div>
+      <div class="gpay-sub" id="gpay-desc">Access granted across all 8 tables and triggers.</div>
+    </div>
+  </div>
+
   <!-- Flash System Messages -->
   {% with messages = get_flashed_messages(with_categories=true) %}
     {% if messages %}
-      <div class="app-container" style="padding-top: 64px; margin-bottom: -40px; position: relative; z-index: 100;">
+      <div class="app-container" style="padding-top: 76px; margin-bottom: -40px; position: relative; z-index: 100;">
         {% for category, message in messages %}
           <div class="tesla-alert alert-{{ category }} alert-dismissible fade show" role="alert">
             <div class="d-flex align-items-center gap-2">
@@ -171,7 +321,7 @@
     </div>
   </footer>
 
-  <!-- Three.js (Selective ES Module / Library for Landing Page Hero Only) -->
+  <!-- Three.js (Selective ES Module for Landing Hero Background) -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
   <!-- Bootstrap 5 JS Bundle -->
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
@@ -179,7 +329,7 @@
   <script src="{{ url_for('static', filename='js/motion.js') }}"></script>
   <!-- Selective WebGL Hero -->
   <script src="{{ url_for('static', filename='js/webgl-hero.js') }}"></script>
-  <!-- Main Bridge -->
+  <!-- Main RBAC & Google Pay Rainbow Animation Bridge -->
   <script src="{{ url_for('static', filename='js/main.js') }}"></script>
 </body>
 </html>
