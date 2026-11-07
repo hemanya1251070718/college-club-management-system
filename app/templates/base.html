@@ -100,6 +100,12 @@
           <span id="current-role-badge-text">{{ role_meta.title|default('Guest (Full Demo)') }}</span>
         </button>
 
+        <!-- Logout Link -->
+        <a href="{{ url_for('auth.logout') }}" class="btn-role-badge d-none d-md-inline-flex text-secondary" title="Sign Out of ClubHub">
+          <i class="bi bi-box-arrow-right"></i>
+          <span>Logout</span>
+        </a>
+
         <!-- Telemetry Circular Button (Clock Icon as in Reference Photo) -->
         <a href="{{ url_for('main.health') }}" class="btn-circle-utility d-none d-sm-inline-flex" title="Cloud SQL Socket Health &amp; Telemetry">
           <i class="bi bi-clock"></i>
@@ -153,6 +159,7 @@
           <a class="drawer-sublink" href="{{ url_for('main.proc_audit') }}">Run sp_audit_club_counts</a>
           <a class="drawer-sublink" href="{{ url_for('main.proc_student_clubs') }}">Run GetStudentClubs</a>
           <a class="drawer-sublink" href="{{ url_for('main.health') }}">System Telemetry &amp; DB Health</a>
+          <a class="drawer-sublink text-danger pt-2" href="{{ url_for('auth.logout') }}"><i class="bi bi-box-arrow-right me-1"></i> Sign Out</a>
         </div>
       </nav>
     </aside>

@@ -1,0 +1,962 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#16113A">
+  <title>ClubHub Enterprise DBMS - Identity &amp; Access Governance</title>
+
+  <!-- Typography: Inter & JetBrains Mono -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+
+  <!-- Bootstrap 5 Baseline CSS & Icons -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+
+  <!-- Design System Tokens & Base Styles -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/tokens.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/components.css') }}">
+
+  <style>
+    /* --------------------------------------------------------------------------
+       Switchd-Inspired Purple Gatekeeper Layout
+       -------------------------------------------------------------------------- */
+    body.login-page-body {
+      min-height: 100vh;
+      margin: 0;
+      padding: 24px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background:
+        radial-gradient(circle at 10% 15%, rgba(99, 102, 241, 0.22) 0%, transparent 40%),
+        radial-gradient(circle at 90% 85%, rgba(139, 92, 246, 0.25) 0%, transparent 45%),
+        #0C0E1E;
+      font-family: 'Inter', -apple-system, sans-serif;
+      box-sizing: border-box;
+      overflow-x: hidden;
+    }
+
+    /* Main Window Shell */
+    .switchd-window {
+      width: 100%;
+      max-width: 1220px;
+      min-height: 740px;
+      background: #18133E;
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      border-radius: 32px;
+      box-shadow: 0 35px 90px rgba(0, 0, 0, 0.65), 0 0 40px rgba(124, 58, 237, 0.15);
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    /* Top Nav Bar inside the purple card */
+    .switchd-header {
+      height: 74px;
+      padding: 0 40px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+      background: rgba(24, 19, 62, 0.6);
+      backdrop-filter: blur(16px);
+      z-index: 10;
+    }
+
+    .switchd-logo {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      color: #FFFFFF;
+      font-size: 19px;
+      font-weight: 700;
+      text-decoration: none;
+      letter-spacing: -0.02em;
+    }
+
+    .switchd-logo-icon {
+      width: 32px;
+      height: 32px;
+      border-radius: 8px;
+      background: linear-gradient(135deg, #7C3AED 0%, #4F46E5 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 16px;
+      color: #FFFFFF;
+      box-shadow: 0 4px 14px rgba(124, 58, 237, 0.4);
+    }
+
+    .switchd-nav-links {
+      display: flex;
+      align-items: center;
+      gap: 28px;
+      list-style: none;
+      margin: 0;
+      padding: 0;
+    }
+
+    .switchd-nav-links a {
+      color: rgba(255, 255, 255, 0.7);
+      font-size: 13.5px;
+      font-weight: 500;
+      text-decoration: none;
+      transition: color 0.2s ease;
+    }
+
+    .switchd-nav-links a:hover {
+      color: #FFFFFF;
+    }
+
+    .switchd-header-actions {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    /* Prominent Top-Right Guest Button */
+    .btn-top-guest {
+      background: rgba(34, 197, 94, 0.14);
+      border: 1px solid rgba(34, 197, 94, 0.4);
+      color: #4ADE80 !important;
+      font-size: 13px;
+      font-weight: 600;
+      padding: 7px 18px;
+      border-radius: 9999px;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      transition: all 0.25s ease;
+      box-shadow: 0 0 16px rgba(34, 197, 94, 0.25);
+    }
+
+    .btn-top-guest:hover {
+      background: rgba(34, 197, 94, 0.25);
+      border-color: rgba(34, 197, 94, 0.7);
+      transform: translateY(-1px);
+      box-shadow: 0 0 22px rgba(34, 197, 94, 0.45);
+      color: #4ADE80 !important;
+    }
+
+    .guest-pulse-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: #22C55E;
+      box-shadow: 0 0 8px #22C55E;
+      animation: pulseGlow 1.8s infinite ease-in-out;
+    }
+
+    /* Auth Tab Pill Buttons in Header */
+    .switchd-tab-btn {
+      padding: 7px 18px;
+      font-size: 13px;
+      font-weight: 600;
+      border-radius: 9999px;
+      text-decoration: none;
+      transition: all 0.2s ease;
+      cursor: pointer;
+      border: 1px solid transparent;
+    }
+
+    .switchd-tab-btn.outline {
+      border-color: rgba(255, 255, 255, 0.2);
+      color: #FFFFFF;
+      background: transparent;
+    }
+
+    .switchd-tab-btn.outline:hover, .switchd-tab-btn.outline.active {
+      background: rgba(255, 255, 255, 0.12);
+      border-color: rgba(255, 255, 255, 0.35);
+      color: #FFFFFF;
+    }
+
+    .switchd-tab-btn.solid {
+      background: #7C3AED;
+      color: #FFFFFF;
+      box-shadow: 0 4px 14px rgba(124, 58, 237, 0.35);
+    }
+
+    .switchd-tab-btn.solid:hover, .switchd-tab-btn.solid.active {
+      background: #6D28D9;
+      color: #FFFFFF;
+    }
+
+    /* Window Body Split Layout */
+    .switchd-content {
+      flex: 1;
+      display: flex;
+      position: relative;
+    }
+
+    /* Left Area: DBMS & Eco Infrastructure Illustration */
+    .switchd-visual-panel {
+      flex: 1.15;
+      position: relative;
+      padding: 40px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+
+    .svg-scene-container {
+      width: 100%;
+      max-width: 540px;
+      margin: auto 0;
+    }
+
+    /* Bottom-Left Floating User Card (Pin Min style) */
+    .pinmin-badge {
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 9999px;
+      padding: 8px 18px 8px 10px;
+      display: inline-flex;
+      align-items: center;
+      gap: 12px;
+      max-width: 480px;
+      backdrop-filter: blur(12px);
+    }
+
+    .pinmin-avatar {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #A78BFA 0%, #4F46E5 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 16px;
+      color: #FFFFFF;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+    }
+
+    .pinmin-info {
+      font-size: 12.5px;
+      line-height: 1.35;
+    }
+
+    .pinmin-name {
+      color: #FFFFFF;
+      font-weight: 600;
+    }
+
+    .pinmin-time {
+      color: rgba(255, 255, 255, 0.45);
+      font-size: 11px;
+      margin-left: 6px;
+    }
+
+    .pinmin-sub {
+      color: rgba(255, 255, 255, 0.65);
+    }
+
+    /* Right Area: Crisp White Form Card */
+    .switchd-form-panel {
+      flex: 0.95;
+      padding: 40px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 5;
+    }
+
+    .switchd-white-card {
+      background: #FFFFFF;
+      border-radius: 26px;
+      padding: 42px 38px;
+      width: 100%;
+      max-width: 440px;
+      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.45);
+      color: #1A1C29;
+    }
+
+    .white-card-title {
+      font-size: 26px;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      color: #171725;
+      margin-bottom: 6px;
+    }
+
+    .white-card-sub {
+      font-size: 13.5px;
+      color: #696974;
+      margin-bottom: 24px;
+    }
+
+    /* Custom Form Fields inside White Card */
+    .switchd-input-group {
+      position: relative;
+      margin-bottom: 16px;
+    }
+
+    .switchd-input-group label {
+      display: block;
+      font-size: 12px;
+      font-weight: 600;
+      color: #44444F;
+      margin-bottom: 6px;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+
+    .switchd-input {
+      width: 100%;
+      height: 48px;
+      padding: 10px 42px 10px 16px;
+      border: 1.5px solid #E2E2EA;
+      border-radius: 12px;
+      background: #FAFAFB;
+      color: #171725;
+      font-size: 14px;
+      transition: all 0.2s ease;
+      box-sizing: border-box;
+    }
+
+    .switchd-input:focus {
+      outline: none;
+      border-color: #7C3AED;
+      background: #FFFFFF;
+      box-shadow: 0 0 0 3px rgba(124, 58, 237, 0.15);
+    }
+
+    .switchd-input-icon {
+      position: absolute;
+      right: 14px;
+      bottom: 14px;
+      color: #92929D;
+      font-size: 16px;
+      pointer-events: none;
+    }
+
+    /* Dynamic Real-Time Role Detection Pill */
+    .role-detection-pill {
+      margin-top: -8px;
+      margin-bottom: 16px;
+      padding: 7px 12px;
+      border-radius: 8px;
+      font-size: 11.5px;
+      font-weight: 600;
+      display: none;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.2s ease;
+    }
+
+    .role-detection-pill.admin {
+      background: rgba(34, 197, 94, 0.12);
+      border: 1px solid rgba(34, 197, 94, 0.35);
+      color: #15803D;
+      display: flex;
+    }
+
+    .role-detection-pill.manager {
+      background: rgba(245, 165, 36, 0.14);
+      border: 1px solid rgba(245, 165, 36, 0.4);
+      color: #B45309;
+      display: flex;
+    }
+
+    .role-detection-pill.member {
+      background: rgba(79, 124, 255, 0.12);
+      border: 1px solid rgba(79, 124, 255, 0.35);
+      color: #1D4ED8;
+      display: flex;
+    }
+
+    .role-detection-pill.invalid {
+      background: rgba(244, 63, 94, 0.12);
+      border: 1px solid rgba(244, 63, 94, 0.35);
+      color: #BE123C;
+      display: flex;
+    }
+
+    .switchd-terms {
+      font-size: 12px;
+      color: #92929D;
+      margin-bottom: 20px;
+    }
+
+    .switchd-terms a {
+      color: #7C3AED;
+      text-decoration: underline;
+    }
+
+    /* Purple Capsule Action Button */
+    .btn-switchd-action {
+      width: 100%;
+      height: 48px;
+      background: linear-gradient(135deg, #7C3AED 0%, #6366F1 100%);
+      color: #FFFFFF;
+      font-size: 15px;
+      font-weight: 600;
+      border: none;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 24px;
+      cursor: pointer;
+      box-shadow: 0 8px 24px rgba(124, 58, 237, 0.35);
+      transition: all 0.25s ease;
+    }
+
+    .btn-switchd-action:hover {
+      background: linear-gradient(135deg, #6D28D9 0%, #4F46E5 100%);
+      transform: translateY(-1px);
+      box-shadow: 0 12px 28px rgba(124, 58, 237, 0.45);
+    }
+
+    .switchd-bottom-toggle {
+      text-align: center;
+      font-size: 13px;
+      color: #696974;
+      margin-top: 22px;
+    }
+
+    .switchd-bottom-toggle a {
+      color: #7C3AED;
+      font-weight: 600;
+      text-decoration: none;
+      cursor: pointer;
+    }
+
+    .switchd-bottom-toggle a:hover {
+      text-decoration: underline;
+    }
+
+    /* Quick One-Click Demo Credential Chips */
+    .demo-chips-box {
+      margin-top: 20px;
+      padding-top: 18px;
+      border-top: 1px dashed #E2E2EA;
+    }
+
+    .demo-chips-title {
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: #92929D;
+      margin-bottom: 8px;
+    }
+
+    .demo-chip-btn {
+      background: #F4F5F8;
+      border: 1px solid #E2E2EA;
+      border-radius: 8px;
+      padding: 5px 10px;
+      font-size: 11.5px;
+      font-weight: 500;
+      color: #44444F;
+      cursor: pointer;
+      transition: all 0.15s ease;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .demo-chip-btn:hover {
+      background: #EDE9FE;
+      border-color: #C4B5FD;
+      color: #6D28D9;
+    }
+
+    /* Responsive */
+    @media (max-width: 992px) {
+      .switchd-content {
+        flex-direction: column;
+      }
+      .switchd-visual-panel {
+        display: none;
+      }
+      .switchd-form-panel {
+        padding: 30px 20px;
+      }
+      .switchd-nav-links {
+        display: none;
+      }
+    }
+  </style>
+</head>
+<body class="login-page-body">
+
+  <!-- Main Purple Shell (Matching Reference Photo) -->
+  <div class="switchd-window">
+    
+    <!-- Top Header Bar -->
+    <header class="switchd-header">
+      <!-- Left: Brand Logo -->
+      <a href="{{ url_for('auth.login') }}" class="switchd-logo">
+        <span class="switchd-logo-icon"><i class="bi bi-cpu-fill"></i></span>
+        <span>ClubHub DBMS</span>
+      </a>
+
+      <!-- Center Links -->
+      <ul class="switchd-nav-links">
+        <li><a href="#charters">Campus Charters</a></li>
+        <li><a href="#triggers">8 Real-time Triggers</a></li>
+        <li><a href="#cursors">8 Cursors Hub</a></li>
+        <li><a href="#cloud">Cloud SQL Live</a></li>
+      </ul>
+
+      <!-- Right Header Actions (With Prominent Guest Button) -->
+      <div class="switchd-header-actions">
+        <!-- Guest Button for Instant Viva/Demo Presentation -->
+        <a href="{{ url_for('auth.guest_mode') }}" id="login-guest-btn" class="btn-top-guest" title="One-Click Full Access for Faculty Review">
+          <span class="guest-pulse-dot"></span>
+          <span>Guest Access</span>
+        </a>
+
+        <!-- Log In / Sign Up Header Toggles -->
+        <button type="button" id="toggle-to-login" class="switchd-tab-btn outline {% if mode != 'signup' %}active{% endif %}">
+          Log In
+        </button>
+        <button type="button" id="toggle-to-signup" class="switchd-tab-btn solid {% if mode == 'signup' %}active{% endif %}">
+          Sign Up
+        </button>
+      </div>
+    </header>
+
+    <!-- Main Split Area -->
+    <div class="switchd-content">
+      
+      <!-- Left Illustration Area (DBMS + Green Energy Technology matching photo) -->
+      <div class="switchd-visual-panel">
+        
+        <!-- Live Technology Scene Illustration (SVG) -->
+        <div class="svg-scene-container">
+          <svg viewBox="0 0 620 440" fill="none" xmlns="http://www.w3.org/2000/svg" style="width: 100%; height: auto;">
+            <!-- Ambient Background Mesh Glow -->
+            <circle cx="340" cy="180" r="160" fill="url(#purpleGlow)" opacity="0.35" />
+            <circle cx="140" cy="280" r="120" fill="url(#cyanGlow)" opacity="0.25" />
+
+            <!-- Ground Platform -->
+            <path d="M40 380 Q 200 370 380 385 T 600 380 L 600 420 L 40 420 Z" fill="#130D32" opacity="0.8" />
+            <path d="M20 395 C 180 385 420 390 600 395" stroke="#372C70" stroke-width="2" stroke-dasharray="4 6" />
+
+            <!-- Solar Panel Arrays (Matching Photo Left Side) -->
+            <g transform="translate(70, 160)">
+              <!-- Solar Panel 1 (Angled Grid) -->
+              <polygon points="20,80 130,40 180,140 70,180" fill="#2E2468" stroke="#7C3AED" stroke-width="2.5" />
+              <!-- Solar Cells Grid -->
+              <line x1="56" y1="67" x2="106" y2="167" stroke="#4C39A8" stroke-width="1.5" />
+              <line x1="93" y1="53" x2="143" y2="153" stroke="#4C39A8" stroke-width="1.5" />
+              <line x1="45" y1="110" x2="155" y2="70" stroke="#4C39A8" stroke-width="1.5" />
+              <line x1="60" y1="140" x2="170" y2="100" stroke="#4C39A8" stroke-width="1.5" />
+              <!-- Panel Support Stand -->
+              <line x1="100" y1="130" x2="100" y2="230" stroke="#4C39A8" stroke-width="4" stroke-linecap="round" />
+              <line x1="70" y1="180" x2="100" y2="230" stroke="#372C70" stroke-width="3" />
+            </g>
+
+            <g transform="translate(180, 190)">
+              <!-- Solar Panel 2 -->
+              <polygon points="15,65 105,30 145,115 55,150" fill="#241B54" stroke="#6366F1" stroke-width="2" />
+              <line x1="80" y1="105" x2="80" y2="200" stroke="#372C70" stroke-width="4" stroke-linecap="round" />
+            </g>
+
+            <!-- Wind Turbine Towers (Matching Photo Center Right) -->
+            <!-- Large Wind Turbine -->
+            <g transform="translate(390, 80)">
+              <!-- Main Pillar Tower -->
+              <polygon points="12,140 16,300 4,300 8,140" fill="#4B3B98" opacity="0.9" />
+              <polygon points="9,140 13,300 11,300 7,140" fill="#7C68D6" />
+              <!-- Nacelle / Hub -->
+              <circle cx="10" cy="140" r="9" fill="#9381E8" />
+              <circle cx="10" cy="140" r="4" fill="#FFFFFF" />
+              <!-- Blades (Rotated 3-blade structure) -->
+              <g id="turbine-blades">
+                <path d="M10 140 L 10 10 Q 14 60 10 140" fill="#8876E0" opacity="0.95" />
+                <path d="M10 140 L 120 205 Q 65 170 10 140" fill="#7C68D6" opacity="0.95" />
+                <path d="M10 140 L -95 210 Q -45 170 10 140" fill="#6B57C2" opacity="0.95" />
+              </g>
+            </g>
+
+            <!-- Small Background Wind Turbine -->
+            <g transform="translate(310, 150) scale(0.65)">
+              <polygon points="12,140 16,300 4,300 8,140" fill="#3B2E7C" opacity="0.8" />
+              <circle cx="10" cy="140" r="8" fill="#6B57C2" />
+              <path d="M10 140 L 10 20 Q 13 70 10 140" fill="#6B57C2" />
+              <path d="M10 140 L 110 200 Q 60 170 10 140" fill="#5A47AC" />
+              <path d="M10 140 L -90 200 Q -40 170 10 140" fill="#4F3D9E" />
+            </g>
+
+            <!-- Database Server Tower (Cloud SQL Representation) -->
+            <g transform="translate(480, 210)">
+              <!-- Server Chassis -->
+              <rect x="0" y="20" width="75" height="150" rx="8" fill="#1C1448" stroke="#4F46E5" stroke-width="2" />
+              <!-- Server Slots with Glowing Cyan/Green LEDs -->
+              <rect x="10" y="35" width="55" height="18" rx="4" fill="#2A1F66" />
+              <circle cx="20" cy="44" r="3" fill="#22C55E" />
+              <circle cx="28" cy="44" r="3" fill="#38BDF8" />
+              <line x1="38" y1="44" x2="58" y2="44" stroke="#6366F1" stroke-width="2" />
+
+              <rect x="10" y="60" width="55" height="18" rx="4" fill="#2A1F66" />
+              <circle cx="20" cy="69" r="3" fill="#22C55E" />
+              <circle cx="28" cy="69" r="3" fill="#22C55E" />
+              <line x1="38" y1="69" x2="58" y2="69" stroke="#6366F1" stroke-width="2" />
+
+              <rect x="10" y="85" width="55" height="18" rx="4" fill="#2A1F66" />
+              <circle cx="20" cy="94" r="3" fill="#38BDF8" />
+              <circle cx="28" cy="94" r="3" fill="#38BDF8" />
+              <line x1="38" y1="94" x2="58" y2="94" stroke="#6366F1" stroke-width="2" />
+
+              <rect x="10" y="110" width="55" height="18" rx="4" fill="#2A1F66" />
+              <circle cx="20" cy="119" r="3" fill="#22C55E" />
+              <circle cx="28" cy="119" r="3" fill="#F59E0B" />
+              <line x1="38" y1="119" x2="58" y2="119" stroke="#6366F1" stroke-width="2" />
+
+              <!-- Database Cylinder Icon on Server Top -->
+              <path d="M22 138 C 22 135 37 133 37 133 C 37 133 52 135 52 138 L 52 154 C 52 157 37 159 37 159 C 37 159 22 157 22 154 Z" fill="#7C3AED" opacity="0.6" />
+            </g>
+
+            <!-- Technology Engineers / Operators (Matching Photo Stylized Figures) -->
+            <!-- Engineer 1 (Near Solar Panel) -->
+            <g transform="translate(130, 245)">
+              <!-- Body/Overalls in Blue -->
+              <path d="M12 25 Q 16 55 18 85 L 10 115 L 2 115 L 10 75 L 4 45 Z" fill="#4338CA" />
+              <path d="M14 25 Q 18 55 24 85 L 30 115 L 22 115 L 18 75 L 14 45 Z" fill="#3730A3" />
+              <!-- Torso -->
+              <rect x="8" y="20" width="16" height="30" rx="4" fill="#6366F1" />
+              <!-- Head -->
+              <circle cx="16" cy="10" r="6" fill="#FCD34D" />
+              <path d="M10 8 Q 16 4 22 8" stroke="#1E1B4B" stroke-width="3" stroke-linecap="round" />
+              <!-- Arm holding tool toward solar panel -->
+              <path d="M20 25 L 36 12" stroke="#6366F1" stroke-width="4" stroke-linecap="round" />
+            </g>
+
+            <!-- Engineer 2 (Operating Control Terminal) -->
+            <g transform="translate(435, 275)">
+              <rect x="8" y="22" width="18" height="34" rx="4" fill="#EA580C" />
+              <circle cx="17" cy="11" r="6" fill="#FCD34D" />
+              <!-- Legs -->
+              <rect x="8" y="55" width="7" height="32" rx="3" fill="#312E81" />
+              <rect x="18" y="55" width="7" height="32" rx="3" fill="#1E1B4B" />
+              <!-- Terminal Screen Stand -->
+              <rect x="-18" y="10" width="22" height="16" rx="3" fill="#38BDF8" stroke="#FFFFFF" stroke-width="1.5" />
+              <line x1="-7" y1="26" x2="-7" y2="60" stroke="#372C70" stroke-width="3" />
+              <!-- Arm tapping terminal -->
+              <path d="M10 26 L -3 18" stroke="#EA580C" stroke-width="4" stroke-linecap="round" />
+            </g>
+
+            <!-- Gradients -->
+            <defs>
+              <radialGradient id="purpleGlow" cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse" gradientTransform="translate(340 180) rotate(90) scale(160)">
+                <stop stop-color="#7C3AED" />
+                <stop offset="1" stop-color="#7C3AED" stop-opacity="0" />
+              </radialGradient>
+              <radialGradient id="cyanGlow" cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse" gradientTransform="translate(140 280) rotate(90) scale(120)">
+                <stop stop-color="#38BDF8" />
+                <stop offset="1" stop-color="#38BDF8" stop-opacity="0" />
+              </radialGradient>
+            </defs>
+          </svg>
+        </div>
+
+        <!-- Floating Info Badge (Pin Min equivalent from photo) -->
+        <div class="pinmin-badge">
+          <div class="pinmin-avatar">
+            <i class="bi bi-shield-lock-fill"></i>
+          </div>
+          <div class="pinmin-info">
+            <div>
+              <span class="pinmin-name">VIT Pune Central DBMS</span>
+              <span class="pinmin-time"><i class="bi bi-clock me-1"></i>Active</span>
+            </div>
+            <div class="pinmin-sub">👋 Welcome! Sign in with your college credentials or tap Guest.</div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Right Form Panel (Sleek White Card) -->
+      <div class="switchd-form-panel">
+        <div class="switchd-white-card">
+          
+          <!-- Flash Messages inside Card -->
+          {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+              <div class="mb-3">
+                {% for category, message in messages %}
+                  <div class="alert alert-{{ category }} py-2 px-3 small d-flex align-items-center gap-2 mb-2" role="alert" style="border-radius: 10px;">
+                    <i class="bi bi-info-circle-fill"></i>
+                    <span>{{ message }}</span>
+                  </div>
+                {% endfor %}
+              </div>
+            {% endif %}
+          {% endwith %}
+
+          <!-- Card Header -->
+          <h2 class="white-card-title" id="form-heading">
+            {% if mode == 'signup' %}Create Account...{% else %}Welcome Back...{% endif %}
+          </h2>
+          <p class="white-card-sub" id="form-subheading">
+            {% if mode == 'signup' %}Enter your official VIT Pune email to auto-detect role{% else %}Please enter your email and password{% endif %}
+          </p>
+
+          <!-- The Authentication Form -->
+          <form id="auth-main-form" method="POST" action="{% if mode == 'signup' %}{{ url_for('auth.signup') }}{% else %}{{ url_for('auth.login') }}{% endif %}">
+            
+            <!-- Full Name (Only for Sign Up) -->
+            <div class="switchd-input-group" id="name-group" style="{% if mode != 'signup' %}display: none;{% endif %}">
+              <label for="input-name">Full Name</label>
+              <input type="text" name="name" id="input-name" class="switchd-input" placeholder="e.g. Aarav Deshmukh" value="{{ name|default('') }}">
+              <i class="bi bi-person switchd-input-icon"></i>
+            </div>
+
+            <!-- Email Address (Strictly checked against VIT standards) -->
+            <div class="switchd-input-group">
+              <label for="input-email">College Email Address</label>
+              <input type="email" name="email" id="input-email" class="switchd-input" placeholder="e.g. name.prn@vit.edu" value="{{ email|default('') }}" required autocomplete="username">
+              <i class="bi bi-at switchd-input-icon"></i>
+            </div>
+
+            <!-- Interactive Real-Time Role Detection Badge -->
+            <div id="role-detected-box" class="role-detection-pill">
+              <i class="bi bi-info-circle"></i>
+              <span id="role-detected-text"></span>
+            </div>
+
+            <!-- Password -->
+            <div class="switchd-input-group">
+              <label for="input-password">Password</label>
+              <input type="password" name="password" id="input-password" class="switchd-input" placeholder="Enter password" required autocomplete="current-password">
+              <i class="bi bi-lock switchd-input-icon" id="toggle-pwd-icon" style="cursor: pointer; pointer-events: auto;"></i>
+            </div>
+
+            <!-- Terms -->
+            <div class="switchd-terms">
+              By login, you agree to our <a href="#">Terms &amp; Conditions</a> &bull; <a href="#">Security Policy</a>
+            </div>
+
+            <!-- Action Button -->
+            <button type="submit" id="btn-submit-auth" class="btn-switchd-action">
+              <span id="btn-text">{% if mode == 'signup' %}sign up...{% else %}login...{% endif %}</span>
+              <i class="bi bi-arrow-right fs-5"></i>
+            </button>
+          </form>
+
+          <!-- Bottom Switch Link (Toggle Log In vs Sign Up) -->
+          <div class="switchd-bottom-toggle">
+            <span id="toggle-prompt">{% if mode == 'signup' %}Already have an account?{% else %}Don't have an account yet?{% endif %}</span>
+            <a id="toggle-form-mode" class="ms-1">{% if mode == 'signup' %}Log In{% else %}Create Account{% endif %}</a>
+          </div>
+
+          <!-- Quick 1-Click Demo Credentials for Viva / Evaluation -->
+          <div class="demo-chips-box">
+            <div class="demo-chips-title">Quick 1-Click Demo Accounts:</div>
+            <div class="d-flex flex-wrap gap-2">
+              <button type="button" class="demo-chip-btn" data-fill-email="sharma.principal@vit.edu" data-fill-role="Principal">
+                <span>👑 Principal</span>
+              </button>
+              <button type="button" class="demo-chip-btn" data-fill-email="patil.121001.cordinator@vit.edu" data-fill-role="Coordinator">
+                <span>👔 Coordinator</span>
+              </button>
+              <button type="button" class="demo-chip-btn" data-fill-email="aarav.123456@vit.edu" data-fill-role="Member">
+                <span>🎓 Member</span>
+              </button>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Google Pay Style Rainbow Circular Success Animation Overlay -->
+  <div id="gpay-success-overlay" class="gpay-overlay" aria-hidden="true">
+    <div class="gpay-card">
+      <div class="gpay-animation-box">
+        <svg class="gpay-svg" viewBox="0 0 120 120">
+          <defs>
+            <linearGradient id="gpayRainbowGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" stop-color="#FF3366" />
+              <stop offset="20%" stop-color="#FF9933" />
+              <stop offset="40%" stop-color="#FFFF33" />
+              <stop offset="60%" stop-color="#33FF66" />
+              <stop offset="80%" stop-color="#33CCFF" />
+              <stop offset="100%" stop-color="#9933FF" />
+            </linearGradient>
+          </defs>
+          <circle class="gpay-circle-bg" cx="60" cy="60" r="50"></circle>
+          <circle class="gpay-circle-rainbow" cx="60" cy="60" r="50"></circle>
+          <polyline class="gpay-checkmark" points="36,60 52,76 84,44"></polyline>
+        </svg>
+      </div>
+      <div class="gpay-title" id="gpay-title">Authenticated</div>
+      <div class="gpay-role" id="gpay-role-name">Identity Verified</div>
+      <div class="gpay-sub" id="gpay-desc">Redirecting to executive cockpit...</div>
+    </div>
+  </div>
+
+  <!-- Interactive Client-side Script -->
+  <script>
+    document.addEventListener("DOMContentLoaded", () => {
+      let isSignUp = "{{ mode }}" === "signup";
+      const form = document.getElementById("auth-main-form");
+      const nameGroup = document.getElementById("name-group");
+      const heading = document.getElementById("form-heading");
+      const subheading = document.getElementById("form-subheading");
+      const btnText = document.getElementById("btn-text");
+      const togglePrompt = document.getElementById("toggle-prompt");
+      const toggleModeBtn = document.getElementById("toggle-form-mode");
+      const tabLogin = document.getElementById("toggle-to-login");
+      const tabSignup = document.getElementById("toggle-to-signup");
+      const emailInput = document.getElementById("input-email");
+      const pwdInput = document.getElementById("input-password");
+      const togglePwdIcon = document.getElementById("toggle-pwd-icon");
+      const roleBox = document.getElementById("role-detected-box");
+      const roleText = document.getElementById("role-detected-text");
+
+      // Password Visibility Toggle
+      if (togglePwdIcon) {
+        togglePwdIcon.addEventListener("click", () => {
+          if (pwdInput.type === "password") {
+            pwdInput.type = "text";
+            togglePwdIcon.classList.replace("bi-lock", "bi-unlock");
+          } else {
+            pwdInput.type = "password";
+            togglePwdIcon.classList.replace("bi-unlock", "bi-lock");
+          }
+        });
+      }
+
+      // Switch Form Mode Function
+      function setMode(toSignUp) {
+        isSignUp = toSignUp;
+        if (isSignUp) {
+          nameGroup.style.display = "block";
+          heading.textContent = "Create Account...";
+          subheading.textContent = "Enter your official VIT Pune email to auto-detect role";
+          btnText.textContent = "create account...  →";
+          togglePrompt.textContent = "Already have an account?";
+          toggleModeBtn.textContent = "Log In";
+          form.action = "{{ url_for('auth.signup') }}";
+          tabSignup.classList.add("active");
+          tabLogin.classList.remove("active");
+        } else {
+          nameGroup.style.display = "none";
+          heading.textContent = "Welcome Back...";
+          subheading.textContent = "Please enter your email and password";
+          btnText.textContent = "login...  →";
+          togglePrompt.textContent = "Don't have an account yet?";
+          toggleModeBtn.textContent = "Create Account";
+          form.action = "{{ url_for('auth.login') }}";
+          tabLogin.classList.add("active");
+          tabSignup.classList.remove("active");
+        }
+      }
+
+      toggleModeBtn.addEventListener("click", () => setMode(!isSignUp));
+      tabLogin.addEventListener("click", () => setMode(false));
+      tabSignup.addEventListener("click", () => setMode(true));
+
+      // Real-Time Role Detection on Typing Email
+      function checkEmailRole() {
+        const email = emailInput.value.trim().toLowerCase();
+        if (!email || !email.includes("@")) {
+          roleBox.style.display = "none";
+          return;
+        }
+
+        if (!email.endsWith("@vit.edu")) {
+          roleBox.className = "role-detection-pill invalid";
+          roleText.textContent = "⚠️ Compulsory: Must be an official @vit.edu domain";
+          return;
+        }
+
+        // 1. Principal
+        if (/^[a-z0-9_.-]+\.principal@vit\.edu$/.test(email)) {
+          roleBox.className = "role-detection-pill admin";
+          roleText.innerHTML = '<i class="bi bi-shield-lock-fill me-1"></i> <strong>Detected Role:</strong> Principal / Super Admin (Full Governance)';
+          return;
+        }
+
+        // 2. Coordinator
+        if (/^[a-z0-9_.-]+\.[a-z0-9_.-]+\.(?:cordinator|coordinator)@vit\.edu$/.test(email)) {
+          roleBox.className = "role-detection-pill manager";
+          roleText.innerHTML = '<i class="bi bi-person-workspace me-1"></i> <strong>Detected Role:</strong> Faculty Coordinator (Charters &amp; Events)';
+          return;
+        }
+
+        // 3. Student Member
+        if (/^[a-z0-9_.-]+\.[a-z0-9_.-]+@vit\.edu$/.test(email)) {
+          roleBox.className = "role-detection-pill member";
+          roleText.innerHTML = '<i class="bi bi-mortarboard-fill me-1"></i> <strong>Detected Role:</strong> Student Member (Read-Only Access)';
+          return;
+        }
+
+        roleBox.className = "role-detection-pill invalid";
+        roleText.textContent = "⚠️ Invalid pattern: Allowed: name.prn@vit.edu | name.prn.cordinator@vit.edu | name.principal@vit.edu";
+      }
+
+      emailInput.addEventListener("input", checkEmailRole);
+      checkEmailRole(); // Initial check if pre-filled
+
+      // One-Click Demo Chip Auto-Fill
+      document.querySelectorAll(".demo-chip-btn").forEach(btn => {
+        btn.addEventListener("click", () => {
+          setMode(false); // Switch to Log In mode
+          emailInput.value = btn.getAttribute("data-fill-email");
+          pwdInput.value = "password123";
+          checkEmailRole();
+        });
+      });
+
+      // AJAX Submission with Google Pay Rainbow Celebration
+      form.addEventListener("submit", (e) => {
+        e.preventDefault();
+        const email = emailInput.value.trim();
+        const password = pwdInput.value.trim();
+        const name = isSignUp ? document.getElementById("input-name").value.trim() : "";
+
+        const payload = isSignUp ? { email, password, name } : { email, password };
+        const endpoint = isSignUp ? "{{ url_for('auth.signup') }}" : "{{ url_for('auth.login') }}";
+
+        fetch(endpoint, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "X-Requested-With": "XMLHttpRequest"
+          },
+          body: JSON.stringify(payload)
+        })
+        .then(res => res.json().then(data => ({ status: res.status, data })))
+        .then(({ status, data }) => {
+          if (status === 200 && data.status === "ok") {
+            // Trigger Google Pay rainbow circle animation
+            const overlay = document.getElementById("gpay-success-overlay");
+            const gpayTitle = document.getElementById("gpay-title");
+            const gpayRole = document.getElementById("gpay-role-name");
+            const gpayDesc = document.getElementById("gpay-desc");
+
+            gpayTitle.textContent = isSignUp ? "Account Created" : "Authenticated";
+            gpayRole.textContent = data.role_label || "Identity Verified";
+            gpayDesc.textContent = data.message || "Access privileges synchronized. Entering cockpit...";
+
+            overlay.classList.add("is-active");
+
+            setTimeout(() => {
+              window.location.href = data.redirect_url || "{{ url_for('main.dashboard') }}";
+            }, 1600);
+          } else {
+            alert(data.message || "Authentication error. Please verify credentials.");
+          }
+        })
+        .catch(err => {
+          // Fallback to standard form submit
+          form.submit();
+        });
+      });
+    });
+  </script>
+</body>
+</html>

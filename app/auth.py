@@ -9,16 +9,10 @@ Roles:
 """
 
 import functools
-from flask import Blueprint, request, session, redirect, url_for, flash, jsonify
+from flask import Blueprint, request, session, redirect, url_for, flash, jsonify, render_template
+from app.user_model import authenticate_user, register_user, detect_role_from_email, get_all_users_count
 
 auth_bp = Blueprint("auth", __name__)
-
-DEMO_USERS = {
-    "admin": {"password": "admin123", "role": "admin", "name": "Prof. D. K. Sharma (Principal / Architect)"},
-    "faculty": {"password": "faculty123", "role": "manager", "name": "Dr. Sunita Patil (Faculty Coordinator)"},
-    "student": {"password": "student123", "role": "member", "name": "Aarav Deshmukh (Student Member)"},
-    "guest": {"password": "", "role": "guest", "name": "Guest Evaluator (Unrestricted Demo Mode)"}
-}
 
 ROLE_METADATA = {
     "guest": {
@@ -30,7 +24,7 @@ ROLE_METADATA = {
         "can_view_triggers": True
     },
     "admin": {
-        "title": "Super Admin",
+        "title": "Super Admin / Principal",
         "badge_class": "badge-status success",
         "description": "Full administrative control, database schema initialization, and raw SQL cursor triggers.",
         "can_edit": True,
@@ -56,12 +50,12 @@ ROLE_METADATA = {
 }
 
 def get_current_role():
-    """Retrieve active session role, defaulting to 'guest' for frictionless evaluation."""
-    return session.get("role", "guest")
+    """Retrieve active session role. Returns None if unauthenticated."""
+    return session.get("role")
 
 def get_current_user():
     """Retrieve active user display name."""
-    return session.get("user_name", "Guest Evaluator (Demo)")
+    return session.get("user_name", "Guest Evaluator")
 
 def write_required(redirect_endpoint="main.dashboard"):
     """
@@ -99,95 +93,147 @@ def execute_required(redirect_endpoint="main.procedures_hub"):
 @auth_bp.route("/api/auth/status")
 def auth_status():
     """Returns current active authentication & authorization details."""
-    role = get_current_role()
+    role = get_current_role() or "guest"
     meta = ROLE_METADATA.get(role, ROLE_METADATA["guest"])
     return jsonify({
         "role": role,
+        "is_authenticated": session.get("role") is not None,
         "user_name": get_current_user(),
+        "user_email": session.get("user_email", ""),
         "meta": meta
     })
 
-@auth_bp.route("/login", methods=["POST"])
+@auth_bp.route("/api/auth/detect-role", methods=["POST"])
+def api_detect_role():
+    """Real-time API endpoint to detect role as user types their email."""
+    data = request.get_json() or {}
+    email = data.get("email", "")
+    role, role_title, error = detect_role_from_email(email)
+    return jsonify({
+        "role": role,
+        "role_title": role_title,
+        "error": error
+    })
+
+@auth_bp.route("/login", methods=["GET", "POST"])
 def login():
     """
-    Authenticates demo credentials or sets designated persona.
-    Supports both JSON and standard HTML form posts.
+    Renders the Switchd-inspired login page or processes authentication credentials.
     """
+    if request.method == "GET":
+        # If already logged in, redirect to cockpit
+        if session.get("role"):
+            return redirect(url_for("main.dashboard"))
+        mode = request.args.get("mode", "login")
+        return render_template("auth/login.html", mode=mode, total_users=get_all_users_count())
+
+    # POST: Process login
     if request.is_json:
         data = request.get_json() or {}
-        username = data.get("username", "").strip().lower()
+        email = data.get("email", "").strip().lower()
         password = data.get("password", "").strip()
         requested_role = data.get("role", "").strip().lower()
     else:
-        username = request.form.get("username", "").strip().lower()
+        email = request.form.get("email", "").strip().lower()
         password = request.form.get("password", "").strip()
         requested_role = request.form.get("role", "").strip().lower()
 
-    # Instant quick role switch if requested
-    if requested_role and requested_role in ROLE_METADATA and not username:
-        if requested_role == "admin":
-            user_info = DEMO_USERS["admin"]
-        elif requested_role == "manager":
-            user_info = DEMO_USERS["faculty"]
-        elif requested_role == "member":
-            user_info = DEMO_USERS["student"]
-        else:
-            user_info = DEMO_USERS["guest"]
-
-        session["role"] = user_info["role"]
-        session["user_name"] = user_info["name"]
-        session["username"] = requested_role
+    # Quick Switcher fallback support
+    if requested_role and requested_role in ROLE_METADATA and not email:
+        session["role"] = requested_role
+        session["user_name"] = ROLE_METADATA[requested_role]["title"]
+        session["user_email"] = f"{requested_role}@vit.edu"
         session.modified = True
+        return jsonify({
+            "status": "ok",
+            "role": requested_role,
+            "role_label": ROLE_METADATA[requested_role]["title"],
+            "user_name": session["user_name"],
+            "redirect_url": url_for("main.dashboard")
+        }), 200
 
+    err, user = authenticate_user(email, password)
+    if err:
         if request.is_json or request.headers.get("X-Requested-With") == "XMLHttpRequest":
-            return jsonify({
-                "status": "ok",
-                "role": user_info["role"],
-                "role_label": ROLE_METADATA[user_info["role"]]["title"],
-                "user_name": user_info["name"],
-                "message": f"Switched persona to {ROLE_METADATA[user_info['role']]['title']}"
-            }), 200
-        flash(f"Switched persona to {ROLE_METADATA[user_info['role']]['title']}", "success")
-        return redirect(request.referrer or url_for("main.dashboard"))
+            return jsonify({"status": "error", "message": err}), 401
+        flash(err, "danger")
+        return render_template("auth/login.html", mode="login", email=email, total_users=get_all_users_count()), 401
 
-    # Credential validation against demo users
-    user = DEMO_USERS.get(username)
-    if user and (user["password"] == password or not user["password"] or password == "admin" or password == "1234"):
-        session["role"] = user["role"]
-        session["user_name"] = user["name"]
-        session["username"] = username
-        session.modified = True
+    # Session persistence
+    session["role"] = user["role"]
+    session["user_name"] = user["name"]
+    session["user_email"] = user["email"]
+    session.modified = True
 
-        if request.is_json or request.headers.get("X-Requested-With") == "XMLHttpRequest":
-            return jsonify({
-                "status": "ok",
-                "role": user["role"],
-                "role_label": ROLE_METADATA[user["role"]]["title"],
-                "user_name": user["name"],
-                "message": f"Successfully authenticated as {user['name']}"
-            }), 200
-        flash(f"Welcome, {user['name']}! Access privileges updated.", "success")
-        return redirect(request.referrer or url_for("main.dashboard"))
-
-    # If login fails
     if request.is_json or request.headers.get("X-Requested-With") == "XMLHttpRequest":
         return jsonify({
-            "status": "error",
-            "message": "Invalid credentials. Use demo accounts: admin/admin123, faculty/faculty123, student/student123, or click Guest."
-        }), 401
+            "status": "ok",
+            "role": user["role"],
+            "role_label": user["role_title"],
+            "user_name": user["name"],
+            "message": f"Welcome back, {user['name']}!",
+            "redirect_url": url_for("main.dashboard")
+        }), 200
 
-    flash("Invalid credentials. Try using 'admin / admin123' or click 'Guest' for instant access.", "danger")
-    return redirect(request.referrer or url_for("main.dashboard"))
+    flash(f"Welcome back, {user['name']}! Signed in as {user['role_title']}.", "success")
+    return redirect(url_for("main.dashboard"))
+
+@auth_bp.route("/signup", methods=["GET", "POST"])
+def signup():
+    """
+    Renders sign up page or registers a new user with strictly validated VIT email.
+    """
+    if request.method == "GET":
+        if session.get("role"):
+            return redirect(url_for("main.dashboard"))
+        return render_template("auth/login.html", mode="signup", total_users=get_all_users_count())
+
+    # POST: Process registration
+    if request.is_json:
+        data = request.get_json() or {}
+        name = data.get("name", "").strip()
+        email = data.get("email", "").strip().lower()
+        password = data.get("password", "").strip()
+    else:
+        name = request.form.get("name", "").strip()
+        email = request.form.get("email", "").strip().lower()
+        password = request.form.get("password", "").strip()
+
+    err, user = register_user(email, password, name)
+    if err:
+        if request.is_json or request.headers.get("X-Requested-With") == "XMLHttpRequest":
+            return jsonify({"status": "error", "message": err}), 400
+        flash(err, "warning")
+        return render_template("auth/login.html", mode="signup", name=name, email=email, total_users=get_all_users_count()), 400
+
+    # Auto-login upon registration
+    session["role"] = user["role"]
+    session["user_name"] = user["name"]
+    session["user_email"] = user["email"]
+    session.modified = True
+
+    if request.is_json or request.headers.get("X-Requested-With") == "XMLHttpRequest":
+        return jsonify({
+            "status": "ok",
+            "role": user["role"],
+            "role_label": user["role_title"],
+            "user_name": user["name"],
+            "message": f"Account created successfully as {user['role_title']}!",
+            "redirect_url": url_for("main.dashboard")
+        }), 200
+
+    flash(f"Account registered successfully as {user['role_title']}!", "success")
+    return redirect(url_for("main.dashboard"))
 
 @auth_bp.route("/guest", methods=["GET", "POST"])
 def guest_mode():
     """
     One-click Guest / Viva demonstration trigger.
-    Immediately grants full access without prompt or challenge.
+    Immediately grants full unrestricted demo access without credentials.
     """
     session["role"] = "guest"
     session["user_name"] = "Guest Evaluator (Unrestricted Demo Mode)"
-    session["username"] = "guest"
+    session["user_email"] = "guest@vit.edu"
     session.modified = True
     
     if request.is_json or request.headers.get("X-Requested-With") == "XMLHttpRequest":
@@ -196,18 +242,16 @@ def guest_mode():
             "role": "guest",
             "role_label": "Guest (Full Demo)",
             "user_name": session["user_name"],
-            "message": "Full Unrestricted Demo Access Activated!"
+            "message": "Full Unrestricted Demo Access Activated!",
+            "redirect_url": url_for("main.dashboard")
         }), 200
         
-    flash("Guest Mode Activated: Full unrestricted access to all tables, triggers, and cursors.", "success")
-    return redirect(request.referrer or url_for("main.dashboard"))
+    flash("Guest Demo Mode Activated: 100% Unrestricted access to all 8 tables, triggers, and cursors.", "success")
+    return redirect(url_for("main.dashboard"))
 
 @auth_bp.route("/logout")
 def logout():
-    """Resets session back to guest mode."""
-    session["role"] = "guest"
-    session["user_name"] = "Guest Evaluator (Unrestricted Demo Mode)"
-    session["username"] = "guest"
-    session.modified = True
-    flash("Session reset to Guest Demo Mode.", "info")
-    return redirect(url_for("main.dashboard"))
+    """Clears user session and redirects to the gatekeeper login page."""
+    session.clear()
+    flash("You have been signed out. Please sign in or click Guest to continue.", "info")
+    return redirect(url_for("auth.login"))

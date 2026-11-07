@@ -126,3 +126,39 @@ def test_member_role_restrictions(client):
         sess["role"] = "guest"
     res_guest = client.get("/clubs")
     assert res_guest.status_code == 200
+
+
+def test_login_page_renders(client):
+    """Test gatekeeper login page renders with status 200."""
+    response = client.get("/login")
+    assert response.status_code == 200
+    assert b"ClubHub DBMS" in response.data
+    assert b"Welcome Back" in response.data
+
+def test_login_authentication_by_role_emails(client):
+    """Test login authentication for Principal, Coordinator, and Student Member."""
+    # 1. Principal
+    res_prin = client.post("/login", json={"email": "sharma.principal@vit.edu", "password": "password123"})
+    assert res_prin.status_code == 200
+    assert res_prin.get_json()["role"] == "admin"
+
+    # 2. Coordinator
+    res_coord = client.post("/login", json={"email": "patil.121001.cordinator@vit.edu", "password": "password123"})
+    assert res_coord.status_code == 200
+    assert res_coord.get_json()["role"] == "manager"
+
+    # 3. Student Member
+    res_mem = client.post("/login", json={"email": "aarav.123456@vit.edu", "password": "password123"})
+    assert res_mem.status_code == 200
+    assert res_mem.get_json()["role"] == "member"
+
+def test_signup_validation_and_registration(client):
+    """Test signup validation strictly enforces @vit.edu role formats."""
+    # Invalid domain
+    res_invalid = client.post("/signup", json={"email": "hacker@gmail.com", "password": "password123", "name": "Fake User"})
+    assert res_invalid.status_code == 400
+
+    # Valid Student Registration
+    res_valid = client.post("/signup", json={"email": "sneha.654321@vit.edu", "password": "mypassword123", "name": "Sneha Kulkarni"})
+    assert res_valid.status_code == 200
+    assert res_valid.get_json()["role"] == "member"
