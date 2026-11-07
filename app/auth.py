@@ -121,9 +121,6 @@ def login():
     Renders the Switchd-inspired login page or processes authentication credentials.
     """
     if request.method == "GET":
-        # If already logged in, redirect to cockpit
-        if session.get("role"):
-            return redirect(url_for("main.dashboard"))
         mode = request.args.get("mode", "login")
         return render_template("auth/login.html", mode=mode, total_users=get_all_users_count())
 
@@ -184,8 +181,6 @@ def signup():
     Renders sign up page or registers a new user with strictly validated VIT email.
     """
     if request.method == "GET":
-        if session.get("role"):
-            return redirect(url_for("main.dashboard"))
         return render_template("auth/login.html", mode="signup", total_users=get_all_users_count())
 
     # POST: Process registration

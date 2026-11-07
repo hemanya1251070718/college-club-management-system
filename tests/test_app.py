@@ -158,7 +158,9 @@ def test_signup_validation_and_registration(client):
     res_invalid = client.post("/signup", json={"email": "hacker@gmail.com", "password": "password123", "name": "Fake User"})
     assert res_invalid.status_code == 400
 
-    # Valid Student Registration
-    res_valid = client.post("/signup", json={"email": "sneha.654321@vit.edu", "password": "mypassword123", "name": "Sneha Kulkarni"})
+    # Valid Student Registration (using unique PRN to remain idempotent across test runs)
+    import time
+    unique_email = f"sneha.{int(time.time() * 1000)}@vit.edu"
+    res_valid = client.post("/signup", json={"email": unique_email, "password": "mypassword123", "name": "Sneha Kulkarni"})
     assert res_valid.status_code == 200
     assert res_valid.get_json()["role"] == "member"

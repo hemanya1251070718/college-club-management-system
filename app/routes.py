@@ -1,5 +1,5 @@
 import re
-from flask import Blueprint, render_template, request, redirect, url_for, flash, jsonify
+from flask import Blueprint, render_template, request, redirect, url_for, flash, jsonify, session
 from app.db import get_db_connection, check_db_health
 from app.auth import write_required, execute_required, get_current_role
 
@@ -46,6 +46,9 @@ def init_db_endpoint():
 # -------------------------------------------------------------
 @main_bp.route("/")
 def dashboard():
+    # Enforce Gatekeeper: Always require login or Guest activation before showing cockpit
+    if not session.get("role"):
+        return redirect(url_for("auth.login"))
     try:
         conn = get_db_connection()
         with conn.cursor() as cursor:
