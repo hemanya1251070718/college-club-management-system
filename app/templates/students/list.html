@@ -4,6 +4,15 @@
 
 {% block content %}
 <div class="app-container">
+  <!-- Breadcrumb (Shneiderman Rule 8: Reduce Memory Load) -->
+  <nav aria-label="Breadcrumb">
+    <ul class="app-breadcrumb">
+      <li><a href="{{ url_for('main.dashboard') }}"><i class="bi bi-house me-1"></i>Cockpit</a></li>
+      <li class="breadcrumb-separator">/</li>
+      <li class="breadcrumb-current">Students Directory</li>
+    </ul>
+  </nav>
+
   <!-- Inner Page Header Band -->
   <header class="inner-page-header">
     <div class="inner-header-layout">
@@ -25,14 +34,18 @@
     </div>
   </header>
 
-  <!-- Search & Filter Bar -->
+  <!-- Search & Filter Bar (Rule 2: '/' Focusable & Rule 8: Visible Chips) -->
   <div class="tesla-card mb-4 p-3 glow-border-hover">
     <form method="GET" action="{{ url_for('main.list_students') }}" class="row g-3 align-items-center">
       <div class="col-md-6">
-        <input type="text" name="q" class="tesla-form-control" placeholder="Search by name, PRN, or student ID..." value="{{ search }}">
+        <label for="student-search-input" class="visually-hidden">Search Students</label>
+        <div class="position-relative">
+          <input type="text" id="student-search-input" name="q" class="tesla-form-control" placeholder="Search by name, PRN, or student ID (Press '/' to focus)..." value="{{ search }}">
+        </div>
       </div>
       <div class="col-md-4">
-        <select name="dept" class="tesla-form-select">
+        <label for="student-dept-select" class="visually-hidden">Filter Department</label>
+        <select id="student-dept-select" name="dept" class="tesla-form-select">
           <option value="">All Departments</option>
           {% for d in departments %}
           <option value="{{ d.dept_id }}" {% if selected_dept == d.dept_id %}selected{% endif %}>
@@ -48,6 +61,24 @@
         {% endif %}
       </div>
     </form>
+    {% if search or selected_dept %}
+    <div class="filter-chip-bar">
+      <span class="text-secondary small">Active Filters:</span>
+      {% if search %}
+      <span class="filter-chip">
+        Search: <strong>"{{ search }}"</strong>
+        <a href="{{ url_for('main.list_students', dept=selected_dept) }}" class="filter-chip-remove" title="Remove keyword filter" aria-label="Remove search filter">&times;</a>
+      </span>
+      {% endif %}
+      {% if selected_dept %}
+      <span class="filter-chip">
+        Dept: <strong>{{ selected_dept }}</strong>
+        <a href="{{ url_for('main.list_students', q=search) }}" class="filter-chip-remove" title="Remove department filter" aria-label="Remove department filter">&times;</a>
+      </span>
+      {% endif %}
+      <a href="{{ url_for('main.list_students') }}" class="text-secondary small text-decoration-underline ms-2">Clear all</a>
+    </div>
+    {% endif %}
   </div>
 
   <!-- Students Data Table -->

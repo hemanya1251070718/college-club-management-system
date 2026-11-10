@@ -4,6 +4,17 @@
 
 {% block content %}
 <div class="app-container">
+  <!-- Breadcrumb (Shneiderman Rule 8: Reduce Memory Load) -->
+  <nav aria-label="Breadcrumb">
+    <ul class="app-breadcrumb">
+      <li><a href="{{ url_for('main.dashboard') }}"><i class="bi bi-house me-1"></i>Cockpit</a></li>
+      <li class="breadcrumb-separator">/</li>
+      <li><a href="{{ url_for('main.procedures_hub') }}">Procedures</a></li>
+      <li class="breadcrumb-separator">/</li>
+      <li class="breadcrumb-current">GetStudentClubs</li>
+    </ul>
+  </nav>
+
   <header class="inner-page-header">
     <div class="inner-header-layout">
       <div>

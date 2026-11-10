@@ -4,6 +4,15 @@
 
 {% block content %}
 <div class="app-container">
+  <!-- Breadcrumb (Shneiderman Rule 8: Reduce Memory Load) -->
+  <nav aria-label="Breadcrumb">
+    <ul class="app-breadcrumb">
+      <li><a href="{{ url_for('main.dashboard') }}"><i class="bi bi-house me-1"></i>Cockpit</a></li>
+      <li class="breadcrumb-separator">/</li>
+      <li class="breadcrumb-current">Clubs Management</li>
+    </ul>
+  </nav>
+
   <!-- Inner Page Header Band (Compact, NOT 100vh) -->
   <header class="inner-page-header">
     <div class="inner-header-layout">
@@ -63,13 +72,13 @@
             <td class="text-end">
               {% if current_role != 'member' %}
               <div class="d-inline-flex gap-1 action-write-btn" data-role-req="admin,manager,guest">
-                <a href="{{ url_for('main.edit_club', club_id=club.club_id) }}" class="btn-ghost-action" title="Edit Club">
-                  <i class="bi bi-pencil"></i>
+                <a href="{{ url_for('main.edit_club', club_id=club.club_id) }}" class="btn-ghost-action" title="Edit Club" aria-label="Edit club {{ club.club_name }}">
+                  <i class="bi bi-pencil" aria-hidden="true"></i>
                 </a>
                 {% if current_role in ['admin', 'guest'] %}
-                <form method="POST" action="{{ url_for('main.delete_club', club_id=club.club_id) }}" class="d-inline delete-form" data-entity="club">
-                  <button type="submit" class="btn-ghost-action text-danger" title="Delete Club">
-                    <i class="bi bi-trash"></i>
+                <form method="POST" action="{{ url_for('main.delete_club', club_id=club.club_id) }}" class="d-inline delete-form" data-entity="club {{ club.club_name }}">
+                  <button type="submit" class="btn-ghost-action text-danger" title="Delete Club" aria-label="Delete club {{ club.club_name }}">
+                    <i class="bi bi-trash" aria-hidden="true"></i>
                   </button>
                 </form>
                 {% endif %}

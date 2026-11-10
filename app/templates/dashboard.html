@@ -245,12 +245,20 @@
     <div class="section-middle-content reveal-on-scroll delay-1" style="max-width: 1200px;">
       <div class="row g-3 w-100">
         <div class="col-md-6 col-lg-3">
-          <div class="tesla-card h-100 glow-border-hover">
-            <span class="badge-status info mb-3">MEMBER 1 &bull; T1 &amp; T2</span>
-            <h4 class="text-white fw-medium mb-2" style="font-size: 16px;">Club Size Automation</h4>
-            <p class="text-secondary small mb-0">
-              Automatic sync of <code class="font-mono text-white">Clubs.member_count</code> on join/departure.
-            </p>
+          <div class="tesla-card h-100 glow-border-hover d-flex flex-column justify-content-between">
+            <div>
+              <div class="d-flex justify-content-between align-items-center mb-3">
+                <span class="badge-status info">MEMBER 1</span>
+                <span class="text-info small font-mono">T1 &amp; T2</span>
+              </div>
+              <h4 class="text-white fw-medium mb-2" style="font-size: 16px;">Trigger 1: Count Sync</h4>
+              <p class="text-secondary small mb-3">
+                Automatic sync of <code class="font-mono text-white">Clubs.member_count</code> on active join (Trigger 1) and departure (Trigger 2).
+              </p>
+            </div>
+            <button type="button" class="btn-ghost-action text-info p-0 text-start small" data-bs-toggle="modal" data-bs-target="#trigger1Modal">
+              <i class="bi bi-code-square me-1"></i> Inspect Trigger 1 SQL &rarr;
+            </button>
           </div>
         </div>
         <div class="col-md-6 col-lg-3">
@@ -289,9 +297,9 @@
         <a href="{{ url_for('main.list_triggers') }}" class="btn-tesla-primary glow-border-hover">
           Explore 8 Triggers Suite
         </a>
-        <a href="{{ url_for('main.create_membership') }}" class="btn-tesla-secondary glow-border-hover" data-role-req="admin,manager,guest">
-          Test Trigger Live
-        </a>
+        <button type="button" class="btn-tesla-secondary glow-border-hover" data-bs-toggle="modal" data-bs-target="#trigger1Modal">
+          <i class="bi bi-code-square me-2 text-info"></i> Inspect Trigger 1 SQL
+        </button>
       </div>
       <a href="#procedures" class="scroll-chevron" aria-label="Scroll to Procedures Hub">
         <i class="bi bi-chevron-down"></i>

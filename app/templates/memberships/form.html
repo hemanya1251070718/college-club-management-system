@@ -4,13 +4,31 @@
 
 {% block content %}
 <div class="app-container">
+  <!-- Breadcrumb (Shneiderman Rule 8: Reduce Memory Load) -->
+  <nav aria-label="Breadcrumb">
+    <ul class="app-breadcrumb">
+      <li><a href="{{ url_for('main.dashboard') }}"><i class="bi bi-house me-1"></i>Cockpit</a></li>
+      <li class="breadcrumb-separator">/</li>
+      <li><a href="{{ url_for('main.list_memberships') }}">Memberships</a></li>
+      <li class="breadcrumb-separator">/</li>
+      <li class="breadcrumb-current">{{ title }} (Trigger 1)</li>
+    </ul>
+  </nav>
+
   <header class="inner-page-header">
     <div class="inner-header-layout">
       <div>
+        <div class="d-flex align-items-center gap-2 mb-2">
+          <span class="badge-status info font-mono">TRIGGER 1 DEMONSTRATION</span>
+          <span class="text-secondary small">&bull; Automated Base Table Synchronization</span>
+        </div>
         <h1 class="inner-page-title">{{ title }}</h1>
-        <p class="inner-page-subtitle">Demonstrating automatic trigger synchronization for club member counts.</p>
+        <p class="inner-page-subtitle">Demonstrating automatic database trigger synchronization for club member counts.</p>
       </div>
-      <div>
+      <div class="d-flex gap-2">
+        <button type="button" class="btn-tesla-secondary" data-bs-toggle="modal" data-bs-target="#trigger1Modal">
+          <i class="bi bi-code-square me-1 text-info"></i> Inspect Trigger 1 SQL
+        </button>
         <a href="{{ url_for('main.list_memberships') }}" class="btn-tesla-secondary">
           <i class="bi bi-arrow-left me-1"></i> Back to Memberships
         </a>
@@ -22,9 +40,14 @@
     <div class="col-lg-8">
       <div class="tesla-card">
         {% if not membership %}
-        <div class="badge-status info mb-4 p-3 d-flex align-items-center gap-2" style="border-radius: 4px;">
-          <i class="bi bi-info-circle-fill"></i>
-          <span>Submitting this form triggers <code class="font-mono text-white">trg_increase_member_count</code> inside Cloud SQL automatically.</span>
+        <div class="badge-status info mb-4 p-3 d-flex align-items-center justify-content-between gap-2" style="border-radius: 4px;">
+          <div class="d-flex align-items-center gap-2">
+            <i class="bi bi-info-circle-fill"></i>
+            <span>Submitting this form executes Trigger 1 (<code class="font-mono text-white">trg_after_membership_insert_sync_count</code>) inside Cloud SQL automatically.</span>
+          </div>
+          <button type="button" class="btn-ghost-action text-info p-0" data-bs-toggle="modal" data-bs-target="#trigger1Modal" title="View SQL">
+            <i class="bi bi-eye"></i> View SQL
+          </button>
         </div>
         {% endif %}
 

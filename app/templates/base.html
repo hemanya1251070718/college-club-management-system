@@ -24,10 +24,13 @@
 </head>
 <body class="{% block body_class %}{% endblock %}" data-user-role="{{ current_role|default('guest') }}">
 
-  <!-- Accessible Skip-to-Content Link -->
-  <a href="#main-content" class="visually-hidden-focusable p-3 bg-primary text-white position-absolute top-0 start-0 z-3">
+  <!-- Accessible Skip-to-Content Link (WCAG 2.4.1 Bypass Blocks) -->
+  <a href="#main-content" class="skip-link">
     Skip to main content
   </a>
+
+  <!-- ARIA Live Announcement Region (Shneiderman Rule 3: Informative Feedback) -->
+  <div id="app-live-status" class="visually-hidden" aria-live="polite" aria-atomic="true"></div>
 
   <!-- Fixed Tidewell-Inspired Header (Frosted Pill Navigation & Utility Cluster) -->
   <header class="app-header" role="banner">
@@ -107,9 +110,14 @@
         </a>
 
         <!-- Telemetry Circular Button (Clock Icon as in Reference Photo) -->
-        <a href="{{ url_for('main.health') }}" class="btn-circle-utility d-none d-sm-inline-flex" title="Cloud SQL Socket Health &amp; Telemetry">
+        <a href="{{ url_for('main.health') }}" class="btn-circle-utility d-none d-sm-inline-flex" title="Cloud SQL Socket Health &amp; Telemetry" aria-label="Cloud SQL Telemetry Health">
           <i class="bi bi-clock"></i>
         </a>
+
+        <!-- Keyboard Shortcuts Help Button (Shneiderman Rule 2) -->
+        <button id="btn-shortcuts-help" class="btn-circle-utility d-none d-sm-inline-flex" type="button" data-bs-toggle="modal" data-bs-target="#keyboardShortcutsModal" title="Keyboard Shortcuts (?)" aria-label="Open Keyboard Shortcuts Guide">
+          <i class="bi bi-keyboard"></i>
+        </button>
 
         <!-- Menu Drawer Circular Button (Two Bar Hamburger as in Reference Photo) -->
         <button class="btn-circle-utility menu-trigger-btn" type="button" aria-label="Open Navigation Menu" aria-expanded="false">
@@ -310,6 +318,163 @@
   <main id="main-content" class="flex-grow-1" role="main">
     {% block content %}{% endblock %}
   </main>
+
+  <!-- =========================================================================
+       SHNEIDERMAN'S 8 GOLDEN RULES ACCESSIBLE MODALS
+       ========================================================================= -->
+
+  <!-- 1. Keyboard Shortcuts Modal (Rule 2: Universal Usability & Shortcuts) -->
+  <div class="modal fade" id="keyboardShortcutsModal" tabindex="-1" aria-labelledby="keyboardShortcutsModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" style="max-width: 580px;">
+      <div class="modal-content tesla-modal-content">
+        <div class="tesla-modal-header">
+          <div class="d-flex align-items-center gap-2">
+            <i class="bi bi-keyboard text-primary fs-5"></i>
+            <h5 class="modal-title fw-bold text-white mb-0" id="keyboardShortcutsModalLabel">Keyboard Navigation Shortcuts</h5>
+          </div>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close shortcuts dialog"></button>
+        </div>
+        <div class="tesla-modal-body">
+          <p class="text-secondary small mb-3">Power-user key combinations for immediate screen traversal and system commands.</p>
+          <div class="d-flex flex-column gap-2">
+            <div class="d-flex justify-content-between align-items-center p-2 rounded" style="background: var(--surface-1);">
+              <span class="text-white small">Focus Search &amp; Filter Bar</span>
+              <kbd class="kbd-key">/</kbd>
+            </div>
+            <div class="d-flex justify-content-between align-items-center p-2 rounded" style="background: var(--surface-1);">
+              <span class="text-white small">Open this Shortcuts Guide</span>
+              <div class="d-flex gap-1"><kbd class="kbd-key">?</kbd> <span class="text-secondary small">or</span> <kbd class="kbd-key">Shift</kbd>+<kbd class="kbd-key">/</kbd></div>
+            </div>
+            <div class="d-flex justify-content-between align-items-center p-2 rounded" style="background: var(--surface-1);">
+              <span class="text-white small">Close Active Modal / Drawer / Overlay</span>
+              <kbd class="kbd-key">Esc</kbd>
+            </div>
+            <div class="d-flex justify-content-between align-items-center p-2 rounded" style="background: var(--surface-1);">
+              <span class="text-white small">Go to Cockpit Dashboard</span>
+              <div class="d-flex gap-1"><kbd class="kbd-key">g</kbd> <span class="text-secondary small">then</span> <kbd class="kbd-key">c</kbd></div>
+            </div>
+            <div class="d-flex justify-content-between align-items-center p-2 rounded" style="background: var(--surface-1);">
+              <span class="text-white small">Go to 8 Database Triggers</span>
+              <div class="d-flex gap-1"><kbd class="kbd-key">g</kbd> <span class="text-secondary small">then</span> <kbd class="kbd-key">t</kbd></div>
+            </div>
+            <div class="d-flex justify-content-between align-items-center p-2 rounded" style="background: var(--surface-1);">
+              <span class="text-white small">Go to Memberships &amp; Count Trigger</span>
+              <div class="d-flex gap-1"><kbd class="kbd-key">g</kbd> <span class="text-secondary small">then</span> <kbd class="kbd-key">m</kbd></div>
+            </div>
+            <div class="d-flex justify-content-between align-items-center p-2 rounded" style="background: var(--surface-1);">
+              <span class="text-white small">Go to Campus Events</span>
+              <div class="d-flex gap-1"><kbd class="kbd-key">g</kbd> <span class="text-secondary small">then</span> <kbd class="kbd-key">e</kbd></div>
+            </div>
+            <div class="d-flex justify-content-between align-items-center p-2 rounded" style="background: var(--surface-1);">
+              <span class="text-white small">Go to 8 Procedures Hub</span>
+              <div class="d-flex gap-1"><kbd class="kbd-key">g</kbd> <span class="text-secondary small">then</span> <kbd class="kbd-key">p</kbd></div>
+            </div>
+            <div class="d-flex justify-content-between align-items-center p-2 rounded" style="background: var(--surface-1);">
+              <span class="text-white small">Go to Students Directory</span>
+              <div class="d-flex gap-1"><kbd class="kbd-key">g</kbd> <span class="text-secondary small">then</span> <kbd class="kbd-key">s</kbd></div>
+            </div>
+            <div class="d-flex justify-content-between align-items-center p-2 rounded" style="background: var(--surface-1);">
+              <span class="text-white small">Go to Clubs Management</span>
+              <div class="d-flex gap-1"><kbd class="kbd-key">g</kbd> <span class="text-secondary small">then</span> <kbd class="kbd-key">l</kbd></div>
+            </div>
+          </div>
+        </div>
+        <div class="tesla-modal-footer">
+          <button type="button" class="btn-tesla-secondary" data-bs-dismiss="modal" style="min-width: 120px;">Close (Esc)</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 2. Safe Destructive Action Confirmation Modal (Rule 5: Error Prevention & Rule 7: Control) -->
+  <div class="modal fade" id="deleteConfirmModal" tabindex="-1" aria-labelledby="deleteConfirmModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" style="max-width: 460px;">
+      <div class="modal-content tesla-modal-content" style="border-color: rgba(244, 63, 94, 0.4);">
+        <div class="tesla-modal-header" style="background: rgba(244, 63, 94, 0.08);">
+          <div class="d-flex align-items-center gap-2">
+            <i class="bi bi-exclamation-triangle-fill text-danger fs-5"></i>
+            <h5 class="modal-title fw-bold text-white mb-0" id="deleteConfirmModalLabel">Confirm Permanent Deletion</h5>
+          </div>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Cancel deletion"></button>
+        </div>
+        <div class="tesla-modal-body">
+          <p id="deleteConfirmTargetLabel" class="text-white mb-2">Are you sure you want to permanently delete this record?</p>
+          <small class="text-secondary d-block">
+            This operation directly removes the entity from Google Cloud SQL and executes cascading triggers (such as decrementing club member counts). This action cannot be undone.
+          </small>
+        </div>
+        <div class="tesla-modal-footer">
+          <button type="button" class="btn-tesla-secondary" data-bs-dismiss="modal" style="min-width: 110px;">Cancel</button>
+          <button type="button" id="deleteConfirmSubmitBtn" class="btn-tesla-danger" style="min-width: 140px;">
+            <i class="bi bi-trash me-1"></i> Delete Record
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 3. Trigger 1 Dedicated Deep Inspection Modal (Direct Fix for Trigger 1 Visibility Bug) -->
+  <div class="modal fade" id="trigger1Modal" tabindex="-1" aria-labelledby="trigger1ModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg" style="max-width: 780px;">
+      <div class="modal-content tesla-modal-content" style="border-color: var(--blue-400);">
+        <div class="tesla-modal-header" style="background: rgba(79, 124, 255, 0.1);">
+          <div class="d-flex align-items-center gap-2">
+            <span class="badge-status info font-mono">TRIGGER 1</span>
+            <h5 class="modal-title fw-bold text-white mb-0" id="trigger1ModalLabel">trg_after_membership_insert_sync_count</h5>
+          </div>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close Trigger 1 modal"></button>
+        </div>
+        <div class="tesla-modal-body">
+          <div class="d-flex align-items-center justify-content-between mb-3">
+            <div>
+              <span class="badge-status success me-2">AFTER INSERT ON Memberships</span>
+              <span class="badge-status neutral font-mono">Modifies: Clubs.member_count</span>
+            </div>
+            <button type="button" id="copyTrigger1SqlBtn" class="btn-tesla-secondary btn-sm" style="min-width: unset; height: 34px; line-height: 34px; padding: 0 14px; font-size: 12px;">
+              <i class="bi bi-clipboard me-1"></i> Copy SQL
+            </button>
+          </div>
+
+          <!-- SQL Code Window -->
+          <pre class="trigger-code-box mb-4"><code id="trigger1SqlCode">DELIMITER $$
+CREATE TRIGGER trg_after_membership_insert_sync_count
+AFTER INSERT ON Memberships
+FOR EACH ROW
+BEGIN
+    IF NEW.status = 'Active' THEN
+        UPDATE Clubs
+        SET member_count = member_count + 1
+        WHERE club_id = NEW.club_id;
+    END IF;
+END$$
+DELIMITER ;</code></pre>
+
+          <!-- Step-by-Step Live Verification Protocol -->
+          <h6 class="text-white fw-bold mb-2"><i class="bi bi-list-check text-info me-2"></i>Step-by-Step Live Verification Protocol:</h6>
+          <div class="d-flex flex-column gap-2 mb-3">
+            <div class="p-3 rounded" style="background: var(--surface-1); border: 1px solid var(--border);">
+              <strong class="text-info d-block mb-1">Step 1: Check Current Count in Base Table</strong>
+              <small class="text-secondary font-mono d-block">SELECT club_id, member_count FROM Clubs WHERE club_id = 'CSI';</small>
+            </div>
+            <div class="p-3 rounded" style="background: var(--surface-1); border: 1px solid var(--border);">
+              <strong class="text-warning d-block mb-1">Step 2: Enroll a Student into CSI</strong>
+              <small class="text-secondary font-mono d-block">INSERT INTO Memberships (membership_id, student_id, club_id, role, join_date, status) VALUES ('TRG1-TEST', 'ME25-0898', 'CSI', 'Member', CURRENT_DATE, 'Active');</small>
+            </div>
+            <div class="p-3 rounded" style="background: var(--surface-1); border: 1px solid var(--border);">
+              <strong class="text-success d-block mb-1">Step 3: Observe Automatic Cloud SQL Synchronization</strong>
+              <small class="text-secondary font-mono d-block">Clubs.member_count increments by +1 instantly with zero application logic recount!</small>
+            </div>
+          </div>
+        </div>
+        <div class="tesla-modal-footer">
+          <button type="button" class="btn-tesla-secondary" data-bs-dismiss="modal" style="min-width: 120px;">Close (Esc)</button>
+          <a href="{{ url_for('main.create_membership') }}" class="btn-tesla-primary" style="min-width: 200px;">
+            <i class="bi bi-play-circle-fill me-2"></i> Test Trigger 1 in UI
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
 
   <!-- Minimal Quiet Tesla Footer -->
   <footer class="app-footer" role="contentinfo">

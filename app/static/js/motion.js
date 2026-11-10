@@ -173,6 +173,9 @@ function initAlertsAutoDismiss() {
  * 6. Delete Action Confirmation Modal / Prompt
  */
 function initDeleteConfirmations() {
+  // If custom styled accessible modal is present in DOM, let main.js handle it
+  if (document.getElementById("deleteConfirmModal")) return;
+
   const deleteForms = document.querySelectorAll("form.delete-form");
   deleteForms.forEach((form) => {
     form.addEventListener("submit", (e) => {

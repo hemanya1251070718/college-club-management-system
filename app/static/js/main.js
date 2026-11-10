@@ -234,4 +234,219 @@ document.addEventListener("DOMContentLoaded", () => {
       }
     });
   }
+
+  /* ==========================================================================
+     SHNEIDERMAN'S 8 GOLDEN RULES UX SUITE IMPLEMENTATION
+     ========================================================================== */
+
+  /**
+   * RULE 2 & 7: Universal Usability & Keyboard Shortcuts System
+   * Guarded against firing when typing in inputs/textareas/selects.
+   */
+  let lastKeyG = false;
+  let gTimeout = null;
+
+  document.addEventListener("keydown", (e) => {
+    const targetTag = e.target.tagName.toLowerCase();
+    const isEditing = targetTag === "input" || targetTag === "textarea" || targetTag === "select" || e.target.isContentEditable;
+
+    // ESC closes open modals, drawer, and overlays
+    if (e.key === "Escape") {
+      // Close Bootstrap modals
+      document.querySelectorAll(".modal.show").forEach(m => {
+        const inst = bootstrap.Modal.getInstance(m);
+        if (inst) inst.hide();
+      });
+      // Close side drawer if open
+      const drawer = document.querySelector(".drawer-backdrop.is-open");
+      if (drawer) {
+        drawer.classList.remove("is-open");
+        drawer.setAttribute("aria-hidden", "true");
+        document.body.style.overflow = "";
+      }
+      return;
+    }
+
+    if (isEditing) return; // Never intercept when user is typing
+
+    // '/' Focus search or filter input
+    if (e.key === "/" && !e.ctrlKey && !e.metaKey) {
+      const searchInput = document.querySelector('input[name="q"], input[type="text"], input[name="search"]');
+      if (searchInput) {
+        e.preventDefault();
+        searchInput.focus();
+        searchInput.select();
+      }
+      return;
+    }
+
+    // '?' Open Keyboard Shortcuts Help Modal
+    if (e.key === "?" || (e.shiftKey && e.key === "/")) {
+      e.preventDefault();
+      const shortcutModalEl = document.getElementById("keyboardShortcutsModal");
+      if (shortcutModalEl) {
+        const modal = bootstrap.Modal.getOrCreateInstance(shortcutModalEl);
+        modal.show();
+      }
+      return;
+    }
+
+    // Two-key chord: 'g' then <key> for quick navigation
+    if (e.key.toLowerCase() === "g" && !lastKeyG) {
+      lastKeyG = true;
+      clearTimeout(gTimeout);
+      gTimeout = setTimeout(() => { lastKeyG = false; }, 1000);
+      return;
+    }
+
+    if (lastKeyG) {
+      lastKeyG = false;
+      clearTimeout(gTimeout);
+      const routes = {
+        c: "/",
+        t: "/triggers",
+        m: "/memberships",
+        e: "/events",
+        p: "/procedures",
+        s: "/students",
+        l: "/clubs",
+        h: "/health"
+      };
+      const dest = routes[e.key.toLowerCase()];
+      if (dest) {
+        e.preventDefault();
+        window.location.href = dest;
+      }
+    }
+  });
+
+  /**
+   * RULE 3 & 5: Informative Feedback & Error Prevention on Form Submits
+   * Prevents double-submits, adds loading spinner, announces state via aria-live
+   */
+  const liveStatusRegion = document.getElementById("app-live-status");
+  function announceStatus(message) {
+    if (liveStatusRegion) {
+      liveStatusRegion.textContent = message;
+    }
+  }
+
+  document.querySelectorAll("form:not(#login-form):not(.delete-form)").forEach(form => {
+    form.addEventListener("submit", (e) => {
+      const submitBtn = form.querySelector('button[type="submit"]');
+      if (submitBtn && !submitBtn.disabled) {
+        submitBtn.classList.add("btn-loading");
+        const originalText = submitBtn.innerHTML;
+        submitBtn.disabled = true;
+        submitBtn.innerHTML = `<span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span> Processing...`;
+        announceStatus("Form submitting, please wait...");
+        // Fallback re-enable if page does not redirect immediately
+        setTimeout(() => {
+          submitBtn.disabled = false;
+          submitBtn.classList.remove("btn-loading");
+          submitBtn.innerHTML = originalText;
+        }, 8000);
+      }
+    });
+  });
+
+  /**
+   * RULE 5 & 7: Destructive Action Confirmation Dialog
+   * Replaces native window.confirm() with a graceful, accessible modal
+   */
+  const deleteModalEl = document.getElementById("deleteConfirmModal");
+  let pendingDeleteForm = null;
+
+  if (deleteModalEl) {
+    const confirmBtn = document.getElementById("deleteConfirmSubmitBtn");
+    const targetLabel = document.getElementById("deleteConfirmTargetLabel");
+
+    document.querySelectorAll("form.delete-form").forEach(form => {
+      form.addEventListener("submit", (e) => {
+        e.preventDefault();
+        pendingDeleteForm = form;
+        const entityName = form.dataset.entity || "record";
+        if (targetLabel) {
+          targetLabel.textContent = `Are you sure you want to permanently delete this ${entityName}? This database operation is irreversible.`;
+        }
+        const modal = bootstrap.Modal.getOrCreateInstance(deleteModalEl);
+        modal.show();
+      });
+    });
+
+    if (confirmBtn) {
+      confirmBtn.addEventListener("click", () => {
+        if (pendingDeleteForm) {
+          const btn = pendingDeleteForm.querySelector('button[type="submit"]');
+          if (btn) btn.disabled = true;
+          pendingDeleteForm.submit();
+        }
+      });
+    }
+  }
+
+  /**
+   * RULE 6 & 8: Form Draft Auto-Save in sessionStorage
+   * Preserves unsaved form inputs in case user accidentally navigates away
+   */
+  document.querySelectorAll("form[method='POST']:not(.delete-form):not(#login-form)").forEach(form => {
+    const formId = form.getAttribute("action") || window.location.pathname;
+    const storageKey = `draft_${formId}`;
+
+    // Restore draft if present
+    try {
+      const saved = sessionStorage.getItem(storageKey);
+      if (saved) {
+        const data = JSON.parse(saved);
+        Object.keys(data).forEach(name => {
+          const input = form.elements[name];
+          if (input && !input.readOnly && input.type !== "hidden" && input.type !== "password") {
+            input.value = data[name];
+          }
+        });
+      }
+    } catch (err) {}
+
+    // Save on changes
+    form.addEventListener("input", () => {
+      try {
+        const formData = new FormData(form);
+        const obj = {};
+        formData.forEach((val, key) => {
+          if (key !== "password") obj[key] = val;
+        });
+        sessionStorage.setItem(storageKey, JSON.stringify(obj));
+      } catch (err) {}
+    });
+
+    // Clear draft on successful submit
+    form.addEventListener("submit", () => {
+      try {
+        sessionStorage.removeItem(storageKey);
+      } catch (err) {}
+    });
+  });
+
+  /**
+   * TRIGGER 1 DIRECT INSPECTOR & SQL CODE COPY
+   * Ensures Trigger 1 is 100% visible, crystal clear, and easy to test
+   */
+  const trigger1ModalEl = document.getElementById("trigger1Modal");
+  const copySqlBtn = document.getElementById("copyTrigger1SqlBtn");
+  if (copySqlBtn) {
+    copySqlBtn.addEventListener("click", () => {
+      const sqlCode = document.getElementById("trigger1SqlCode");
+      if (sqlCode) {
+        navigator.clipboard.writeText(sqlCode.innerText.trim()).then(() => {
+          copySqlBtn.innerHTML = '<i class="bi bi-check2 text-success me-1"></i> Copied!';
+          announceStatus("Trigger 1 SQL copied to clipboard.");
+          setTimeout(() => {
+            copySqlBtn.innerHTML = '<i class="bi bi-clipboard me-1"></i> Copy SQL';
+          }, 2000);
+        });
+      }
+    });
+  }
+
+  console.info("ClubHub DBMS • Shneiderman 8 Golden Rules Suite Initialized");
 });

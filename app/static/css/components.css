@@ -382,17 +382,18 @@ body.has-scroll-snap {
 }
 
 /* --------------------------------------------------------------------------
-   Tesla-Style Buttons (40px Height, 4px Radius, 14px / 500)
+   Tesla-Style Buttons (44px Accessible Touch Height, 4px Radius, 14px / 500)
    -------------------------------------------------------------------------- */
 .btn-tesla-primary {
-  height: 40px;
-  min-width: 264px;
+  min-height: 44px;
+  height: 44px;
+  min-width: 220px;
   background-color: var(--blue-500);
   color: #FFFFFF !important;
   font-family: var(--font-sans);
   font-size: 14px;
   font-weight: 500;
-  line-height: 40px;
+  line-height: 44px;
   text-align: center;
   text-decoration: none;
   border-radius: var(--radius-btn);
@@ -403,7 +404,8 @@ body.has-scroll-snap {
   align-items: center;
   justify-content: center;
   transition: background-color var(--dur-fast) var(--ease-out),
-              box-shadow var(--dur-base) var(--ease-out);
+              box-shadow var(--dur-base) var(--ease-out),
+              transform var(--dur-fast) var(--ease-out);
 }
 
 .btn-tesla-primary:hover,
@@ -412,16 +414,21 @@ body.has-scroll-snap {
   box-shadow: 0 0 16px rgba(47, 91, 234, 0.45);
 }
 
+.btn-tesla-primary:active {
+  transform: scale(0.98);
+}
+
 .btn-tesla-secondary {
-  height: 40px;
-  min-width: 264px;
+  min-height: 44px;
+  height: 44px;
+  min-width: 180px;
   background-color: rgba(255, 255, 255, 0.08);
   border: 1px solid rgba(255, 255, 255, 0.2);
   color: var(--text-1) !important;
   font-family: var(--font-sans);
   font-size: 14px;
   font-weight: 500;
-  line-height: 38px;
+  line-height: 42px;
   text-align: center;
   text-decoration: none;
   border-radius: var(--radius-btn);
@@ -433,7 +440,8 @@ body.has-scroll-snap {
   backdrop-filter: blur(8px);
   -webkit-backdrop-filter: blur(8px);
   transition: background-color var(--dur-fast) var(--ease-out),
-              border-color var(--dur-fast) var(--ease-out);
+              border-color var(--dur-fast) var(--ease-out),
+              transform var(--dur-fast) var(--ease-out);
 }
 
 .btn-tesla-secondary:hover,
@@ -442,9 +450,54 @@ body.has-scroll-snap {
   border-color: rgba(255, 255, 255, 0.35);
 }
 
+.btn-tesla-secondary:active {
+  transform: scale(0.98);
+}
+
+.btn-tesla-danger {
+  min-height: 44px;
+  height: 44px;
+  min-width: 140px;
+  background-color: var(--danger);
+  color: #FFFFFF !important;
+  font-family: var(--font-sans);
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 44px;
+  text-align: center;
+  text-decoration: none;
+  border-radius: var(--radius-btn);
+  border: none;
+  padding: 0 24px;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: background-color var(--dur-fast) var(--ease-out),
+              box-shadow var(--dur-base) var(--ease-out),
+              transform var(--dur-fast) var(--ease-out);
+}
+
+.btn-tesla-danger:hover,
+.btn-tesla-danger:focus-visible {
+  background-color: #E11D48;
+  box-shadow: 0 0 16px rgba(244, 63, 94, 0.45);
+}
+
+.btn-tesla-danger:active {
+  transform: scale(0.98);
+}
+
+.btn-loading {
+  position: relative;
+  pointer-events: none;
+  opacity: 0.85;
+}
+
 @media (max-width: 640px) {
   .btn-tesla-primary,
-  .btn-tesla-secondary {
+  .btn-tesla-secondary,
+  .btn-tesla-danger {
     min-width: 100%;
     width: 100%;
   }
@@ -524,7 +577,7 @@ body.has-scroll-snap {
 
 .tesla-table thead {
   position: sticky;
-  top: 56px;
+  top: 0;
   z-index: 10;
   background: var(--surface-2);
   backdrop-filter: blur(12px);
@@ -555,13 +608,186 @@ body.has-scroll-snap {
 }
 
 .tesla-table tbody tr {
-  height: 56px;
+  min-height: 56px;
   transition: background-color var(--dur-fast) var(--ease-out);
 }
 
 .tesla-table tbody tr:hover td {
   background: var(--surface-2);
   color: var(--text-1);
+}
+
+/* --------------------------------------------------------------------------
+   Breadcrumb Navigation (Shneiderman Rule 8: Reduce Short-Term Memory Load)
+   -------------------------------------------------------------------------- */
+.app-breadcrumb {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-2);
+  margin-bottom: var(--sp-3);
+  font-size: 13px;
+  color: var(--text-3);
+  list-style: none;
+  padding: 0;
+}
+
+.app-breadcrumb a {
+  color: var(--text-3);
+  text-decoration: none;
+  transition: color var(--dur-fast);
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.app-breadcrumb a:hover {
+  color: var(--blue-400);
+}
+
+.app-breadcrumb .breadcrumb-separator {
+  opacity: 0.4;
+  font-size: 11px;
+}
+
+.app-breadcrumb .breadcrumb-current {
+  color: var(--text-1);
+  font-weight: var(--fw-medium);
+}
+
+/* --------------------------------------------------------------------------
+   Filter Chips Bar (Rule 8: Memory Load & Rule 6: Easy Reversal)
+   -------------------------------------------------------------------------- */
+.filter-chip-bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--sp-2);
+  margin-top: var(--sp-2);
+}
+
+.filter-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 10px;
+  font-size: 12px;
+  font-family: var(--font-sans);
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-pill);
+  color: var(--text-2);
+}
+
+.filter-chip strong {
+  color: var(--text-1);
+}
+
+.filter-chip-remove {
+  cursor: pointer;
+  background: transparent;
+  border: none;
+  color: var(--text-3);
+  padding: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 13px;
+  line-height: 1;
+}
+
+.filter-chip-remove:hover {
+  color: var(--danger);
+}
+
+/* --------------------------------------------------------------------------
+   Keyboard Shortcut KBD Badges (Shneiderman Rule 2: Shortcuts)
+   -------------------------------------------------------------------------- */
+.kbd-key {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 24px;
+  height: 24px;
+  padding: 0 6px;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text-1);
+  background: var(--surface-3);
+  border: 1px solid var(--border-strong);
+  border-bottom: 2px solid rgba(255, 255, 255, 0.25);
+  border-radius: 4px;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.4);
+}
+
+/* --------------------------------------------------------------------------
+   Trigger 1 Dedicated Spotlight Callout (Direct Fix for Trigger 1 Visibility)
+   -------------------------------------------------------------------------- */
+.trigger-spotlight-card {
+  background: linear-gradient(135deg, rgba(79, 124, 255, 0.12) 0%, rgba(124, 58, 237, 0.08) 100%);
+  border: 1px solid rgba(79, 124, 255, 0.35);
+  border-radius: var(--radius-card);
+  padding: var(--sp-6);
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.35);
+  margin-bottom: var(--sp-6);
+}
+
+.trigger-spotlight-card::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 4px;
+  height: 100%;
+  background: linear-gradient(to bottom, var(--blue-400), var(--violet-400));
+}
+
+.trigger-code-box {
+  background: #060812;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 14px 18px;
+  font-family: var(--font-mono);
+  font-size: 12.5px;
+  color: #7DD3FC;
+  overflow-x: auto;
+  line-height: 1.6;
+}
+
+/* --------------------------------------------------------------------------
+   Modal Structure System (Rule 1: Consistency & Rule 7: Control)
+   -------------------------------------------------------------------------- */
+.tesla-modal-content {
+  background: var(--surface-2);
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-card);
+  box-shadow: var(--shadow-lg);
+  color: var(--text-1);
+  overflow: hidden;
+}
+
+.tesla-modal-header {
+  padding: 18px 24px;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.tesla-modal-body {
+  padding: 24px;
+  color: var(--text-2);
+}
+
+.tesla-modal-footer {
+  padding: 16px 24px;
+  border-top: 1px solid var(--border);
+  background: rgba(0, 0, 0, 0.2);
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
 }
 
 .tabular-nums {

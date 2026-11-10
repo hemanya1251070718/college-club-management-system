@@ -4,6 +4,15 @@
 
 {% block content %}
 <div class="app-container">
+  <!-- Breadcrumb (Shneiderman Rule 8: Reduce Memory Load) -->
+  <nav aria-label="Breadcrumb">
+    <ul class="app-breadcrumb">
+      <li><a href="{{ url_for('main.dashboard') }}"><i class="bi bi-house me-1"></i>Cockpit</a></li>
+      <li class="breadcrumb-separator">/</li>
+      <li class="breadcrumb-current">Campus Events Management</li>
+    </ul>
+  </nav>
+
   <!-- Inner Page Header Band -->
   <header class="inner-page-header">
     <div class="inner-header-layout">
@@ -74,20 +83,20 @@
             </td>
             <td class="text-end">
               <div class="d-inline-flex gap-1">
-                <a href="{{ url_for('main.event_registrations', event_id=ev.event_id) }}" class="btn-ghost-action text-info" title="Attendees &amp; Triggers 5 &amp; 7">
-                  <i class="bi bi-person-check"></i>
+                <a href="{{ url_for('main.event_registrations', event_id=ev.event_id) }}" class="btn-ghost-action text-info" title="Attendees &amp; Triggers 5 &amp; 7" aria-label="Manage attendees for {{ ev.event_name }}">
+                  <i class="bi bi-person-check" aria-hidden="true"></i>
                 </a>
-                <a href="{{ url_for('main.event_feedback', event_id=ev.event_id) }}" class="btn-ghost-action text-warning" title="Feedback &amp; Trigger 6">
-                  <i class="bi bi-star"></i>
+                <a href="{{ url_for('main.event_feedback', event_id=ev.event_id) }}" class="btn-ghost-action text-warning" title="Feedback &amp; Trigger 6" aria-label="Reviews and feedback for {{ ev.event_name }}">
+                  <i class="bi bi-star" aria-hidden="true"></i>
                 </a>
                 {% if current_role != 'member' %}
-                <a href="{{ url_for('main.edit_event', event_id=ev.event_id) }}" class="btn-ghost-action action-write-btn" data-role-req="admin,manager,guest" title="Edit Event">
-                  <i class="bi bi-pencil"></i>
+                <a href="{{ url_for('main.edit_event', event_id=ev.event_id) }}" class="btn-ghost-action action-write-btn" data-role-req="admin,manager,guest" title="Edit Event" aria-label="Edit event {{ ev.event_name }}">
+                  <i class="bi bi-pencil" aria-hidden="true"></i>
                 </a>
                 {% if current_role in ['admin', 'guest'] %}
-                <form method="POST" action="{{ url_for('main.delete_event', event_id=ev.event_id) }}" class="d-inline delete-form action-write-btn" data-role-req="admin,guest" data-entity="event">
-                  <button type="submit" class="btn-ghost-action text-danger" title="Delete Event">
-                    <i class="bi bi-trash"></i>
+                <form method="POST" action="{{ url_for('main.delete_event', event_id=ev.event_id) }}" class="d-inline delete-form action-write-btn" data-role-req="admin,guest" data-entity="event {{ ev.event_name }}">
+                  <button type="submit" class="btn-ghost-action text-danger" title="Delete Event" aria-label="Delete event {{ ev.event_name }}">
+                    <i class="bi bi-trash" aria-hidden="true"></i>
                   </button>
                 </form>
                 {% endif %}

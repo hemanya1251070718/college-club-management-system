@@ -4,6 +4,15 @@
 
 {% block content %}
 <div class="app-container">
+  <!-- Breadcrumb (Shneiderman Rule 8: Reduce Memory Load) -->
+  <nav aria-label="Breadcrumb">
+    <ul class="app-breadcrumb">
+      <li><a href="{{ url_for('main.dashboard') }}"><i class="bi bi-house me-1"></i>Cockpit</a></li>
+      <li class="breadcrumb-separator">/</li>
+      <li class="breadcrumb-current">8 Production Triggers Architecture</li>
+    </ul>
+  </nav>
+
   <!-- Inner Page Header Band -->
   <header class="inner-page-header">
     <div class="inner-header-layout">
@@ -15,25 +24,64 @@
         <h1 class="inner-page-title">8 Database Triggers Architecture</h1>
         <p class="inner-page-subtitle">Production DBMS evaluation: 8 non-identical triggers across 8 canonical domain tables with zero audit table overhead.</p>
       </div>
-      <div>
+      <div class="d-flex gap-2">
+        <button type="button" class="btn-tesla-secondary" data-bs-toggle="modal" data-bs-target="#trigger1Modal">
+          <i class="bi bi-code-square me-2 text-info"></i> Inspect Trigger 1 SQL
+        </button>
         <a href="{{ url_for('main.create_membership') }}" class="btn-tesla-primary">
-          <i class="bi bi-play-circle-fill me-2"></i> Test Trigger in UI
+          <i class="bi bi-play-circle-fill me-2"></i> Test Trigger 1 Live
         </a>
       </div>
     </div>
   </header>
 
+  <!-- =========================================================================
+       TRIGGER 1 SPOTLIGHT CALLOUT (Direct Resolution for Trigger 1 Visibility)
+       ========================================================================= -->
+  <div class="trigger-spotlight-card" id="trigger-1-spotlight">
+    <div class="row align-items-center g-4">
+      <div class="col-lg-8">
+        <div class="d-flex align-items-center gap-2 mb-2">
+          <span class="badge-status info font-mono">FEATURED TRIGGER 1</span>
+          <span class="badge-status success">AFTER INSERT ON Memberships</span>
+          <span class="badge-status neutral font-mono">Member 1 Assignment</span>
+        </div>
+        <h3 class="text-white fw-bold mb-2 font-mono" style="font-size: 20px;">
+          trg_after_membership_insert_sync_count
+        </h3>
+        <p class="text-secondary small mb-3">
+          Automatic declarative synchronization: When a student enrolls in a club with status <code class="font-mono text-white">'Active'</code>, Cloud SQL immediately increments <code class="font-mono text-white">Clubs.member_count</code> by +1 directly in the base table. Eliminates manual application-layer recounts.
+        </p>
+        <div class="d-flex flex-wrap gap-2">
+          <span class="badge-status neutral"><i class="bi bi-table me-1"></i>Monitored: Memberships</span>
+          <span class="badge-status neutral"><i class="bi bi-pencil-square me-1"></i>Updated: Clubs.member_count</span>
+          <span class="badge-status neutral"><i class="bi bi-speedometer2 me-1"></i>Execution Complexity: O(1)</span>
+        </div>
+      </div>
+      <div class="col-lg-4 text-lg-end">
+        <div class="d-flex flex-column gap-2">
+          <button type="button" class="btn-tesla-primary w-100" data-bs-toggle="modal" data-bs-target="#trigger1Modal">
+            <i class="bi bi-eye me-2"></i> Inspect SQL &amp; Protocol
+          </button>
+          <a href="{{ url_for('main.create_membership') }}" class="btn-tesla-secondary w-100">
+            <i class="bi bi-plus-circle me-2"></i> Enroll Member to Fire
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <!-- Team Distribution 4-Pillar Grid (Tesla Cards, Zero 3D Tilt Glitch) -->
   <div class="row g-4 mb-5">
     <div class="col-md-6 col-xl-3">
-      <div class="tesla-card h-100">
+      <div class="tesla-card h-100" style="border-top: 2px solid var(--blue-400);">
         <div class="d-flex justify-content-between align-items-center mb-3">
           <span class="badge-status info">MEMBER 1</span>
           <span class="text-secondary small">Triggers 1 &amp; 2</span>
         </div>
         <h4 class="text-white fw-medium mb-2" style="font-size: 16px;">Club Size Automation</h4>
         <p class="text-secondary small mb-0">
-          Automatic increment and decrement of <code class="font-mono text-white">Clubs.member_count</code> on membership joins and departures.
+          Automatic increment (<code class="font-mono text-white">Trigger 1</code>) and decrement (<code class="font-mono text-white">Trigger 2</code>) of <code class="font-mono text-white">Clubs.member_count</code>.
         </p>
       </div>
     </div>
@@ -96,24 +144,29 @@
           </tr>
         </thead>
         <tbody>
-          <!-- Trigger 1 -->
-          <tr>
+          <!-- Trigger 1 (Prominently Highlighted & Inspectable) -->
+          <tr id="trigger-1" style="background: rgba(79, 124, 255, 0.05);">
             <td><span class="badge-status info font-mono">1</span></td>
             <td>
               <strong class="text-white font-mono">trg_after_membership_insert_sync_count</strong>
-              <small class="d-block text-secondary">Member 1</small>
+              <small class="d-block text-secondary">Member 1 &bull; Auto-Increment Sync</small>
             </td>
             <td>
               <span class="badge-status success">AFTER INSERT</span>
-              <small class="d-block text-secondary mt-1 font-mono">Memberships</small>
+              <small class="d-block text-secondary mt-1 font-mono">Memberships &rarr; Clubs</small>
             </td>
             <td>
               When a student joins a club with status <code class="font-mono text-white">'Active'</code>, <code class="font-mono text-white">Clubs.member_count</code> automatically increments by 1 in real time.
             </td>
             <td class="text-end">
-              <a href="{{ url_for('main.create_membership') }}" class="btn-ghost-action text-info">
-                Enroll Member
-              </a>
+              <div class="d-inline-flex gap-1">
+                <button type="button" class="btn-ghost-action text-info" data-bs-toggle="modal" data-bs-target="#trigger1Modal" title="Inspect Trigger 1 SQL Code">
+                  <i class="bi bi-code-slash me-1"></i>SQL
+                </button>
+                <a href="{{ url_for('main.create_membership') }}" class="btn-ghost-action text-primary" title="Enroll Member to Fire Trigger 1">
+                  Enroll
+                </a>
+              </div>
             </td>
           </tr>
 
