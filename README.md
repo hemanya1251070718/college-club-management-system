@@ -4,15 +4,25 @@
 
 ---
 
-## 🌐 Live Production Deployment
+## 🌐 Live Production Deployments
 
 | Service | Live URL / Endpoint | Details |
 |---|---|---|
-| **Web Application Dashboard** | [https://club-management-app-326279554484.asia-south1.run.app/](https://club-management-app-326279554484.asia-south1.run.app/) | Live Flask Web UI on Google Cloud Run |
-| **8 Triggers Showcase** | [https://club-management-app-326279554484.asia-south1.run.app/triggers](https://club-management-app-326279554484.asia-south1.run.app/triggers) | Architectural catalog of all 8 production triggers |
-| **8 Cursors & Procedures Hub** | [https://club-management-app-326279554484.asia-south1.run.app/procedures](https://club-management-app-326279554484.asia-south1.run.app/procedures) | Interactive execution runner for all 8 cursor procedures |
-| **System & Database Health** | [https://club-management-app-326279554484.asia-south1.run.app/health](https://club-management-app-326279554484.asia-south1.run.app/health) | Real-time Cloud SQL Unix Socket ping |
-| **Raw JSON Health Endpoint** | [https://club-management-app-326279554484.asia-south1.run.app/health?format=json](https://club-management-app-326279554484.asia-south1.run.app/health?format=json) | Automated uptime monitoring payload |
+| **Primary Web Distribution (Vercel)** | [https://cloud-chi-six.vercel.app](https://cloud-chi-six.vercel.app) | Global Edge Serverless Web UI with Gatekeeper Auth & Guest Evaluator |
+| **GCP Cloud Run Production App** | [https://club-management-app-326279554484.asia-south1.run.app/](https://club-management-app-326279554484.asia-south1.run.app/) | Live Flask Web UI on Google Cloud Run (Mumbai asia-south1) |
+| **8 Triggers Showcase & Trigger 1 DDL** | [https://cloud-chi-six.vercel.app/triggers](https://cloud-chi-six.vercel.app/triggers) | Architectural catalog of all 8 production triggers + Trigger 1 Spotlight |
+| **8 Cursors & Procedures Hub** | [https://cloud-chi-six.vercel.app/procedures](https://cloud-chi-six.vercel.app/procedures) | Interactive execution runner for all 8 cursor procedures |
+| **8 Golden Rules Audit Report (PDF)** | [https://cloud-chi-six.vercel.app/8_golden_rules.pdf](https://cloud-chi-six.vercel.app/8_golden_rules.pdf) | 13-page formal compliance audit against Ben Shneiderman's 8 Golden Rules |
+| **System & Database Health** | [https://cloud-chi-six.vercel.app/health](https://cloud-chi-six.vercel.app/health) | Real-time Cloud SQL Unix Socket ping |
+
+---
+
+## 📚 Evaluation & Demonstration Resources
+
+- **[Viva & Demo Script](docs/DEMO_SCRIPT.md)**: Complete step-by-step presentation walkthrough for faculty evaluation.
+- **[Interview & Viva Prep](docs/INTERVIEW_PREP.md)**: Comprehensive technical Q&A on MySQL triggers, cursors, normal forms, and RBAC.
+- **[Engineering Learning Notes](docs/LEARNING_NOTES.md)**: Deep dive into schema normalization, BCNF, ACID transactions, and design tokens.
+- **[8 Golden Rules PDF](docs/8_golden_rules.pdf)**: Comprehensive 13-page UI/UX audit report.
 
 ---
 
