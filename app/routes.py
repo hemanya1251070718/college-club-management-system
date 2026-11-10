@@ -1,9 +1,22 @@
+import os
 import re
-from flask import Blueprint, render_template, request, redirect, url_for, flash, jsonify, session
+from flask import Blueprint, render_template, request, redirect, url_for, flash, jsonify, session, send_file
 from app.db import get_db_connection, check_db_health
 from app.auth import write_required, execute_required, get_current_role
 
 main_bp = Blueprint("main", __name__)
+
+# -------------------------------------------------------------
+# SHNEIDERMAN 8 GOLDEN RULES REPORT PDF ROUTE
+# -------------------------------------------------------------
+@main_bp.route("/8_golden_rules.pdf")
+@main_bp.route("/docs/8_golden_rules.pdf")
+def serve_golden_rules_pdf():
+    """Serves the generated 13-page 8 Golden Rules implementation report PDF."""
+    pdf_path = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "docs", "8_golden_rules.pdf")
+    if os.path.exists(pdf_path):
+        return send_file(pdf_path, as_attachment=False, mimetype="application/pdf")
+    return "Report PDF not found. Run generate_pdf_report.py to build it.", 404
 
 # -------------------------------------------------------------
 # HEALTH CHECK ROUTE (Required for Cloud Run & Monitoring)

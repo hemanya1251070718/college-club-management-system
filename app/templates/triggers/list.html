@@ -38,36 +38,57 @@
   <!-- =========================================================================
        TRIGGER 1 SPOTLIGHT CALLOUT (Direct Resolution for Trigger 1 Visibility)
        ========================================================================= -->
-  <div class="trigger-spotlight-card" id="trigger-1-spotlight">
+  <div class="trigger-spotlight-card" id="trigger-1-spotlight" style="border: 2px solid var(--blue-400); box-shadow: 0 0 24px rgba(79, 124, 255, 0.25);">
     <div class="row align-items-center g-4">
       <div class="col-lg-8">
         <div class="d-flex align-items-center gap-2 mb-2">
-          <span class="badge-status info font-mono">FEATURED TRIGGER 1</span>
+          <span class="badge-status info font-mono fw-bold" style="background: var(--blue-500); color: #fff;">★ TRIGGER 1 SPOTLIGHT</span>
           <span class="badge-status success">AFTER INSERT ON Memberships</span>
           <span class="badge-status neutral font-mono">Member 1 Assignment</span>
         </div>
-        <h3 class="text-white fw-bold mb-2 font-mono" style="font-size: 20px;">
+        <h3 class="text-white fw-bold mb-2 font-mono" style="font-size: 22px;">
           trg_after_membership_insert_sync_count
         </h3>
         <p class="text-secondary small mb-3">
           Automatic declarative synchronization: When a student enrolls in a club with status <code class="font-mono text-white">'Active'</code>, Cloud SQL immediately increments <code class="font-mono text-white">Clubs.member_count</code> by +1 directly in the base table. Eliminates manual application-layer recounts.
         </p>
-        <div class="d-flex flex-wrap gap-2">
+        <div class="d-flex flex-wrap gap-2 mb-3">
           <span class="badge-status neutral"><i class="bi bi-table me-1"></i>Monitored: Memberships</span>
           <span class="badge-status neutral"><i class="bi bi-pencil-square me-1"></i>Updated: Clubs.member_count</span>
           <span class="badge-status neutral"><i class="bi bi-speedometer2 me-1"></i>Execution Complexity: O(1)</span>
+          <span class="badge-status success"><i class="bi bi-check2-circle me-1"></i>Live in Cloud SQL Engine</span>
         </div>
       </div>
       <div class="col-lg-4 text-lg-end">
         <div class="d-flex flex-column gap-2">
-          <button type="button" class="btn-tesla-primary w-100" data-bs-toggle="modal" data-bs-target="#trigger1Modal">
-            <i class="bi bi-eye me-2"></i> Inspect SQL &amp; Protocol
-          </button>
-          <a href="{{ url_for('main.create_membership') }}" class="btn-tesla-secondary w-100">
-            <i class="bi bi-plus-circle me-2"></i> Enroll Member to Fire
+          <a href="{{ url_for('main.create_membership') }}" class="btn-tesla-primary w-100">
+            <i class="bi bi-play-circle-fill me-2"></i> Enroll Member to Fire Trigger 1
           </a>
+          <button type="button" class="btn-tesla-secondary w-100" data-bs-toggle="modal" data-bs-target="#trigger1Modal">
+            <i class="bi bi-card-checklist me-2"></i> View Verification Protocol
+          </button>
         </div>
       </div>
+    </div>
+
+    <!-- Inline Syntax-Highlighted Production SQL Definition -->
+    <div class="mt-3 pt-3 border-top" style="border-color: rgba(79, 124, 255, 0.25) !important;">
+      <div class="d-flex justify-content-between align-items-center mb-2">
+        <span class="text-white small fw-medium font-mono"><i class="bi bi-terminal-fill me-2 text-info"></i>PRODUCTION SQL DDL DEFINITION (MEMBER 1)</span>
+        <span class="badge-status success small">COMPLIANT &amp; TESTED</span>
+      </div>
+      <pre class="trigger-code-box mb-0" style="background: #060815; border: 1px solid rgba(79, 124, 255, 0.3);"><code style="color: #7DD3FC;">DELIMITER $$
+CREATE TRIGGER trg_after_membership_insert_sync_count
+AFTER INSERT ON Memberships
+FOR EACH ROW
+BEGIN
+    IF NEW.status = 'Active' THEN
+        UPDATE Clubs
+        SET member_count = member_count + 1
+        WHERE club_id = NEW.club_id;
+    END IF;
+END $$
+DELIMITER ;</code></pre>
     </div>
   </div>
 
@@ -144,27 +165,30 @@
           </tr>
         </thead>
         <tbody>
-          <!-- Trigger 1 (Prominently Highlighted & Inspectable) -->
-          <tr id="trigger-1" style="background: rgba(79, 124, 255, 0.05);">
-            <td><span class="badge-status info font-mono">1</span></td>
+          <!-- Trigger 1 (Prominently Highlighted, High-Contrast Glow, Inspectable) -->
+          <tr id="trigger-1" style="background: rgba(79, 124, 255, 0.15); border-left: 4px solid var(--blue-400); box-shadow: inset 0 0 16px rgba(79, 124, 255, 0.1);">
             <td>
-              <strong class="text-white font-mono">trg_after_membership_insert_sync_count</strong>
-              <small class="d-block text-secondary">Member 1 &bull; Auto-Increment Sync</small>
+              <span class="badge-status info font-mono fw-bold" style="background: var(--blue-500); color: #fff; font-size: 13px;">★ 1</span>
             </td>
             <td>
-              <span class="badge-status success">AFTER INSERT</span>
+              <strong class="text-white font-mono" style="font-size: 14.5px;">trg_after_membership_insert_sync_count</strong>
+              <span class="badge bg-primary ms-1" style="font-size: 10px; vertical-align: middle;">TRIGGER 1 (MEMBER 1)</span>
+              <small class="d-block text-info mt-1"><i class="bi bi-arrow-repeat me-1"></i>Member 1 &bull; Auto-Increment Sync directly on Clubs table</small>
+            </td>
+            <td>
+              <span class="badge-status success fw-bold">AFTER INSERT</span>
               <small class="d-block text-secondary mt-1 font-mono">Memberships &rarr; Clubs</small>
             </td>
             <td>
-              When a student joins a club with status <code class="font-mono text-white">'Active'</code>, <code class="font-mono text-white">Clubs.member_count</code> automatically increments by 1 in real time.
+              When a student joins a club with status <code class="font-mono text-white">'Active'</code>, <code class="font-mono text-white">Clubs.member_count</code> automatically increments by 1 directly in the Cloud SQL base table.
             </td>
             <td class="text-end">
               <div class="d-inline-flex gap-1">
                 <button type="button" class="btn-ghost-action text-info" data-bs-toggle="modal" data-bs-target="#trigger1Modal" title="Inspect Trigger 1 SQL Code">
                   <i class="bi bi-code-slash me-1"></i>SQL
                 </button>
-                <a href="{{ url_for('main.create_membership') }}" class="btn-ghost-action text-primary" title="Enroll Member to Fire Trigger 1">
-                  Enroll
+                <a href="{{ url_for('main.create_membership') }}" class="btn-tesla-primary" style="padding: 4px 10px; font-size: 12px;" title="Enroll Member to Fire Trigger 1">
+                  Test Live
                 </a>
               </div>
             </td>

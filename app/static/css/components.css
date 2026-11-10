@@ -576,12 +576,9 @@ body.has-scroll-snap {
 }
 
 .tesla-table thead {
-  position: sticky;
-  top: 0;
-  z-index: 10;
+  position: relative;
+  z-index: 2;
   background: var(--surface-2);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
 }
 
 .tesla-table th {

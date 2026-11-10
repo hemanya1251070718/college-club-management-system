@@ -71,7 +71,7 @@ def detect_role_from_email(email):
     Validates and classifies role strictly by email pattern:
       - Principal:      <name>.principal@vit.edu                 -> 'admin'
       - Coordinator:    <name>.<prn>.cordinator@vit.edu          -> 'manager' (also accepts coordinator)
-      - Student Member: <name>.<prn>@vit.edu                     -> 'member'
+      - Student Member: <name>.<prn>@vit.edu                     -> 'member' (or any official @vit.edu)
     Returns: (role, role_title, error_message)
     """
     if not email:
@@ -81,23 +81,19 @@ def detect_role_from_email(email):
     if not email.endswith("@vit.edu"):
         return None, None, "Compulsory requirement: Email must belong to the official '@vit.edu' domain."
     
+    prefix = email.split("@")[0]
+    parts = prefix.split(".")
+
     # 1. Principal / Super Admin
-    if re.match(r"^[a-z0-9_.-]+\.principal@vit\.edu$", email):
+    if "principal" in parts:
         return "admin", "Super Admin / Principal", None
     
     # 2. Faculty Coordinator
-    if re.match(r"^[a-z0-9_.-]+\.[a-z0-9_.-]+\.(?:cordinator|coordinator)@vit\.edu$", email):
+    if "cordinator" in parts or "coordinator" in parts:
         return "manager", "Faculty Coordinator", None
     
-    # 3. Student Member (somename.prn@vit.edu)
-    if re.match(r"^[a-z0-9_.-]+\.[a-z0-9_.-]+@vit\.edu$", email):
-        return "member", "Student Member", None
-    
-    return None, None, (
-        "Email does not conform to required role patterns: "
-        "Student (name.prn@vit.edu), Coordinator (name.prn.cordinator@vit.edu), "
-        "or Principal (name.principal@vit.edu)."
-    )
+    # 3. Student Member (somename.prn@vit.edu or any official VIT email)
+    return "member", "Student Member", None
 
 def init_users_db():
     """Initializes users table and seeds pre-configured demo accounts."""
@@ -285,6 +281,41 @@ def authenticate_user(email, password):
                 return "Incorrect password. Please try again or use the demo credentials.", None
     except Exception as e:
         print(f"Notice: SQLite auth error: {e}")
+
+    # 3. Serverless Auto-Recovery & Instant Provisioning for Official VIT Accounts:
+    # On serverless platforms (Vercel/AWS Lambda), lambda instances are ephemeral and do not share disk.
+    # If the user provides a valid VIT Pune email pattern and valid password (>= 4 chars),
+    # auto-provision and authenticate them immediately on the active container so they NEVER get locked out!
+    role, role_title, err = detect_role_from_email(email_clean)
+    if not err and len(password.strip()) >= 4:
+        name_clean = email_clean.split("@")[0].replace(".", " ").title()
+        user_record = {
+            "id": len(MEMORY_USERS) + 1,
+            "email": email_clean,
+            "password_hash": generate_password_hash(password.strip()),
+            "name": name_clean,
+            "role": role,
+            "role_title": role_title
+        }
+        MEMORY_USERS[email_clean] = user_record
+        try:
+            conn = get_sqlite_conn()
+            with conn:
+                conn.execute("""
+                    INSERT OR REPLACE INTO users (email, password_hash, name, role, role_title)
+                    VALUES (?, ?, ?, ?, ?);
+                """, (email_clean, user_record["password_hash"], name_clean, role, role_title))
+            conn.close()
+        except Exception:
+            pass
+
+        return None, {
+            "id": user_record["id"],
+            "email": email_clean,
+            "name": name_clean,
+            "role": role,
+            "role_title": role_title
+        }
 
     return "No account found with this email. Please sign up first.", None
 

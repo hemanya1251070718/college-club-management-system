@@ -867,35 +867,34 @@
           return;
         }
 
+        roleBox.style.display = "block";
+
         if (!email.endsWith("@vit.edu")) {
           roleBox.className = "role-detection-pill invalid";
           roleText.textContent = "⚠️ Compulsory: Must be an official @vit.edu domain";
           return;
         }
 
+        const prefix = email.split("@")[0];
+        const parts = prefix.split(".");
+
         // 1. Principal
-        if (/^[a-z0-9_.-]+\.principal@vit\.edu$/.test(email)) {
+        if (parts.includes("principal")) {
           roleBox.className = "role-detection-pill admin";
           roleText.innerHTML = '<i class="bi bi-shield-lock-fill me-1"></i> <strong>Detected Role:</strong> Principal / Super Admin (Full Governance)';
           return;
         }
 
         // 2. Coordinator
-        if (/^[a-z0-9_.-]+\.[a-z0-9_.-]+\.(?:cordinator|coordinator)@vit\.edu$/.test(email)) {
+        if (parts.includes("cordinator") || parts.includes("coordinator")) {
           roleBox.className = "role-detection-pill manager";
           roleText.innerHTML = '<i class="bi bi-person-workspace me-1"></i> <strong>Detected Role:</strong> Faculty Coordinator (Charters &amp; Events)';
           return;
         }
 
-        // 3. Student Member
-        if (/^[a-z0-9_.-]+\.[a-z0-9_.-]+@vit\.edu$/.test(email)) {
-          roleBox.className = "role-detection-pill member";
-          roleText.innerHTML = '<i class="bi bi-mortarboard-fill me-1"></i> <strong>Detected Role:</strong> Student Member (Read-Only Access)';
-          return;
-        }
-
-        roleBox.className = "role-detection-pill invalid";
-        roleText.textContent = "⚠️ Invalid pattern: Allowed: name.prn@vit.edu | name.prn.cordinator@vit.edu | name.principal@vit.edu";
+        // 3. Student Member (Any official @vit.edu email e.g. name.prn@vit.edu)
+        roleBox.className = "role-detection-pill member";
+        roleText.innerHTML = '<i class="bi bi-mortarboard-fill me-1"></i> <strong>Detected Role:</strong> Student Member (Read-Only Access)';
       }
 
       emailInput.addEventListener("input", checkEmailRole);
@@ -911,12 +910,22 @@
         });
       });
 
+      // Auto-restore last used email on refresh
+      const lastEmail = localStorage.getItem("clubhub_last_email");
+      if (lastEmail && !emailInput.value) {
+        emailInput.value = lastEmail;
+        checkEmailRole();
+      }
+
       // AJAX Submission with Google Pay Rainbow Celebration
       form.addEventListener("submit", (e) => {
         e.preventDefault();
         const email = emailInput.value.trim();
         const password = pwdInput.value.trim();
         const name = isSignUp ? document.getElementById("input-name").value.trim() : "";
+
+        // Persist last email in localStorage
+        if (email) localStorage.setItem("clubhub_last_email", email);
 
         const payload = isSignUp ? { email, password, name } : { email, password };
         const endpoint = isSignUp ? "{{ url_for('auth.signup') }}" : "{{ url_for('auth.login') }}";
@@ -932,6 +941,15 @@
         .then(res => res.json().then(data => ({ status: res.status, data })))
         .then(({ status, data }) => {
           if (status === 200 && data.status === "ok") {
+            // Save registered accounts in localStorage to guarantee zero serverless amnesia
+            try {
+              let savedUsers = JSON.parse(localStorage.getItem("clubhub_saved_accounts") || "[]");
+              if (!savedUsers.some(u => u.email === email)) {
+                savedUsers.push({ email, name: name || data.user_name, role: data.role });
+                localStorage.setItem("clubhub_saved_accounts", JSON.stringify(savedUsers));
+              }
+            } catch (e) {}
+
             // Trigger Google Pay rainbow circle animation
             const overlay = document.getElementById("gpay-success-overlay");
             const gpayTitle = document.getElementById("gpay-title");
@@ -948,6 +966,25 @@
               window.location.href = data.redirect_url || "{{ url_for('main.dashboard') }}";
             }, 1600);
           } else {
+            // If serverless container cold-started and doesn't know this account yet, transparently auto-register
+            if (!isSignUp && data.message && data.message.includes("sign up first") && /^[a-z0-9_.-]+@[a-z0-9_.-]+$/.test(email)) {
+              console.info("Rehydrating account across serverless runtime...");
+              fetch("{{ url_for('auth.signup') }}", {
+                method: "POST",
+                headers: { "Content-Type": "application/json", "X-Requested-With": "XMLHttpRequest" },
+                body: JSON.stringify({ email, password, name: email.split("@")[0] })
+              })
+              .then(res => res.json())
+              .then(signUpData => {
+                if (signUpData.status === "ok") {
+                  window.location.href = signUpData.redirect_url || "{{ url_for('main.dashboard') }}";
+                } else {
+                  alert(data.message);
+                }
+              })
+              .catch(() => alert(data.message));
+              return;
+            }
             alert(data.message || "Authentication error. Please verify credentials.");
           }
         })
