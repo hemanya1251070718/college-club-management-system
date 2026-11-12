@@ -11,7 +11,7 @@ def create_app(config_class=Config):
     app.register_blueprint(main_bp)
 
     # Register authentication & RBAC blueprint
-    from app.auth import auth_bp, get_current_role, get_current_user, ROLE_METADATA
+    from app.auth import auth_bp, get_current_role, get_current_user, get_current_student_id, can_test_trigger, can_test_procedure, ROLE_METADATA
     app.register_blueprint(auth_bp)
 
     # Gatekeeper Security: Enforce Login Page Before Accessing Any Dashboard/Data View
@@ -59,9 +59,12 @@ def create_app(config_class=Config):
         return {
             "current_role": role,
             "current_user_name": get_current_user(),
+            "current_student_id": get_current_student_id(),
             "role_meta": ROLE_METADATA.get(role, ROLE_METADATA["guest"]),
             "all_roles": ROLE_METADATA,
-            "is_logged_in": session.get("role") is not None
+            "is_logged_in": session.get("role") is not None,
+            "can_test_trigger": can_test_trigger,
+            "can_test_procedure": can_test_procedure
         }
     
     # Custom error handlers for clean error pages without leaking stack traces

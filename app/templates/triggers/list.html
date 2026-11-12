@@ -148,48 +148,52 @@ DELIMITER ;</code></pre>
   </div>
 
   <!-- Triggers Detailed HUD Catalog -->
-  <div class="table-surface-card">
+  <div class="table-surface-card" style="overflow: visible;">
     <div class="p-3 border-bottom d-flex justify-content-between align-items-center" style="border-color: var(--border) !important; background: var(--surface-2);">
       <span class="text-white fw-medium">Production Trigger Specifications &amp; Live Verification</span>
       <span class="badge-status neutral font-mono">8 Canonical Base Tables</span>
     </div>
-    <div class="table-responsive">
-      <table class="tesla-table">
-        <thead>
+    <div class="table-responsive" style="overflow-x: auto; overflow-y: visible !important;">
+      <table class="tesla-table" style="border-collapse: separate; border-spacing: 0; width: 100%;">
+        <thead style="position: static;">
           <tr>
-            <th style="width: 5%;">#</th>
-            <th style="width: 25%;">Trigger Name</th>
-            <th style="width: 15%;">Timing &amp; Table</th>
-            <th style="width: 40%;">Enforced Business Rule</th>
-            <th style="width: 15%;" class="text-end">Live Test</th>
+            <th style="width: 5%; padding: 16px 20px; background: var(--surface-2);">#</th>
+            <th style="width: 25%; padding: 16px 20px; background: var(--surface-2);">Trigger Name</th>
+            <th style="width: 15%; padding: 16px 20px; background: var(--surface-2);">Timing &amp; Table</th>
+            <th style="width: 40%; padding: 16px 20px; background: var(--surface-2);">Enforced Business Rule</th>
+            <th style="width: 15%; padding: 16px 20px; background: var(--surface-2);" class="text-end">Live Test</th>
           </tr>
         </thead>
         <tbody>
-          <!-- Trigger 1 (Prominently Highlighted, High-Contrast Glow, Inspectable) -->
-          <tr id="trigger-1" style="background: rgba(79, 124, 255, 0.15); border-left: 4px solid var(--blue-400); box-shadow: inset 0 0 16px rgba(79, 124, 255, 0.1);">
-            <td>
+          <!-- Trigger 1 (Always Visible, Zero Stacking Bug, Inspectable) -->
+          <tr id="trigger-1" style="background: rgba(79, 124, 255, 0.12); border-left: 4px solid var(--blue-400); scroll-margin-top: 120px;">
+            <td style="padding-top: 20px;">
               <span class="badge-status info font-mono fw-bold" style="background: var(--blue-500); color: #fff; font-size: 13px;">★ 1</span>
             </td>
-            <td>
+            <td style="padding-top: 20px;">
               <strong class="text-white font-mono" style="font-size: 14.5px;">trg_after_membership_insert_sync_count</strong>
               <span class="badge bg-primary ms-1" style="font-size: 10px; vertical-align: middle;">TRIGGER 1 (MEMBER 1)</span>
               <small class="d-block text-info mt-1"><i class="bi bi-arrow-repeat me-1"></i>Member 1 &bull; Auto-Increment Sync directly on Clubs table</small>
             </td>
-            <td>
+            <td style="padding-top: 20px;">
               <span class="badge-status success fw-bold">AFTER INSERT</span>
               <small class="d-block text-secondary mt-1 font-mono">Memberships &rarr; Clubs</small>
             </td>
-            <td>
+            <td style="padding-top: 20px;">
               When a student joins a club with status <code class="font-mono text-white">'Active'</code>, <code class="font-mono text-white">Clubs.member_count</code> automatically increments by 1 directly in the Cloud SQL base table.
             </td>
-            <td class="text-end">
+            <td style="padding-top: 20px;" class="text-end">
               <div class="d-inline-flex gap-1">
                 <button type="button" class="btn-ghost-action text-info" data-bs-toggle="modal" data-bs-target="#trigger1Modal" title="Inspect Trigger 1 SQL Code">
                   <i class="bi bi-code-slash me-1"></i>SQL
                 </button>
+                {% if can_test_trigger(1) %}
                 <a href="{{ url_for('main.create_membership') }}" class="btn-tesla-primary" style="padding: 4px 10px; font-size: 12px;" title="Enroll Member to Fire Trigger 1">
                   Test Live
                 </a>
+                {% else %}
+                <span class="badge-status neutral small"><i class="bi bi-lock me-1"></i>Protected</span>
+                {% endif %}
               </div>
             </td>
           </tr>
@@ -209,9 +213,13 @@ DELIMITER ;</code></pre>
               When an active membership is deleted, <code class="font-mono text-white">Clubs.member_count</code> automatically decrements by 1 directly in the base table.
             </td>
             <td class="text-end">
+              {% if can_test_trigger(2) %}
               <a href="{{ url_for('main.list_memberships') }}" class="btn-ghost-action text-danger">
                 Delete Member
               </a>
+              {% else %}
+              <span class="badge-status neutral small"><i class="bi bi-lock me-1"></i>Coordinator/President Only</span>
+              {% endif %}
             </td>
           </tr>
 
@@ -230,9 +238,13 @@ DELIMITER ;</code></pre>
               Enforces Club Bylaws: Aborts transaction via <code class="font-mono text-white">SIGNAL SQLSTATE '45000'</code> if an attempt is made to insert a second active President for the same club.
             </td>
             <td class="text-end">
+              {% if can_test_trigger(3) %}
               <a href="{{ url_for('main.create_membership') }}" class="btn-ghost-action text-warning">
                 Test 2nd President
               </a>
+              {% else %}
+              <span class="badge-status neutral small"><i class="bi bi-lock me-1"></i>President Only</span>
+              {% endif %}
             </td>
           </tr>
 
@@ -251,9 +263,13 @@ DELIMITER ;</code></pre>
               When a member's status is toggled between <code class="font-mono text-white">Active</code> and <code class="font-mono text-white">Inactive</code>, <code class="font-mono text-white">Clubs.member_count</code> is automatically incremented or decremented.
             </td>
             <td class="text-end">
+              {% if can_test_trigger(4) %}
               <a href="{{ url_for('main.list_memberships') }}" class="btn-ghost-action">
                 Toggle Status
               </a>
+              {% else %}
+              <span class="badge-status neutral small"><i class="bi bi-lock me-1"></i>Coordinator Only</span>
+              {% endif %}
             </td>
           </tr>
 
@@ -272,9 +288,13 @@ DELIMITER ;</code></pre>
               Rejects retrospective registrations for events that are already marked <code class="font-mono text-white">'Completed'</code> or <code class="font-mono text-white">'Cancelled'</code>.
             </td>
             <td class="text-end">
+              {% if can_test_trigger(5) %}
               <a href="{{ url_for('main.list_events') }}" class="btn-ghost-action text-warning">
                 Test on Events
               </a>
+              {% else %}
+              <span class="badge-status neutral small"><i class="bi bi-lock me-1"></i>Protected</span>
+              {% endif %}
             </td>
           </tr>
 
@@ -293,9 +313,13 @@ DELIMITER ;</code></pre>
               Authenticity assurance: Intercepts event feedback submissions and verifies via cross-table check that the student was registered for that event.
             </td>
             <td class="text-end">
+              {% if can_test_trigger(6) %}
               <a href="{{ url_for('main.list_events') }}" class="btn-ghost-action text-info">
                 Test Feedback
               </a>
+              {% else %}
+              <span class="badge-status neutral small"><i class="bi bi-lock me-1"></i>Protected</span>
+              {% endif %}
             </td>
           </tr>
 
@@ -314,9 +338,13 @@ DELIMITER ;</code></pre>
               When attendee status is marked <code class="font-mono text-white">'Attended'</code> at the check-in desk, if the event was <code class="font-mono text-white">'Planned'</code>, it automatically flips to <code class="font-mono text-white">'Ongoing'</code>.
             </td>
             <td class="text-end">
+              {% if can_test_trigger(7) %}
               <a href="{{ url_for('main.list_events') }}" class="btn-ghost-action text-primary">
                 Mark Attendance
               </a>
+              {% else %}
+              <span class="badge-status neutral small"><i class="bi bi-lock me-1"></i>Coordinator Only</span>
+              {% endif %}
             </td>
           </tr>
 
@@ -335,9 +363,13 @@ DELIMITER ;</code></pre>
               Zero-config provisioning: When a new club is created, automatically provisions baseline profile row with institutional email and Instagram handle in <code class="font-mono text-white">ClubProfile</code>.
             </td>
             <td class="text-end">
+              {% if can_test_trigger(8) %}
               <a href="{{ url_for('main.create_club') }}" class="btn-ghost-action text-success">
                 Create Club
               </a>
+              {% else %}
+              <span class="badge-status neutral small"><i class="bi bi-lock me-1"></i>President/Admin Only</span>
+              {% endif %}
             </td>
           </tr>
         </tbody>

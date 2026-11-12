@@ -425,15 +425,23 @@ def list_memberships():
 
 
 @main_bp.route("/memberships/new", methods=["GET", "POST"])
-@write_required("main.list_memberships")
 def create_membership():
     conn = get_db_connection()
+    current_role = get_current_role() or "guest"
     if request.method == "POST":
         student_id = request.form.get("student_id", "").strip()
+        if not student_id and session.get("student_id"):
+            student_id = session.get("student_id")
+
         club_id = request.form.get("club_id", "").strip()
         role = request.form.get("role", "Member").strip()
         join_date = request.form.get("join_date", "").strip()
         status = request.form.get("status", "Active").strip()
+
+        # Governance rule: Student Members can only enroll as Member or Volunteer
+        if current_role == "member" and role in ["President", "Secretary"]:
+            flash("Governance Guard: Student Members cannot self-appoint as President or Secretary. Enrolled as Member.", "warning")
+            role = "Member"
 
         if not student_id or not club_id or not join_date:
             flash("Student, Club, and Join Date are required.", "warning")
@@ -729,6 +737,9 @@ def event_registrations(event_id):
 @main_bp.route("/events/<event_id>/register", methods=["POST"])
 def register_for_event(event_id):
     student_id = request.form.get("student_id", "").strip()
+    if not student_id and session.get("student_id"):
+        student_id = session.get("student_id")
+
     if not student_id:
         flash("Please select a student to register.", "warning")
         return redirect(url_for("main.event_registrations", event_id=event_id))
@@ -758,6 +769,7 @@ def register_for_event(event_id):
 
 
 @main_bp.route("/events/<event_id>/attendance/<reg_id>", methods=["POST"])
+@write_required("main.event_registrations")
 def mark_attendance(event_id, reg_id):
     try:
         conn = get_db_connection()
@@ -828,11 +840,14 @@ def event_feedback(event_id):
 @main_bp.route("/events/<event_id>/feedback/submit", methods=["POST"])
 def submit_event_feedback(event_id):
     student_id = request.form.get("student_id", "").strip()
+    if not student_id and session.get("student_id"):
+        student_id = session.get("student_id")
+
     rating = request.form.get("rating", "5").strip()
     comments = request.form.get("comments", "").strip()
 
     if not student_id:
-        flash("Student selection is required for feedback.", "warning")
+        flash("Student identification is required for feedback.", "warning")
         return redirect(url_for("main.event_feedback", event_id=event_id))
 
     clean_sid = re.sub(r'[^A-Z0-9]', '', student_id)

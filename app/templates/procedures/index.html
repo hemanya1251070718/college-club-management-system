@@ -114,6 +114,7 @@
         <p class="text-secondary small mb-4">
           Iterates over all recognized clubs using a cursor, compares cached <code class="font-mono text-white">Clubs.member_count</code> against actual active <code class="font-mono text-white">Memberships</code> rows, and repairs drift.
         </p>
+        {% if can_test_procedure(1) %}
         <form method="POST" action="{{ url_for('main.execute_proc', proc_id='audit') }}" class="mt-auto">
           <div class="d-flex gap-2">
             <button type="submit" name="p_fix" value="0" class="btn-tesla-secondary flex-fill" style="min-width: unset;">
@@ -124,6 +125,11 @@
             </button>
           </div>
         </form>
+        {% else %}
+        <div class="p-2 text-center rounded mt-auto" style="background: var(--surface-1); border: 1px solid var(--border);">
+          <span class="badge-status neutral small"><i class="bi bi-lock me-1 text-warning"></i>Restricted to Club President / Admin</span>
+        </div>
+        {% endif %}
       </div>
     </div>
 
@@ -140,6 +146,7 @@
         <p class="text-secondary small mb-3">
           Identifies non-members actively participating in campus events, detects their preferred club by attendance frequency, and auto-enrolls them as active Volunteers.
         </p>
+        {% if can_test_procedure(2) %}
         <form method="POST" action="{{ url_for('main.execute_proc', proc_id='recruitment') }}" class="mt-auto">
           <div class="row g-2 mb-3">
             <div class="col-6">
@@ -156,6 +163,11 @@
             </button>
           </div>
         </form>
+        {% else %}
+        <div class="p-2 text-center rounded mt-auto" style="background: var(--surface-1); border: 1px solid var(--border);">
+          <span class="badge-status neutral small"><i class="bi bi-lock me-1 text-warning"></i>Restricted to Coordinator / Secretary</span>
+        </div>
+        {% endif %}
       </div>
     </div>
 
@@ -173,6 +185,7 @@
         <p class="text-secondary small mb-3">
           Evaluates Feedback ratings for all Completed events, isolates top-rated initiatives (rating &ge; threshold), and commits financial performance bonus reconciliations.
         </p>
+        {% if can_test_procedure(3) %}
         <form method="POST" action="{{ url_for('main.execute_proc', proc_id='budget') }}" class="mt-auto">
           <div class="row g-2 mb-3">
             <div class="col-6">
@@ -193,6 +206,11 @@
             </button>
           </div>
         </form>
+        {% else %}
+        <div class="p-2 text-center rounded mt-auto" style="background: var(--surface-1); border: 1px solid var(--border);">
+          <span class="badge-status neutral small"><i class="bi bi-lock me-1 text-warning"></i>Restricted to Coordinator / Secretary</span>
+        </div>
+        {% endif %}
       </div>
     </div>
 
@@ -209,6 +227,7 @@
         <p class="text-secondary small mb-3">
           Scans past events lingering in 'Planned'. Reconciles status to 'Completed' if attendees attended, or flips to 'Cancelled' if zero attendance was recorded.
         </p>
+        {% if can_test_procedure(4) %}
         <form method="POST" action="{{ url_for('main.execute_proc', proc_id='close_events') }}" class="mt-auto">
           <div class="row g-2 mb-3">
             <div class="col-7">
@@ -225,6 +244,11 @@
             </button>
           </div>
         </form>
+        {% else %}
+        <div class="p-2 text-center rounded mt-auto" style="background: var(--surface-1); border: 1px solid var(--border);">
+          <span class="badge-status neutral small"><i class="bi bi-lock me-1 text-warning"></i>Restricted to Coordinator / Secretary</span>
+        </div>
+        {% endif %}
       </div>
     </div>
 
@@ -242,6 +266,7 @@
         <p class="text-secondary small mb-3">
           Enforces membership constitution: flags active non-executive members who registered but skipped host club events &ge; threshold, marking them Inactive.
         </p>
+        {% if can_test_procedure(5) %}
         <form method="POST" action="{{ url_for('main.execute_proc', proc_id='deactivate') }}" class="mt-auto">
           <div class="row g-2 mb-3">
             <div class="col-6">
@@ -258,6 +283,11 @@
             </button>
           </div>
         </form>
+        {% else %}
+        <div class="p-2 text-center rounded mt-auto" style="background: var(--surface-1); border: 1px solid var(--border);">
+          <span class="badge-status neutral small"><i class="bi bi-lock me-1 text-warning"></i>Restricted to Coordinator / Secretary</span>
+        </div>
+        {% endif %}
       </div>
     </div>
 
@@ -274,6 +304,7 @@
         <p class="text-secondary small mb-3">
           Evaluates cross-campus attendance. Regular members with high verified participation (&ge; threshold) are promoted directly to 'Core Member' in Memberships.
         </p>
+        {% if can_test_procedure(6) %}
         <form method="POST" action="{{ url_for('main.execute_proc', proc_id='promote') }}" class="mt-auto">
           <div class="row g-2 mb-3">
             <div class="col-6">
@@ -294,6 +325,11 @@
             </button>
           </div>
         </form>
+        {% else %}
+        <div class="p-2 text-center rounded mt-auto" style="background: var(--surface-1); border: 1px solid var(--border);">
+          <span class="badge-status neutral small"><i class="bi bi-lock me-1 text-warning"></i>Restricted to Club President / Admin</span>
+        </div>
+        {% endif %}
       </div>
     </div>
 
@@ -311,6 +347,7 @@
         <p class="text-secondary small mb-3">
           Annual academic session transition: identifies active memberships held by final-year students (year_of_study = 4), transitions them to Alumni ('Inactive'), and updates counts.
         </p>
+        {% if can_test_procedure(7) %}
         <form method="POST" action="{{ url_for('main.execute_proc', proc_id='grad') }}" class="mt-auto">
           <div class="row g-2 mb-3">
             <div class="col-6">
@@ -327,6 +364,11 @@
             </button>
           </div>
         </form>
+        {% else %}
+        <div class="p-2 text-center rounded mt-auto" style="background: var(--surface-1); border: 1px solid var(--border);">
+          <span class="badge-status neutral small"><i class="bi bi-lock me-1 text-warning"></i>Restricted to Club President / Admin</span>
+        </div>
+        {% endif %}
       </div>
     </div>
 
@@ -343,6 +385,7 @@
         <p class="text-secondary small mb-3">
           Student Grievance Protection Policy: iterates low-rating reviews (&le; threshold) and automatically replaces comments with protected standardized tags in Feedback.
         </p>
+        {% if can_test_procedure(8) %}
         <form method="POST" action="{{ url_for('main.execute_proc', proc_id='privacy') }}" class="mt-auto">
           <div class="row g-2 mb-3">
             <div class="col-6">
@@ -359,6 +402,11 @@
             </button>
           </div>
         </form>
+        {% else %}
+        <div class="p-2 text-center rounded mt-auto" style="background: var(--surface-1); border: 1px solid var(--border);">
+          <span class="badge-status neutral small"><i class="bi bi-lock me-1 text-warning"></i>Restricted to Club President / Admin</span>
+        </div>
+        {% endif %}
       </div>
     </div>
 

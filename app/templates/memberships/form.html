@@ -54,6 +54,14 @@
         <form method="POST">
           <div class="row g-4">
             {% if not membership %}
+            {% if current_role == 'member' and session.get('student_id') %}
+            <div class="col-md-6">
+              <label class="tesla-form-label">Student (Self)</label>
+              <input type="hidden" name="student_id" value="{{ session.get('student_id') }}">
+              <input type="text" class="tesla-form-control font-mono" value="{{ current_user_name }} ({{ session.get('student_id') }})" readonly>
+              <small class="text-success d-block mt-1"><i class="bi bi-shield-check me-1"></i>Enrolling as authenticated student</small>
+            </div>
+            {% else %}
             <div class="col-md-6">
               <label class="tesla-form-label">Student *</label>
               <select name="student_id" class="tesla-form-select" required>
@@ -65,6 +73,7 @@
                 {% endfor %}
               </select>
             </div>
+            {% endif %}
             <div class="col-md-6">
               <label class="tesla-form-label">Club *</label>
               <select name="club_id" class="tesla-form-select" required>
@@ -90,9 +99,19 @@
             <div class="col-md-4">
               <label class="tesla-form-label">Role *</label>
               <select name="role" class="tesla-form-select" required>
-                {% for r in ['Member', 'Core Member', 'Volunteer', 'Event Coordinator', 'Treasurer', 'Secretary', 'President'] %}
-                <option value="{{ r }}" {% if membership and membership.role == r %}selected{% endif %}>{{ r }}</option>
-                {% endfor %}
+                {% if current_role == 'member' %}
+                  {% for r in ['Member', 'Core Member', 'Volunteer'] %}
+                  <option value="{{ r }}" {% if membership and membership.role == r %}selected{% endif %}>{{ r }}</option>
+                  {% endfor %}
+                {% elif current_role in ['coordinator', 'manager'] %}
+                  {% for r in ['Member', 'Core Member', 'Volunteer', 'Event Coordinator', 'Secretary', 'Treasurer'] %}
+                  <option value="{{ r }}" {% if membership and membership.role == r %}selected{% endif %}>{{ r }}</option>
+                  {% endfor %}
+                {% else %}
+                  {% for r in ['Member', 'Core Member', 'Volunteer', 'Event Coordinator', 'Treasurer', 'Secretary', 'President'] %}
+                  <option value="{{ r }}" {% if membership and membership.role == r %}selected{% endif %}>{{ r }}</option>
+                  {% endfor %}
+                {% endif %}
               </select>
             </div>
 
