@@ -751,17 +751,26 @@
 
           <!-- Quick 1-Click Demo Credentials for Viva / Evaluation -->
           <div class="demo-chips-box">
-            <div class="demo-chips-title">Quick 1-Click Demo Accounts:</div>
-            <div class="d-flex flex-wrap gap-2">
+            <div class="demo-chips-title">Quick 1-Click Demo Accounts (Username == Password):</div>
+            <div class="d-flex flex-wrap gap-2 mb-2">
               <button type="button" class="demo-chip-btn" data-fill-email="sharma.principal@vit.edu" data-fill-role="Principal">
-                <span>👑 Principal</span>
+                <span>👑 Principal (Admin)</span>
               </button>
-              <button type="button" class="demo-chip-btn" data-fill-email="patil.121001.cordinator@vit.edu" data-fill-role="Coordinator">
-                <span>👔 Coordinator</span>
+              <button type="button" class="demo-chip-btn" data-fill-email="aditya.12410214.president@vit.edu" data-fill-role="President">
+                <span>🏆 CSI President</span>
               </button>
-              <button type="button" class="demo-chip-btn" data-fill-email="aarav.123456@vit.edu" data-fill-role="Member">
-                <span>🎓 Member</span>
+              <button type="button" class="demo-chip-btn" data-fill-email="priya.12410219.secretary@vit.edu" data-fill-role="Secretary">
+                <span>👔 CSI Secretary</span>
               </button>
+              <button type="button" class="demo-chip-btn" data-fill-email="hemanya.1251070718@vit.edu" data-fill-role="Member">
+                <span>🎓 Hemanya (Core Member)</span>
+              </button>
+              <button type="button" class="demo-chip-btn" data-fill-email="rohan.1251070725@vit.edu" data-fill-role="Student">
+                <span>👤 Rohan (Student)</span>
+              </button>
+            </div>
+            <div style="color: #92929D; font-size: 11.5px; line-height: 1.4;">
+              💡 <strong>All 75 students &amp; faculty pre-registered:</strong> Username and password are identical (e.g. <code style="color: #A78BFA;">hemanya.1251070718@vit.edu</code>), or enter <code style="color: #A78BFA;">password123</code>.
             </div>
           </div>
 
@@ -878,34 +887,42 @@
         const prefix = email.split("@")[0];
         const parts = prefix.split(".");
 
-        // 1. Principal
+        // 1. Principal / Super Admin
         if (parts.includes("principal")) {
           roleBox.className = "role-detection-pill admin";
           roleText.innerHTML = '<i class="bi bi-shield-lock-fill me-1"></i> <strong>Detected Role:</strong> Principal / Super Admin (Full Governance)';
           return;
         }
 
-        // 2. Coordinator
-        if (parts.includes("cordinator") || parts.includes("coordinator")) {
+        // 2. Club President
+        if (parts.includes("president")) {
           roleBox.className = "role-detection-pill manager";
-          roleText.innerHTML = '<i class="bi bi-person-workspace me-1"></i> <strong>Detected Role:</strong> Faculty Coordinator (Charters &amp; Events)';
+          roleText.innerHTML = '<i class="bi bi-award-fill me-1"></i> <strong>Detected Role:</strong> Club President (Constitutional Governance)';
           return;
         }
 
-        // 3. Student Member (Any official @vit.edu email e.g. name.prn@vit.edu)
+        // 3. Coordinator / Secretary / Treasurer
+        if (parts.includes("coordinator") || parts.includes("cordinator") || parts.includes("secretary") || parts.includes("treasurer")) {
+          roleBox.className = "role-detection-pill manager";
+          roleText.innerHTML = '<i class="bi bi-person-workspace me-1"></i> <strong>Detected Role:</strong> Club Coordinator / Secretary (Operations &amp; Events)';
+          return;
+        }
+
+        // 4. Student Member / Core Member
         roleBox.className = "role-detection-pill member";
-        roleText.innerHTML = '<i class="bi bi-mortarboard-fill me-1"></i> <strong>Detected Role:</strong> Student Member (Read-Only Access)';
+        roleText.innerHTML = '<i class="bi bi-mortarboard-fill me-1"></i> <strong>Detected Role:</strong> Student Member / Core Member (Self-Enrolment &amp; Feedback)';
       }
 
       emailInput.addEventListener("input", checkEmailRole);
       checkEmailRole(); // Initial check if pre-filled
 
-      // One-Click Demo Chip Auto-Fill
+      // One-Click Demo Chip Auto-Fill (Username == Password rule)
       document.querySelectorAll(".demo-chip-btn").forEach(btn => {
         btn.addEventListener("click", () => {
           setMode(false); // Switch to Log In mode
-          emailInput.value = btn.getAttribute("data-fill-email");
-          pwdInput.value = "password123";
+          const email = btn.getAttribute("data-fill-email");
+          emailInput.value = email;
+          pwdInput.value = email; // Password matches username!
           checkEmailRole();
         });
       });

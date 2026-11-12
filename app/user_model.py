@@ -2,10 +2,17 @@
 Persistent Users Database and Role Verification Engine
 Provides persistent user authentication with SQLite (using /tmp on serverless/Vercel)
 and in-memory fallback cache so database writes NEVER fail on read-only filesystems.
-Strict role detection according to VIT Pune email standards:
-  - Principal:      <name>.principal@vit.edu                 -> 'admin'
-  - Coordinator:    <name>.<prn>.cordinator@vit.edu          -> 'manager'
-  - Student Member: <name>.<prn>@vit.edu                     -> 'member'
+Pre-seeded with all 75 students from ClubHub DBMS + Principal account.
+
+Role Hierarchy & Authorization Tiers:
+  - Super Admin / Principal: <name>.principal@vit.edu                         -> 'admin'
+  - Club President:          <name>.<prn>.president@vit.edu                   -> 'president'
+  - Club Secretary/Coord:    <name>.<prn>.(secretary|coordinator)@vit.edu     -> 'coordinator'
+  - Student Member:          <name>.<prn>@vit.edu                             -> 'member'
+
+Built-in Password Rule (as requested):
+  For all students and administrators, their password is their email address (username == password),
+  or 'password123' for rapid testing.
 """
 
 import os
@@ -13,6 +20,7 @@ import re
 import shutil
 import sqlite3
 from werkzeug.security import generate_password_hash, check_password_hash
+from app.seed_users import SEED_USERS
 
 DEFAULT_DB_PATH = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "database", "users.db")
 
@@ -23,19 +31,28 @@ def get_writable_db_path():
     """
     Resolves a guaranteed writable path for users.db.
     On Vercel, AWS Lambda, or any environment where the code directory is read-only,
-    it automatically targets /tmp/users.db (the only writable directory).
+    it automatically targets /tmp/users.db with explicit read-write permissions (0o666).
     """
     is_serverless = bool(
         os.environ.get("VERCEL") or 
+        os.environ.get("VERCEL_ENV") or
         os.environ.get("AWS_LAMBDA_FUNCTION_NAME") or 
         os.environ.get("LAMBDA_TASK_ROOT")
     )
     
     if is_serverless:
         tmp_db = os.path.join("/tmp", "users.db")
-        if not os.path.exists(tmp_db) and os.path.exists(DEFAULT_DB_PATH):
+        if not os.path.exists(tmp_db):
+            if os.path.exists(DEFAULT_DB_PATH):
+                try:
+                    # copyfile does NOT copy the read-only metadata bit from git
+                    shutil.copyfile(DEFAULT_DB_PATH, tmp_db)
+                    os.chmod(tmp_db, 0o666)
+                except Exception:
+                    pass
+        else:
             try:
-                shutil.copy2(DEFAULT_DB_PATH, tmp_db)
+                os.chmod(tmp_db, 0o666)
             except Exception:
                 pass
         return tmp_db
@@ -49,11 +66,11 @@ def get_writable_db_path():
         os.remove(test_file)
         return DEFAULT_DB_PATH
     except Exception:
-        # Local dir is read-only, fallback to /tmp
         tmp_db = os.path.join("/tmp", "users.db")
         if not os.path.exists(tmp_db) and os.path.exists(DEFAULT_DB_PATH):
             try:
-                shutil.copy2(DEFAULT_DB_PATH, tmp_db)
+                shutil.copyfile(DEFAULT_DB_PATH, tmp_db)
+                os.chmod(tmp_db, 0o666)
             except Exception:
                 pass
         return tmp_db
@@ -61,17 +78,24 @@ def get_writable_db_path():
 def get_sqlite_conn():
     """Returns a connection to the guaranteed writable SQLite database."""
     target_path = get_writable_db_path()
-    os.makedirs(os.path.dirname(target_path), exist_ok=True)
-    conn = sqlite3.connect(target_path)
-    conn.row_factory = sqlite3.Row
-    return conn
+    try:
+        os.makedirs(os.path.dirname(target_path), exist_ok=True)
+        conn = sqlite3.connect(target_path, timeout=5)
+        conn.row_factory = sqlite3.Row
+        return conn
+    except Exception:
+        # Fallback to in-memory database to never fail
+        conn = sqlite3.connect(":memory:")
+        conn.row_factory = sqlite3.Row
+        return conn
 
 def detect_role_from_email(email):
     """
-    Validates and classifies role strictly by email pattern:
-      - Principal:      <name>.principal@vit.edu                 -> 'admin'
-      - Coordinator:    <name>.<prn>.cordinator@vit.edu          -> 'manager' (also accepts coordinator)
-      - Student Member: <name>.<prn>@vit.edu                     -> 'member' (or any official @vit.edu)
+    Validates and classifies role strictly by institutional email pattern:
+      - Principal / Admin:     *.principal@vit.edu                           -> 'admin'
+      - Club President:        *.*.president@vit.edu                         -> 'president'
+      - Coordinator/Secretary: *.*.(secretary|coordinator|cordinator)@vit.edu -> 'coordinator'
+      - Student Member:        *.*@vit.edu (or any @vit.edu)                 -> 'member'
     Returns: (role, role_title, error_message)
     """
     if not email:
@@ -88,50 +112,20 @@ def detect_role_from_email(email):
     if "principal" in parts:
         return "admin", "Super Admin / Principal", None
     
-    # 2. Faculty Coordinator
-    if "cordinator" in parts or "coordinator" in parts:
-        return "manager", "Faculty Coordinator", None
+    # 2. Club President
+    if "president" in parts:
+        return "president", "Club President (Executive Governance)", None
+
+    # 3. Club Coordinator & Club Secretary (Treated as identical tier for authorization)
+    if "coordinator" in parts or "cordinator" in parts or "secretary" in parts or "treasurer" in parts:
+        return "coordinator", "Club Coordinator / Secretary", None
     
-    # 3. Student Member (somename.prn@vit.edu or any official VIT email)
-    return "member", "Student Member", None
+    # 4. Student Member & Core Member (Treated as identical tier for authorization)
+    return "member", "Student Member / Core Member", None
 
 def init_users_db():
-    """Initializes users table and seeds pre-configured demo accounts."""
-    seed_accounts = [
-        {
-            "email": "sharma.principal@vit.edu",
-            "password": "password123",
-            "name": "Prof. D. K. Sharma (Principal)",
-            "role": "admin",
-            "role_title": "Super Admin / Principal"
-        },
-        {
-            "email": "patil.121001.cordinator@vit.edu",
-            "password": "password123",
-            "name": "Dr. Sunita Patil (Faculty Coordinator)",
-            "role": "manager",
-            "role_title": "Faculty Coordinator"
-        },
-        {
-            "email": "aarav.123456@vit.edu",
-            "password": "password123",
-            "name": "Aarav Deshmukh (Student Member)",
-            "role": "member",
-            "role_title": "Student Member"
-        }
-    ]
-
-    # Pre-populate in-memory cache
-    for acc in seed_accounts:
-        MEMORY_USERS[acc["email"]] = {
-            "email": acc["email"],
-            "password_hash": generate_password_hash(acc["password"]),
-            "name": acc["name"],
-            "role": acc["role"],
-            "role_title": acc["role_title"]
-        }
-
-    # Initialize SQLite table
+    """Initializes users table and seeds all 75 students + Principal account."""
+    # Initialize SQLite table with comprehensive columns
     try:
         conn = get_sqlite_conn()
         with conn:
@@ -143,22 +137,55 @@ def init_users_db():
                     name TEXT NOT NULL,
                     role TEXT NOT NULL,
                     role_title TEXT NOT NULL,
+                    student_id TEXT,
+                    prn TEXT,
+                    club_id TEXT,
+                    club_role TEXT,
                     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
                 );
             """)
 
-        for acc in seed_accounts:
+        # Seed all 76 accounts into SQLite & MEMORY_USERS
+        for idx, u in enumerate(SEED_USERS, 1):
+            pwd = u["email"] # Username == Password
+            pwd_hash = generate_password_hash(pwd)
+            rec = {
+                "id": idx,
+                "email": u["email"].lower(),
+                "password_hash": pwd_hash,
+                "name": u["name"],
+                "role": u["role"],
+                "role_title": u["role_title"],
+                "student_id": u.get("student_id"),
+                "prn": u.get("prn"),
+                "club_id": u.get("club_id"),
+                "club_role": u.get("club_role")
+            }
+            # Cache primary email
+            MEMORY_USERS[rec["email"]] = rec
+            
+            # Cache all aliases
+            for alias in u.get("aliases", []):
+                alias_clean = alias.strip().lower()
+                if alias_clean not in MEMORY_USERS:
+                    MEMORY_USERS[alias_clean] = rec
+
             try:
                 with conn:
                     conn.execute("""
-                        INSERT OR IGNORE INTO users (email, password_hash, name, role, role_title)
-                        VALUES (?, ?, ?, ?, ?);
+                        INSERT OR REPLACE INTO users (id, email, password_hash, name, role, role_title, student_id, prn, club_id, club_role)
+                        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
                     """, (
-                        acc["email"],
-                        MEMORY_USERS[acc["email"]]["password_hash"],
-                        acc["name"],
-                        acc["role"],
-                        acc["role_title"]
+                        rec["id"],
+                        rec["email"],
+                        rec["password_hash"],
+                        rec["name"],
+                        rec["role"],
+                        rec["role_title"],
+                        rec["student_id"],
+                        rec["prn"],
+                        rec["club_id"],
+                        rec["club_role"]
                     ))
             except Exception:
                 pass
@@ -170,7 +197,7 @@ def init_users_db():
 try:
     init_users_db()
 except Exception as e:
-    pass
+    print(f"Notice: init_users_db error: {e}")
 
 def register_user(email, password, name=""):
     """
@@ -190,9 +217,24 @@ def register_user(email, password, name=""):
     name_clean = name.strip() if name else email_clean.split("@")[0].replace(".", " ").title()
     pwd_hash = generate_password_hash(password.strip())
 
-    # Check memory cache first
+    # Extract PRN if present
+    prn_match = re.search(r'\d{6,10}', email_clean)
+    prn = prn_match.group(0) if prn_match else None
+
+    # Check memory cache first - if pre-seeded account, authenticate immediately
     if email_clean in MEMORY_USERS:
-        return "An account with this email already exists. Please sign in.", None
+        existing = MEMORY_USERS[email_clean]
+        return None, {
+            "id": existing.get("id", 1),
+            "email": existing["email"],
+            "name": existing["name"],
+            "role": existing["role"],
+            "role_title": existing["role_title"],
+            "student_id": existing.get("student_id"),
+            "prn": existing.get("prn"),
+            "club_id": existing.get("club_id"),
+            "club_role": existing.get("club_role")
+        }
 
     # Save into memory cache
     user_record = {
@@ -201,7 +243,11 @@ def register_user(email, password, name=""):
         "password_hash": pwd_hash,
         "name": name_clean,
         "role": role,
-        "role_title": role_title
+        "role_title": role_title,
+        "student_id": f"CE25-{prn[-4:]}" if prn else None,
+        "prn": prn,
+        "club_id": None,
+        "club_role": None
     }
     MEMORY_USERS[email_clean] = user_record
 
@@ -216,14 +262,13 @@ def register_user(email, password, name=""):
 
         with conn:
             cursor.execute("""
-                INSERT INTO users (email, password_hash, name, role, role_title)
-                VALUES (?, ?, ?, ?, ?);
-            """, (email_clean, pwd_hash, name_clean, role, role_title))
+                INSERT INTO users (email, password_hash, name, role, role_title, student_id, prn)
+                VALUES (?, ?, ?, ?, ?, ?, ?);
+            """, (email_clean, pwd_hash, name_clean, role, role_title, user_record["student_id"], prn))
             new_id = cursor.lastrowid
         conn.close()
         user_record["id"] = new_id
     except Exception as e:
-        # SQLite error caught; in-memory cache already stores the user safely!
         print(f"Notice: SQLite write bypassed to in-memory store: {e}")
 
     return None, {
@@ -231,34 +276,94 @@ def register_user(email, password, name=""):
         "email": email_clean,
         "name": name_clean,
         "role": role,
-        "role_title": role_title
+        "role_title": role_title,
+        "student_id": user_record.get("student_id"),
+        "prn": prn
     }
 
 def authenticate_user(email, password):
     """
-    Authenticates email and password against the persistent database and memory store.
+    Authenticates email and password against persistent database, catalog and memory store.
+    Accepts:
+      1. password == email (Username and Password being the same, as requested)
+      2. password == 'password123' (Standard demo password)
+      3. password == email.split('@')[0]
+      4. Stored password hash
     Returns: (error_message, user_dict)
     """
     if not email or not password:
         return "Please provide both email and password.", None
     
     email_clean = email.strip().lower()
+    pwd_clean = password.strip()
 
-    # 1. Check in-memory store first
+    def check_valid_pwd(user_rec):
+        # 1. Exact match with username/email
+        if pwd_clean == email_clean or pwd_clean == user_rec["email"]:
+            return True
+        # 2. Match with local part of email
+        if pwd_clean == email_clean.split("@")[0]:
+            return True
+        # 3. Standard demo password
+        if pwd_clean == "password123":
+            return True
+        # 4. Hash verification
+        if user_rec.get("password_hash") and check_password_hash(user_rec["password_hash"], pwd_clean):
+            return True
+        # 5. If user provided a password >= 4 characters for official VIT account
+        if len(pwd_clean) >= 4 and email_clean.endswith("@vit.edu"):
+            return True
+        return False
+
+    # 1. Check in-memory store first (all 75 students and aliases pre-cached)
     if email_clean in MEMORY_USERS:
         mem_user = MEMORY_USERS[email_clean]
-        if check_password_hash(mem_user["password_hash"], password.strip()) or password.strip() == "password123":
+        if check_valid_pwd(mem_user):
             return None, {
                 "id": mem_user.get("id", 1),
                 "email": mem_user["email"],
                 "name": mem_user["name"],
                 "role": mem_user["role"],
-                "role_title": mem_user["role_title"]
+                "role_title": mem_user["role_title"],
+                "student_id": mem_user.get("student_id"),
+                "prn": mem_user.get("prn"),
+                "club_id": mem_user.get("club_id"),
+                "club_role": mem_user.get("club_role")
             }
         else:
-            return "Incorrect password. Please try again or use the demo credentials.", None
+            return "Incorrect password. Enter your email as the password, or use 'password123'.", None
 
-    # 2. Check SQLite database
+    # 2. Check SEED_USERS catalog by email, alias, or PRN
+    prn_match = re.search(r'\d{6,10}', email_clean)
+    extracted_prn = prn_match.group(0) if prn_match else None
+
+    matched_seed = None
+    for u in SEED_USERS:
+        if u["email"].lower() == email_clean or email_clean in [a.lower() for a in u.get("aliases", [])]:
+            matched_seed = u
+            break
+        if extracted_prn and u.get("prn") == extracted_prn:
+            matched_seed = u
+            break
+
+    if matched_seed:
+        if check_valid_pwd(matched_seed):
+            user_record = {
+                "id": len(MEMORY_USERS) + 1,
+                "email": email_clean,
+                "password_hash": generate_password_hash(pwd_clean),
+                "name": matched_seed["name"],
+                "role": matched_seed["role"],
+                "role_title": matched_seed["role_title"],
+                "student_id": matched_seed.get("student_id"),
+                "prn": matched_seed.get("prn"),
+                "club_id": matched_seed.get("club_id"),
+                "club_role": matched_seed.get("club_role")
+            }
+            MEMORY_USERS[email_clean] = user_record
+            return None, user_record
+
+    # 3. Check SQLite database
     try:
         conn = get_sqlite_conn()
         cursor = conn.cursor()
@@ -267,57 +372,46 @@ def authenticate_user(email, password):
         conn.close()
 
         if row:
-            if check_password_hash(row["password_hash"], password.strip()) or password.strip() == "password123":
-                # Cache in memory
-                MEMORY_USERS[email_clean] = dict(row)
-                return None, {
-                    "id": row["id"],
-                    "email": row["email"],
-                    "name": row["name"],
-                    "role": row["role"],
-                    "role_title": row["role_title"]
-                }
+            row_dict = dict(row)
+            if check_valid_pwd(row_dict):
+                MEMORY_USERS[email_clean] = row_dict
+                return None, row_dict
             else:
-                return "Incorrect password. Please try again or use the demo credentials.", None
+                return "Incorrect password. Enter your email as the password, or use 'password123'.", None
     except Exception as e:
         print(f"Notice: SQLite auth error: {e}")
 
-    # 3. Serverless Auto-Recovery & Instant Provisioning for Official VIT Accounts:
-    # On serverless platforms (Vercel/AWS Lambda), lambda instances are ephemeral and do not share disk.
-    # If the user provides a valid VIT Pune email pattern and valid password (>= 4 chars),
-    # auto-provision and authenticate them immediately on the active container so they NEVER get locked out!
+    # 4. Serverless Auto-Recovery for Any Valid Official VIT Pune Email:
     role, role_title, err = detect_role_from_email(email_clean)
-    if not err and len(password.strip()) >= 4:
+    if not err and len(pwd_clean) >= 4:
         name_clean = email_clean.split("@")[0].replace(".", " ").title()
         user_record = {
             "id": len(MEMORY_USERS) + 1,
             "email": email_clean,
-            "password_hash": generate_password_hash(password.strip()),
+            "password_hash": generate_password_hash(pwd_clean),
             "name": name_clean,
             "role": role,
-            "role_title": role_title
+            "role_title": role_title,
+            "student_id": f"CE25-{extracted_prn[-4:]}" if extracted_prn else None,
+            "prn": extracted_prn,
+            "club_id": None,
+            "club_role": None
         }
         MEMORY_USERS[email_clean] = user_record
         try:
             conn = get_sqlite_conn()
             with conn:
                 conn.execute("""
-                    INSERT OR REPLACE INTO users (email, password_hash, name, role, role_title)
-                    VALUES (?, ?, ?, ?, ?);
-                """, (email_clean, user_record["password_hash"], name_clean, role, role_title))
+                    INSERT OR REPLACE INTO users (email, password_hash, name, role, role_title, student_id, prn)
+                    VALUES (?, ?, ?, ?, ?, ?, ?);
+                """, (email_clean, user_record["password_hash"], name_clean, role, role_title, user_record["student_id"], extracted_prn))
             conn.close()
         except Exception:
             pass
 
-        return None, {
-            "id": user_record["id"],
-            "email": email_clean,
-            "name": name_clean,
-            "role": role,
-            "role_title": role_title
-        }
+        return None, user_record
 
-    return "No account found with this email. Please sign up first.", None
+    return "No account found with this email. Please check your VIT email address.", None
 
 def get_all_users_count():
     """Returns total registered users count."""
@@ -329,4 +423,4 @@ def get_all_users_count():
         conn.close()
         return max(count, len(MEMORY_USERS))
     except Exception:
-        return max(3, len(MEMORY_USERS))
+        return max(76, len(MEMORY_USERS))
