@@ -45,10 +45,10 @@ def test_students_page_renders(client):
     assert b"Students Directory" in response.data
 
 def test_memberships_page_renders(client):
-    """Test memberships trigger demo page."""
+    """Test memberships directory page."""
     response = client.get("/memberships")
     assert response.status_code == 200
-    assert b"Memberships &amp; Automatic Database Trigger" in response.data or b"Memberships & Automatic Database Trigger" in response.data
+    assert b"Club Memberships Directory" in response.data or b"Memberships" in response.data
 
 def test_events_page_renders(client):
     """Test events listing page."""
@@ -176,14 +176,24 @@ def test_all_75_students_preseeded_and_username_equals_password(client):
     assert len(MEMORY_USERS) >= 76
     assert get_all_users_count() >= 76
 
-    # Test student login with username == password
-    err, user = authenticate_user("hemanya.1251070718@vit.edu", "hemanya.1251070718@vit.edu")
-    assert err is None
-    assert user["role"] in ["coordinator", "member"]
-    assert user["student_id"] == "CE25-0718"
+    # Test multi-role student login returning SELECT_ROLE with all assigned club personas
+    err, result = authenticate_user("hemanya.1251070718@vit.edu", "hemanya.1251070718@vit.edu")
+    assert err == "SELECT_ROLE"
+    assert len(result["personas"]) == 3
+    persona_clubs = [p["club_id"] for p in result["personas"]]
+    assert "CSI" in persona_clubs
+    assert "EDC" in persona_clubs
+    assert "ZEPHYR" in persona_clubs
 
-    # Test student member login with username == password
-    err_mem, user_mem = authenticate_user("jiya.1251070870@vit.edu", "jiya.1251070870@vit.edu")
+    # Test direct authentication with bypass_role_select=True
+    err_direct, user_direct = authenticate_user(
+        "hemanya.1251070718@vit.edu", "hemanya.1251070718@vit.edu", bypass_role_select=True
+    )
+    assert err_direct is None
+    assert user_direct["student_id"] == "CE25-0718"
+
+    # Test single-member student login with username == password
+    err_mem, user_mem = authenticate_user("ishan.1251070277@vit.edu", "ishan.1251070277@vit.edu")
     assert err_mem is None
     assert user_mem["role"] == "member"
 
@@ -235,3 +245,35 @@ def test_role_based_trigger_and_procedure_permissions(client):
         for i in range(1, 9):
             assert can_test_trigger(i) is True
             assert can_test_procedure(i) is True
+
+def test_multi_role_login_and_persona_selection_flow(client):
+    """
+    Tests that a multi-role student logging in via HTTP gets a 'select_role'
+    response with available club personas, and posting to /api/auth/select-role
+    sets the chosen persona session and grants appropriate permissions.
+    """
+    resp = client.post(
+        "/login",
+        data={"email": "hemanya.1251070718@vit.edu", "password": "hemanya.1251070718@vit.edu"},
+        headers={"Accept": "application/json", "X-Requested-With": "XMLHttpRequest"}
+    )
+    assert resp.status_code == 200
+    json_data = resp.get_json()
+    assert json_data["status"] == "select_role"
+    assert len(json_data["roles"]) == 3
+
+    sel_resp = client.post(
+        "/api/auth/select-role",
+        json={
+            "club_id": "CSI",
+            "club_name": "Computer Society of India",
+            "club_role": "Secretary",
+            "role_tier": "coordinator",
+            "role_title": "Secretary of Computer Society of India"
+        }
+    )
+    assert sel_resp.status_code == 200
+    sel_data = sel_resp.get_json()
+    assert sel_data["success"] is True
+    assert sel_data["role"] == "coordinator"
+    assert sel_data["club_id"] == "CSI"

@@ -12,6 +12,8 @@ Roles:
 import functools
 from flask import Blueprint, request, session, redirect, url_for, flash, jsonify, render_template
 from app.user_model import authenticate_user, register_user, detect_role_from_email, get_all_users_count
+from app.memberships_data import get_student_personas, classify_role_tier
+from app.seed_users import SEED_USERS
 
 auth_bp = Blueprint("auth", __name__)
 
@@ -147,7 +149,10 @@ def auth_status():
         "user_email": session.get("user_email", ""),
         "student_id": session.get("student_id"),
         "club_id": session.get("club_id"),
+        "club_name": session.get("club_name"),
         "club_role": session.get("club_role"),
+        "role_title": session.get("role_title"),
+        "available_roles": session.get("available_roles", []),
         "meta": meta
     })
 
@@ -199,6 +204,30 @@ def login():
         }), 200
 
     err, user = authenticate_user(email, password)
+    
+    # Check if student holds multiple memberships and needs to select active persona
+    if err == "SELECT_ROLE":
+        user_info = user["user"]
+        personas = user["personas"]
+        if request.is_json or request.headers.get("X-Requested-With") == "XMLHttpRequest":
+            return jsonify({
+                "status": "select_role",
+                "user_name": user_info["name"],
+                "student_id": user_info.get("student_id"),
+                "email": user_info["email"],
+                "message": f"Welcome back, {user_info['name']}! Please choose your active operating persona:",
+                "roles": personas
+            }), 200
+        return render_template(
+            "auth/login.html",
+            mode="select_role",
+            roles=personas,
+            user_name=user_info["name"],
+            student_id=user_info.get("student_id"),
+            email=user_info["email"],
+            total_users=get_all_users_count()
+        )
+
     if err:
         if request.is_json or request.headers.get("X-Requested-With") == "XMLHttpRequest":
             return jsonify({"status": "error", "message": err}), 401
@@ -212,7 +241,10 @@ def login():
     session["student_id"] = user.get("student_id")
     session["prn"] = user.get("prn")
     session["club_id"] = user.get("club_id")
+    session["club_name"] = user.get("club_name")
     session["club_role"] = user.get("club_role")
+    session["role_title"] = user.get("role_title")
+    session["available_roles"] = user.get("personas", [])
     session.modified = True
 
     if request.is_json or request.headers.get("X-Requested-With") == "XMLHttpRequest":
@@ -228,6 +260,59 @@ def login():
 
     flash(f"Welcome back, {user['name']}! Signed in as {user['role_title']}.", "success")
     return redirect(url_for("main.dashboard"))
+
+@auth_bp.route("/api/auth/select-role", methods=["POST"])
+def select_role():
+    """
+    Selects or switches student persona.
+    Sets active authorization tier strictly based on selected club role:
+      - President: 'president' tier
+      - Secretary / Coordinator / Treasurer: 'coordinator' tier
+      - Core Member / Member: 'member' tier
+    """
+    data = request.get_json() or {}
+    club_id = data.get("club_id")
+    club_name = data.get("club_name", club_id)
+    club_role = data.get("club_role", "Member")
+    role_tier = data.get("role_tier") or classify_role_tier(club_role)
+    student_id = data.get("student_id") or session.get("student_id")
+    email = data.get("email") or session.get("user_email")
+    user_name = data.get("user_name") or session.get("user_name")
+
+    if not user_name and email:
+        for u in SEED_USERS:
+            if u["email"].lower() == email.lower() or email.lower() in [a.lower() for a in u.get("aliases", [])]:
+                user_name = u["name"]
+                student_id = u.get("student_id")
+                break
+
+    personas = get_student_personas(student_id=student_id, email=email)
+
+    session["role"] = role_tier
+    session["club_id"] = club_id
+    session["club_name"] = club_name
+    session["club_role"] = club_role
+    session["role_title"] = f"{club_role} — {club_name}"
+    if user_name:
+        session["user_name"] = user_name
+    if email:
+        session["user_email"] = email
+    if student_id:
+        session["student_id"] = student_id
+    session["available_roles"] = personas
+    session.modified = True
+
+    return jsonify({
+        "status": "ok",
+        "success": True,
+        "role": role_tier,
+        "club_id": club_id,
+        "role_label": session["role_title"],
+        "user_name": session.get("user_name"),
+        "student_id": session.get("student_id"),
+        "message": f"Operating persona activated: {club_role} ({club_name})",
+        "redirect_url": url_for("main.dashboard")
+    }), 200
 
 @auth_bp.route("/signup", methods=["GET", "POST"])
 def signup():

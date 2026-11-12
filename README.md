@@ -126,17 +126,17 @@ To eliminate header clipping across all viewports and browsers:
 1. **Cloud SQL MySQL 8.0:** Provisioned managed instance in Mumbai (`asia-south1-a`) with 10 GB SSD storage.
 2. **Canonical Schema:** 8 fully normalized domain tables populated with real student records, club charters, events, memberships, and feedback.
 3. **Database View (`ClubSummary`):** Clean abstraction joining `Clubs` with advisor metadata and live count statistics.
-4. **8 Production Database Triggers (2 per Member across 4 Members):**
-   - **Member 1:**
+4. **8 Production Database Triggers (4 Core Architectural Modules):**
+   - **Module 1: Membership Lifecycle & Count Synchronization:**
      - `trg_after_membership_insert_sync_count`: Increments `Clubs.member_count` on `AFTER INSERT ON Memberships`.
      - `trg_after_membership_delete_sync_count`: Decrements `Clubs.member_count` on `AFTER DELETE ON Memberships`.
-   - **Member 2:**
+   - **Module 2: Governance & Single-President Bylaws:**
      - `trg_prevent_multiple_presidents`: Enforces single-president rule via `SIGNAL SQLSTATE '45000'` on `BEFORE INSERT ON Memberships`.
      - `trg_adjust_member_count_on_status_change`: Dynamically adjusts counts on `Active <-> Inactive` on `AFTER UPDATE ON Memberships`.
-   - **Member 3:**
+   - **Module 3: Event Lifecycle & Authentic Feedback Integrity:**
      - `trg_prevent_registration_for_completed_event`: Rejects registrations on `Completed` or `Cancelled` events on `BEFORE INSERT ON EventRegistrations`.
      - `trg_verify_feedback_registration`: Verifies authentic registration prior to accepting event reviews on `BEFORE INSERT ON Feedback`.
-   - **Member 4:**
+   - **Module 4: State Progression & Zero-Config Provisioning:**
      - `trg_auto_progress_event_on_attendance`: Flips event status from `Planned` to `Ongoing` upon first check-in on `AFTER UPDATE ON EventRegistrations`.
      - `trg_auto_create_club_profile`: Zero-config provisioning generating institutional email and Instagram handle on `AFTER INSERT ON Clubs`.
 5. **8 Stored Procedures with Cursor Logic:**

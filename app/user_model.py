@@ -21,6 +21,8 @@ import shutil
 import sqlite3
 from werkzeug.security import generate_password_hash, check_password_hash
 from app.seed_users import SEED_USERS
+from app.memberships_data import get_student_personas, classify_role_tier
+
 
 DEFAULT_DB_PATH = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "database", "users.db")
 
@@ -281,7 +283,34 @@ def register_user(email, password, name=""):
         "prn": prn
     }
 
-def authenticate_user(email, password):
+def finalize_authenticated_user(user_record, bypass_role_select=False):
+    """
+    Checks student's club memberships across campus charters.
+    If multiple memberships exist and bypass_role_select is False,
+    returns ('SELECT_ROLE', {'user': user_record, 'personas': personas}).
+    Otherwise auto-binds single/default persona and returns (None, user_record).
+    """
+    sid = user_record.get("student_id")
+    prn = user_record.get("prn")
+    email = user_record.get("email")
+    personas = get_student_personas(student_id=sid, prn=prn, email=email)
+    
+    if len(personas) > 1 and not bypass_role_select:
+        return "SELECT_ROLE", {"user": user_record, "personas": personas}
+    elif len(personas) >= 1:
+        p = personas[0]
+        user_record["role"] = p["role_tier"]
+        user_record["role_title"] = p["role_title"]
+        user_record["club_id"] = p["club_id"]
+        user_record["club_name"] = p["club_name"]
+        user_record["club_role"] = p["club_role"]
+        user_record["personas"] = personas
+        return None, user_record
+    else:
+        user_record["personas"] = []
+        return None, user_record
+
+def authenticate_user(email, password, bypass_role_select=False):
     """
     Authenticates email and password against persistent database, catalog and memory store.
     Accepts:
@@ -289,7 +318,7 @@ def authenticate_user(email, password):
       2. password == 'password123' (Standard demo password)
       3. password == email.split('@')[0]
       4. Stored password hash
-    Returns: (error_message, user_dict)
+    Returns: (error_message, user_dict_or_select_dict)
     """
     if not email or not password:
         return "Please provide both email and password.", None
@@ -319,7 +348,7 @@ def authenticate_user(email, password):
     if email_clean in MEMORY_USERS:
         mem_user = MEMORY_USERS[email_clean]
         if check_valid_pwd(mem_user):
-            return None, {
+            return finalize_authenticated_user({
                 "id": mem_user.get("id", 1),
                 "email": mem_user["email"],
                 "name": mem_user["name"],
@@ -329,7 +358,7 @@ def authenticate_user(email, password):
                 "prn": mem_user.get("prn"),
                 "club_id": mem_user.get("club_id"),
                 "club_role": mem_user.get("club_role")
-            }
+            }, bypass_role_select=bypass_role_select)
         else:
             return "Incorrect password. Enter your email as the password, or use 'password123'.", None
 
@@ -361,7 +390,7 @@ def authenticate_user(email, password):
                 "club_role": matched_seed.get("club_role")
             }
             MEMORY_USERS[email_clean] = user_record
-            return None, user_record
+            return finalize_authenticated_user(user_record, bypass_role_select=bypass_role_select)
 
     # 3. Check SQLite database
     try:
@@ -375,7 +404,7 @@ def authenticate_user(email, password):
             row_dict = dict(row)
             if check_valid_pwd(row_dict):
                 MEMORY_USERS[email_clean] = row_dict
-                return None, row_dict
+                return finalize_authenticated_user(row_dict, bypass_role_select=bypass_role_select)
             else:
                 return "Incorrect password. Enter your email as the password, or use 'password123'.", None
     except Exception as e:
@@ -409,7 +438,7 @@ def authenticate_user(email, password):
         except Exception:
             pass
 
-        return None, user_record
+        return finalize_authenticated_user(user_record, bypass_role_select=bypass_role_select)
 
     return "No account found with this email. Please check your VIT email address.", None
 

@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 
-{% block title %}Club Memberships &amp; Trigger Demo{% endblock %}
+{% block title %}Club Memberships Directory{% endblock %}
 
 {% block content %}
 <div class="app-container">
@@ -9,7 +9,7 @@
     <ul class="app-breadcrumb">
       <li><a href="{{ url_for('main.dashboard') }}"><i class="bi bi-house me-1"></i>Cockpit</a></li>
       <li class="breadcrumb-separator">/</li>
-      <li class="breadcrumb-current">Memberships &amp; Trigger 1 Architecture</li>
+      <li class="breadcrumb-current">Memberships</li>
     </ul>
   </nav>
 
@@ -18,19 +18,16 @@
     <div class="inner-header-layout">
       <div>
         <div class="d-flex align-items-center gap-2 mb-2">
-          <span class="badge-status info font-mono">TRIGGER 1 &amp; TRIGGER 2</span>
-          <span class="text-secondary small">&bull; Automated Base Table Synchronization</span>
+          <span class="badge-status info font-mono">CAMPUS CHARTERS</span>
+          <span class="text-secondary small">&bull; Student Enrollment &amp; Leadership Directory</span>
         </div>
-        <h1 class="inner-page-title">Memberships &amp; Automatic Database Triggers</h1>
-        <p class="inner-page-subtitle">Demonstrating Production Triggers: <code class="font-mono text-white">trg_after_membership_insert_sync_count</code> (Trigger 1) &bull; <code class="font-mono text-white">trg_after_membership_delete_sync_count</code> (Trigger 2)</p>
+        <h1 class="inner-page-title">Club Memberships Directory</h1>
+        <p class="inner-page-subtitle">Manage student affiliations, executive leadership appointments, and active memberships across campus charters.</p>
       </div>
       <div class="d-flex gap-2">
-        <button type="button" class="btn-tesla-secondary" data-bs-toggle="modal" data-bs-target="#trigger1Modal">
-          <i class="bi bi-code-square me-2 text-info"></i> Inspect Trigger 1 SQL
-        </button>
         {% if current_role != 'member' %}
         <a href="{{ url_for('main.create_membership') }}" class="btn-tesla-primary action-write-btn glow-border-hover" data-role-req="admin,manager,guest">
-          <i class="bi bi-lightning-charge-fill me-2"></i> Enroll Member (Fires Trigger 1)
+          <i class="bi bi-person-plus-fill me-2"></i> Enroll Member
         </a>
         {% else %}
         <span class="badge-status neutral px-3 py-2 role-member-locked-badge">
@@ -40,24 +37,6 @@
       </div>
     </div>
   </header>
-
-  <!-- Trigger Technical Banner -->
-  <div class="tesla-card mb-4 p-4 glow-border-hover" style="border-left: 3px solid var(--info);">
-    <div class="d-flex align-items-center justify-content-between flex-wrap gap-3">
-      <div class="d-flex align-items-center gap-3">
-        <i class="bi bi-lightning-charge-fill fs-3 text-info"></i>
-        <div>
-          <strong class="text-white d-block mb-1">Trigger 1 In Action: Automated Cloud SQL Synchronization</strong>
-          <span class="text-secondary small">
-            Every time an active member is enrolled or deleted in this table, <code class="font-mono text-white">trg_after_membership_insert_sync_count</code> or <code class="font-mono text-white">trg_after_membership_delete_sync_count</code> updates <code class="font-mono text-white">Clubs.member_count</code> automatically. Zero application-level recount logic is required.
-          </span>
-        </div>
-      </div>
-      <button type="button" class="btn-tesla-secondary btn-sm" data-bs-toggle="modal" data-bs-target="#trigger1Modal" style="min-width: unset; height: 36px; line-height: 36px; padding: 0 16px;">
-        <i class="bi bi-eye me-1"></i> View Trigger 1 Details
-      </button>
-    </div>
-  </div>
 
   <!-- Filter by Club with Active Filter Chip (Rule 6 & Rule 8) -->
   <div class="tesla-card mb-4 p-3 glow-border-hover">

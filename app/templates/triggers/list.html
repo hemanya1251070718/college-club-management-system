@@ -25,79 +25,19 @@
         <p class="inner-page-subtitle">Production DBMS evaluation: 8 non-identical triggers across 8 canonical domain tables with zero audit table overhead.</p>
       </div>
       <div class="d-flex gap-2">
-        <button type="button" class="btn-tesla-secondary" data-bs-toggle="modal" data-bs-target="#trigger1Modal">
-          <i class="bi bi-code-square me-2 text-info"></i> Inspect Trigger 1 SQL
-        </button>
-        <a href="{{ url_for('main.create_membership') }}" class="btn-tesla-primary">
-          <i class="bi bi-play-circle-fill me-2"></i> Test Trigger 1 Live
+        <a href="{{ url_for('main.procedures_hub') }}" class="btn-tesla-secondary">
+          <i class="bi bi-cpu me-1"></i> Stored Procedures Hub
         </a>
       </div>
     </div>
   </header>
 
-  <!-- =========================================================================
-       TRIGGER 1 SPOTLIGHT CALLOUT (Direct Resolution for Trigger 1 Visibility)
-       ========================================================================= -->
-  <div class="trigger-spotlight-card" id="trigger-1-spotlight" style="border: 2px solid var(--blue-400); box-shadow: 0 0 24px rgba(79, 124, 255, 0.25);">
-    <div class="row align-items-center g-4">
-      <div class="col-lg-8">
-        <div class="d-flex align-items-center gap-2 mb-2">
-          <span class="badge-status info font-mono fw-bold" style="background: var(--blue-500); color: #fff;">★ TRIGGER 1 SPOTLIGHT</span>
-          <span class="badge-status success">AFTER INSERT ON Memberships</span>
-          <span class="badge-status neutral font-mono">Member 1 Assignment</span>
-        </div>
-        <h3 class="text-white fw-bold mb-2 font-mono" style="font-size: 22px;">
-          trg_after_membership_insert_sync_count
-        </h3>
-        <p class="text-secondary small mb-3">
-          Automatic declarative synchronization: When a student enrolls in a club with status <code class="font-mono text-white">'Active'</code>, Cloud SQL immediately increments <code class="font-mono text-white">Clubs.member_count</code> by +1 directly in the base table. Eliminates manual application-layer recounts.
-        </p>
-        <div class="d-flex flex-wrap gap-2 mb-3">
-          <span class="badge-status neutral"><i class="bi bi-table me-1"></i>Monitored: Memberships</span>
-          <span class="badge-status neutral"><i class="bi bi-pencil-square me-1"></i>Updated: Clubs.member_count</span>
-          <span class="badge-status neutral"><i class="bi bi-speedometer2 me-1"></i>Execution Complexity: O(1)</span>
-          <span class="badge-status success"><i class="bi bi-check2-circle me-1"></i>Live in Cloud SQL Engine</span>
-        </div>
-      </div>
-      <div class="col-lg-4 text-lg-end">
-        <div class="d-flex flex-column gap-2">
-          <a href="{{ url_for('main.create_membership') }}" class="btn-tesla-primary w-100">
-            <i class="bi bi-play-circle-fill me-2"></i> Enroll Member to Fire Trigger 1
-          </a>
-          <button type="button" class="btn-tesla-secondary w-100" data-bs-toggle="modal" data-bs-target="#trigger1Modal">
-            <i class="bi bi-card-checklist me-2"></i> View Verification Protocol
-          </button>
-        </div>
-      </div>
-    </div>
-
-    <!-- Inline Syntax-Highlighted Production SQL Definition -->
-    <div class="mt-3 pt-3 border-top" style="border-color: rgba(79, 124, 255, 0.25) !important;">
-      <div class="d-flex justify-content-between align-items-center mb-2">
-        <span class="text-white small fw-medium font-mono"><i class="bi bi-terminal-fill me-2 text-info"></i>PRODUCTION SQL DDL DEFINITION (MEMBER 1)</span>
-        <span class="badge-status success small">COMPLIANT &amp; TESTED</span>
-      </div>
-      <pre class="trigger-code-box mb-0" style="background: #060815; border: 1px solid rgba(79, 124, 255, 0.3);"><code style="color: #7DD3FC;">DELIMITER $$
-CREATE TRIGGER trg_after_membership_insert_sync_count
-AFTER INSERT ON Memberships
-FOR EACH ROW
-BEGIN
-    IF NEW.status = 'Active' THEN
-        UPDATE Clubs
-        SET member_count = member_count + 1
-        WHERE club_id = NEW.club_id;
-    END IF;
-END $$
-DELIMITER ;</code></pre>
-    </div>
-  </div>
-
-  <!-- Team Distribution 4-Pillar Grid (Tesla Cards, Zero 3D Tilt Glitch) -->
+  <!-- Team Distribution 4-Pillar Grid -->
   <div class="row g-4 mb-5">
     <div class="col-md-6 col-xl-3">
       <div class="tesla-card h-100" style="border-top: 2px solid var(--blue-400);">
         <div class="d-flex justify-content-between align-items-center mb-3">
-          <span class="badge-status info">MEMBER 1</span>
+          <span class="badge-status info">LIFECYCLE</span>
           <span class="text-secondary small">Triggers 1 &amp; 2</span>
         </div>
         <h4 class="text-white fw-medium mb-2" style="font-size: 16px;">Club Size Automation</h4>
@@ -108,9 +48,9 @@ DELIMITER ;</code></pre>
     </div>
 
     <div class="col-md-6 col-xl-3">
-      <div class="tesla-card h-100">
+      <div class="tesla-card h-100" style="border-top: 2px solid var(--success);">
         <div class="d-flex justify-content-between align-items-center mb-3">
-          <span class="badge-status success">MEMBER 2</span>
+          <span class="badge-status success">GOVERNANCE</span>
           <span class="text-secondary small">Triggers 3 &amp; 4</span>
         </div>
         <h4 class="text-white fw-medium mb-2" style="font-size: 16px;">Governance &amp; Status</h4>
@@ -121,9 +61,9 @@ DELIMITER ;</code></pre>
     </div>
 
     <div class="col-md-6 col-xl-3">
-      <div class="tesla-card h-100">
+      <div class="tesla-card h-100" style="border-top: 2px solid var(--warning);">
         <div class="d-flex justify-content-between align-items-center mb-3">
-          <span class="badge-status warning">MEMBER 3</span>
+          <span class="badge-status warning">INTEGRITY</span>
           <span class="text-secondary small">Triggers 5 &amp; 6</span>
         </div>
         <h4 class="text-white fw-medium mb-2" style="font-size: 16px;">Event Integrity &amp; Reviews</h4>
@@ -134,9 +74,9 @@ DELIMITER ;</code></pre>
     </div>
 
     <div class="col-md-6 col-xl-3">
-      <div class="tesla-card h-100">
+      <div class="tesla-card h-100" style="border-top: 2px solid var(--violet-400);">
         <div class="d-flex justify-content-between align-items-center mb-3">
-          <span class="badge-status neutral" style="color: var(--violet-400);">MEMBER 4</span>
+          <span class="badge-status neutral" style="color: var(--violet-400);">PROVISIONING</span>
           <span class="text-secondary small">Triggers 7 &amp; 8</span>
         </div>
         <h4 class="text-white fw-medium mb-2" style="font-size: 16px;">Lifecycle &amp; Provisioning</h4>
@@ -154,8 +94,8 @@ DELIMITER ;</code></pre>
       <span class="badge-status neutral font-mono">8 Canonical Base Tables</span>
     </div>
     <div class="table-responsive" style="overflow-x: auto; overflow-y: visible !important;">
-      <table class="tesla-table" style="border-collapse: separate; border-spacing: 0; width: 100%;">
-        <thead style="position: static;">
+      <table class="tesla-table" style="width: 100%;">
+        <thead>
           <tr>
             <th style="width: 5%; padding: 16px 20px; background: var(--surface-2);">#</th>
             <th style="width: 25%; padding: 16px 20px; background: var(--surface-2);">Trigger Name</th>
@@ -165,36 +105,28 @@ DELIMITER ;</code></pre>
           </tr>
         </thead>
         <tbody>
-          <!-- Trigger 1 (Always Visible, Zero Stacking Bug, Inspectable) -->
-          <tr id="trigger-1" style="background: rgba(79, 124, 255, 0.12); border-left: 4px solid var(--blue-400); scroll-margin-top: 120px;">
-            <td style="padding-top: 20px;">
-              <span class="badge-status info font-mono fw-bold" style="background: var(--blue-500); color: #fff; font-size: 13px;">★ 1</span>
+          <!-- Trigger 1 -->
+          <tr>
+            <td><span class="badge-status info font-mono">1</span></td>
+            <td>
+              <strong class="text-white font-mono">trg_after_membership_insert_sync_count</strong>
+              <small class="d-block text-secondary">Membership Lifecycle</small>
             </td>
-            <td style="padding-top: 20px;">
-              <strong class="text-white font-mono" style="font-size: 14.5px;">trg_after_membership_insert_sync_count</strong>
-              <span class="badge bg-primary ms-1" style="font-size: 10px; vertical-align: middle;">TRIGGER 1 (MEMBER 1)</span>
-              <small class="d-block text-info mt-1"><i class="bi bi-arrow-repeat me-1"></i>Member 1 &bull; Auto-Increment Sync directly on Clubs table</small>
-            </td>
-            <td style="padding-top: 20px;">
-              <span class="badge-status success fw-bold">AFTER INSERT</span>
+            <td>
+              <span class="badge-status success">AFTER INSERT</span>
               <small class="d-block text-secondary mt-1 font-mono">Memberships &rarr; Clubs</small>
             </td>
-            <td style="padding-top: 20px;">
+            <td>
               When a student joins a club with status <code class="font-mono text-white">'Active'</code>, <code class="font-mono text-white">Clubs.member_count</code> automatically increments by 1 directly in the Cloud SQL base table.
             </td>
-            <td style="padding-top: 20px;" class="text-end">
-              <div class="d-inline-flex gap-1">
-                <button type="button" class="btn-ghost-action text-info" data-bs-toggle="modal" data-bs-target="#trigger1Modal" title="Inspect Trigger 1 SQL Code">
-                  <i class="bi bi-code-slash me-1"></i>SQL
-                </button>
-                {% if can_test_trigger(1) %}
-                <a href="{{ url_for('main.create_membership') }}" class="btn-tesla-primary" style="padding: 4px 10px; font-size: 12px;" title="Enroll Member to Fire Trigger 1">
-                  Test Live
-                </a>
-                {% else %}
-                <span class="badge-status neutral small"><i class="bi bi-lock me-1"></i>Protected</span>
-                {% endif %}
-              </div>
+            <td class="text-end">
+              {% if can_test_trigger(1) %}
+              <a href="{{ url_for('main.create_membership') }}" class="btn-ghost-action text-info">
+                Test Live
+              </a>
+              {% else %}
+              <span class="badge-status neutral small"><i class="bi bi-lock me-1"></i>Protected</span>
+              {% endif %}
             </td>
           </tr>
 
@@ -203,7 +135,7 @@ DELIMITER ;</code></pre>
             <td><span class="badge-status info font-mono">2</span></td>
             <td>
               <strong class="text-white font-mono">trg_after_membership_delete_sync_count</strong>
-              <small class="d-block text-secondary">Member 1</small>
+              <small class="d-block text-secondary">Membership Lifecycle</small>
             </td>
             <td>
               <span class="badge-status danger">AFTER DELETE</span>
@@ -228,7 +160,7 @@ DELIMITER ;</code></pre>
             <td><span class="badge-status success font-mono">3</span></td>
             <td>
               <strong class="text-white font-mono">trg_prevent_multiple_presidents</strong>
-              <small class="d-block text-secondary">Member 2</small>
+              <small class="d-block text-secondary">Club Bylaws</small>
             </td>
             <td>
               <span class="badge-status warning">BEFORE INSERT</span>
@@ -247,13 +179,12 @@ DELIMITER ;</code></pre>
               {% endif %}
             </td>
           </tr>
-
           <!-- Trigger 4 -->
           <tr>
             <td><span class="badge-status success font-mono">4</span></td>
             <td>
               <strong class="text-white font-mono">trg_adjust_member_count_on_status_change</strong>
-              <small class="d-block text-secondary">Member 2</small>
+              <small class="d-block text-secondary">Membership Governance</small>
             </td>
             <td>
               <span class="badge-status info">AFTER UPDATE</span>
@@ -278,7 +209,7 @@ DELIMITER ;</code></pre>
             <td><span class="badge-status warning font-mono">5</span></td>
             <td>
               <strong class="text-white font-mono">trg_prevent_registration_for_completed_event</strong>
-              <small class="d-block text-secondary">Member 3</small>
+              <small class="d-block text-secondary">Event Integrity</small>
             </td>
             <td>
               <span class="badge-status warning">BEFORE INSERT</span>
@@ -303,7 +234,7 @@ DELIMITER ;</code></pre>
             <td><span class="badge-status warning font-mono">6</span></td>
             <td>
               <strong class="text-white font-mono">trg_verify_feedback_registration</strong>
-              <small class="d-block text-secondary">Member 3</small>
+              <small class="d-block text-secondary">Feedback Verification</small>
             </td>
             <td>
               <span class="badge-status warning">BEFORE INSERT</span>
@@ -328,7 +259,7 @@ DELIMITER ;</code></pre>
             <td><span class="badge-status neutral font-mono" style="color: var(--violet-400);">7</span></td>
             <td>
               <strong class="text-white font-mono">trg_auto_progress_event_on_attendance</strong>
-              <small class="d-block text-secondary">Member 4</small>
+              <small class="d-block text-secondary">Attendance Progression</small>
             </td>
             <td>
               <span class="badge-status info">AFTER UPDATE</span>
@@ -353,8 +284,25 @@ DELIMITER ;</code></pre>
             <td><span class="badge-status neutral font-mono" style="color: var(--violet-400);">8</span></td>
             <td>
               <strong class="text-white font-mono">trg_auto_create_club_profile</strong>
-              <small class="d-block text-secondary">Member 4</small>
+              <small class="d-block text-secondary">System Provisioning</small>
             </td>
+            <td>
+              <span class="badge-status success">AFTER INSERT</span>
+              <small class="d-block text-secondary mt-1 font-mono">Clubs</small>
+            </td>
+            <td>
+              Zero-config provisioning: When a new club is created, automatically provisions baseline profile row with institutional email and Instagram handle in <code class="font-mono text-white">ClubProfile</code>.
+            </td>
+            <td class="text-end">
+              {% if can_test_trigger(8) %}
+              <a href="{{ url_for('main.create_club') }}" class="btn-ghost-action text-success">
+                Create Club
+              </a>
+              {% else %}
+              <span class="badge-status neutral small"><i class="bi bi-lock me-1"></i>President/Admin Only</span>
+              {% endif %}
+            </td>
+          </tr>
             <td>
               <span class="badge-status success">AFTER INSERT</span>
               <small class="d-block text-secondary mt-1 font-mono">Clubs</small>

@@ -468,6 +468,72 @@
       color: #6D28D9;
     }
 
+    /* Interactive Persona Selection Cards */
+    .persona-select-card {
+      background: #FAFAFB;
+      border: 1.5px solid #E2E2EA;
+      border-radius: 14px;
+      padding: 14px 16px;
+      cursor: pointer;
+      transition: all 0.22s ease;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      text-align: left;
+    }
+    .persona-select-card:hover {
+      background: #F5F3FF;
+      border-color: #7C3AED;
+      transform: translateY(-2px);
+      box-shadow: 0 8px 24px rgba(124, 58, 237, 0.16);
+    }
+    .persona-card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .persona-club-name {
+      font-size: 13.5px;
+      font-weight: 700;
+      color: #171725;
+    }
+    .persona-role-title {
+      font-size: 13px;
+      font-weight: 600;
+      color: #7C3AED;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .persona-perm-desc {
+      font-size: 11.5px;
+      color: #696974;
+      line-height: 1.45;
+      margin: 0;
+    }
+    .persona-card-footer {
+      display: flex;
+      justify-content: flex-end;
+      align-items: center;
+      margin-top: 4px;
+    }
+    .btn-select-persona-pill {
+      background: linear-gradient(135deg, #7C3AED 0%, #6366F1 100%);
+      color: #FFFFFF;
+      font-size: 11.5px;
+      font-weight: 600;
+      border: none;
+      border-radius: 6px;
+      padding: 5px 12px;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      transition: all 0.15s ease;
+    }
+    .persona-select-card:hover .btn-select-persona-pill {
+      box-shadow: 0 4px 12px rgba(124, 58, 237, 0.35);
+    }
+
     /* Responsive */
     @media (max-width: 992px) {
       .switchd-content {
@@ -693,85 +759,128 @@
             {% endif %}
           {% endwith %}
 
-          <!-- Card Header -->
-          <h2 class="white-card-title" id="form-heading">
-            {% if mode == 'signup' %}Create Account...{% else %}Welcome Back...{% endif %}
-          </h2>
-          <p class="white-card-sub" id="form-subheading">
-            {% if mode == 'signup' %}Enter your official VIT Pune email to auto-detect role{% else %}Please enter your email and password{% endif %}
-          </p>
+          <!-- Standard Credentials Auth View -->
+          <div id="auth-form-view" style="{% if mode == 'select_role' %}display: none;{% endif %}">
+            <!-- Card Header -->
+            <h2 class="white-card-title" id="form-heading">
+              {% if mode == 'signup' %}Create Account...{% else %}Welcome Back...{% endif %}
+            </h2>
+            <p class="white-card-sub" id="form-subheading">
+              {% if mode == 'signup' %}Enter your official VIT Pune email to auto-detect role{% else %}Please enter your email and password{% endif %}
+            </p>
 
-          <!-- The Authentication Form -->
-          <form id="auth-main-form" method="POST" action="{% if mode == 'signup' %}{{ url_for('auth.signup') }}{% else %}{{ url_for('auth.login') }}{% endif %}">
-            
-            <!-- Full Name (Only for Sign Up) -->
-            <div class="switchd-input-group" id="name-group" style="{% if mode != 'signup' %}display: none;{% endif %}">
-              <label for="input-name">Full Name</label>
-              <input type="text" name="name" id="input-name" class="switchd-input" placeholder="e.g. Aarav Deshmukh" value="{{ name|default('') }}">
-              <i class="bi bi-person switchd-input-icon"></i>
+            <!-- The Authentication Form -->
+            <form id="auth-main-form" method="POST" action="{% if mode == 'signup' %}{{ url_for('auth.signup') }}{% else %}{{ url_for('auth.login') }}{% endif %}">
+              
+              <!-- Full Name (Only for Sign Up) -->
+              <div class="switchd-input-group" id="name-group" style="{% if mode != 'signup' %}display: none;{% endif %}">
+                <label for="input-name">Full Name</label>
+                <input type="text" name="name" id="input-name" class="switchd-input" placeholder="e.g. Aarav Deshmukh" value="{{ name|default('') }}">
+                <i class="bi bi-person switchd-input-icon"></i>
+              </div>
+
+              <!-- Email Address (Strictly checked against VIT standards) -->
+              <div class="switchd-input-group">
+                <label for="input-email">College Email Address</label>
+                <input type="email" name="email" id="input-email" class="switchd-input" placeholder="e.g. name.prn@vit.edu" value="{{ email|default('') }}" required autocomplete="username">
+                <i class="bi bi-at switchd-input-icon"></i>
+              </div>
+
+              <!-- Interactive Real-Time Role Detection Badge -->
+              <div id="role-detected-box" class="role-detection-pill">
+                <i class="bi bi-info-circle"></i>
+                <span id="role-detected-text"></span>
+              </div>
+
+              <!-- Password -->
+              <div class="switchd-input-group">
+                <label for="input-password">Password</label>
+                <input type="password" name="password" id="input-password" class="switchd-input" placeholder="Enter password" required autocomplete="current-password">
+                <i class="bi bi-lock switchd-input-icon" id="toggle-pwd-icon" style="cursor: pointer; pointer-events: auto;"></i>
+              </div>
+
+              <!-- Terms -->
+              <div class="switchd-terms">
+                By login, you agree to our <a href="#">Terms &amp; Conditions</a> &bull; <a href="#">Security Policy</a>
+              </div>
+
+              <!-- Action Button -->
+              <button type="submit" id="btn-submit-auth" class="btn-switchd-action">
+                <span id="btn-text">{% if mode == 'signup' %}sign up...{% else %}login...{% endif %}</span>
+                <i class="bi bi-arrow-right fs-5"></i>
+              </button>
+            </form>
+
+            <!-- Bottom Switch Link (Toggle Log In vs Sign Up) -->
+            <div class="switchd-bottom-toggle">
+              <span id="toggle-prompt">{% if mode == 'signup' %}Already have an account?{% else %}Don't have an account yet?{% endif %}</span>
+              <a id="toggle-form-mode" class="ms-1">{% if mode == 'signup' %}Log In{% else %}Create Account{% endif %}</a>
             </div>
 
-            <!-- Email Address (Strictly checked against VIT standards) -->
-            <div class="switchd-input-group">
-              <label for="input-email">College Email Address</label>
-              <input type="email" name="email" id="input-email" class="switchd-input" placeholder="e.g. name.prn@vit.edu" value="{{ email|default('') }}" required autocomplete="username">
-              <i class="bi bi-at switchd-input-icon"></i>
+            <!-- Quick 1-Click Demo Credentials for Viva / Evaluation -->
+            <div class="demo-chips-box">
+              <div class="demo-chips-title">Quick 1-Click Demo Accounts (Username == Password):</div>
+              <div class="d-flex flex-wrap gap-2 mb-2">
+                <button type="button" class="demo-chip-btn" data-fill-email="sharma.principal@vit.edu" data-fill-role="Principal">
+                  <span>👑 Principal (Admin)</span>
+                </button>
+                <button type="button" class="demo-chip-btn" data-fill-email="aditya.12410214.president@vit.edu" data-fill-role="President">
+                  <span>🏆 CSI President</span>
+                </button>
+                <button type="button" class="demo-chip-btn" data-fill-email="priya.12410219.secretary@vit.edu" data-fill-role="Secretary">
+                  <span>👔 CSI Secretary</span>
+                </button>
+                <button type="button" class="demo-chip-btn" data-fill-email="hemanya.1251070718@vit.edu" data-fill-role="Member">
+                  <span>🎓 Hemanya (Multi-Role)</span>
+                </button>
+                <button type="button" class="demo-chip-btn" data-fill-email="rohan.1251070725@vit.edu" data-fill-role="Student">
+                  <span>👤 Rohan (Student)</span>
+                </button>
+              </div>
+              <div style="color: #92929D; font-size: 11.5px; line-height: 1.4;">
+                💡 <strong>All 75 students &amp; faculty pre-registered:</strong> Username and password are identical (e.g. <code style="color: #A78BFA;">hemanya.1251070718@vit.edu</code>), or enter <code style="color: #A78BFA;">password123</code>.
+              </div>
             </div>
-
-            <!-- Interactive Real-Time Role Detection Badge -->
-            <div id="role-detected-box" class="role-detection-pill">
-              <i class="bi bi-info-circle"></i>
-              <span id="role-detected-text"></span>
-            </div>
-
-            <!-- Password -->
-            <div class="switchd-input-group">
-              <label for="input-password">Password</label>
-              <input type="password" name="password" id="input-password" class="switchd-input" placeholder="Enter password" required autocomplete="current-password">
-              <i class="bi bi-lock switchd-input-icon" id="toggle-pwd-icon" style="cursor: pointer; pointer-events: auto;"></i>
-            </div>
-
-            <!-- Terms -->
-            <div class="switchd-terms">
-              By login, you agree to our <a href="#">Terms &amp; Conditions</a> &bull; <a href="#">Security Policy</a>
-            </div>
-
-            <!-- Action Button -->
-            <button type="submit" id="btn-submit-auth" class="btn-switchd-action">
-              <span id="btn-text">{% if mode == 'signup' %}sign up...{% else %}login...{% endif %}</span>
-              <i class="bi bi-arrow-right fs-5"></i>
-            </button>
-          </form>
-
-          <!-- Bottom Switch Link (Toggle Log In vs Sign Up) -->
-          <div class="switchd-bottom-toggle">
-            <span id="toggle-prompt">{% if mode == 'signup' %}Already have an account?{% else %}Don't have an account yet?{% endif %}</span>
-            <a id="toggle-form-mode" class="ms-1">{% if mode == 'signup' %}Log In{% else %}Create Account{% endif %}</a>
           </div>
 
-          <!-- Quick 1-Click Demo Credentials for Viva / Evaluation -->
-          <div class="demo-chips-box">
-            <div class="demo-chips-title">Quick 1-Click Demo Accounts (Username == Password):</div>
-            <div class="d-flex flex-wrap gap-2 mb-2">
-              <button type="button" class="demo-chip-btn" data-fill-email="sharma.principal@vit.edu" data-fill-role="Principal">
-                <span>👑 Principal (Admin)</span>
-              </button>
-              <button type="button" class="demo-chip-btn" data-fill-email="aditya.12410214.president@vit.edu" data-fill-role="President">
-                <span>🏆 CSI President</span>
-              </button>
-              <button type="button" class="demo-chip-btn" data-fill-email="priya.12410219.secretary@vit.edu" data-fill-role="Secretary">
-                <span>👔 CSI Secretary</span>
-              </button>
-              <button type="button" class="demo-chip-btn" data-fill-email="hemanya.1251070718@vit.edu" data-fill-role="Member">
-                <span>🎓 Hemanya (Core Member)</span>
-              </button>
-              <button type="button" class="demo-chip-btn" data-fill-email="rohan.1251070725@vit.edu" data-fill-role="Student">
-                <span>👤 Rohan (Student)</span>
-              </button>
+          <!-- Interactive Persona / Role Selection Panel (Multi-Role Support) -->
+          <div id="persona-selection-view" style="{% if mode != 'select_role' %}display: none;{% endif %}">
+            <div class="d-flex align-items-center gap-2 mb-2">
+              <span class="badge-status info" style="font-size: 11px;"><i class="bi bi-person-badge-fill me-1"></i>Multi-Role Affiliation</span>
+              <span class="text-secondary small font-monospace" id="persona-prn-badge" style="font-size: 11px;">{{ student_id|default('') }}</span>
             </div>
-            <div style="color: #92929D; font-size: 11.5px; line-height: 1.4;">
-              💡 <strong>All 75 students &amp; faculty pre-registered:</strong> Username and password are identical (e.g. <code style="color: #A78BFA;">hemanya.1251070718@vit.edu</code>), or enter <code style="color: #A78BFA;">password123</code>.
+            <h2 class="white-card-title mb-1" style="font-size: 20px;">Select Active Persona</h2>
+            <p class="white-card-sub mb-3" style="font-size: 13px;">
+              Signed in as <strong id="persona-display-name" class="text-dark">{{ user_name|default('Student') }}</strong>. You hold active appointments across multiple campus charters. Choose which persona to operate as:
+            </p>
+
+            <div id="persona-cards-container" class="d-flex flex-column gap-3 mb-3">
+              {% if roles %}
+                {% for r in roles %}
+                <div class="persona-select-card" onclick="selectPersonaDirect('{{ r.club_id }}', '{{ r.club_name }}', '{{ r.club_role }}', '{{ r.role_tier }}', '{{ r.role_title }}', '{{ email|default('') }}', '{{ student_id|default('') }}', '{{ user_name|default('') }}')">
+                  <div class="persona-card-header">
+                    <div class="persona-club-name">
+                      <i class="bi {{ r.icon|default('bi-shield') }} me-1 text-primary"></i> {{ r.club_name }}
+                      <span class="text-secondary small font-monospace" style="font-size: 10px;">({{ r.club_id }})</span>
+                    </div>
+                    <span class="{{ r.tier_badge_class|default('badge-status info') }}" style="font-size: 10.5px;">{{ r.tier_label|default(r.role_tier|upper) }}</span>
+                  </div>
+                  <div class="persona-role-title">
+                    <span>{{ r.club_role }}</span>
+                    <span class="text-secondary" style="font-weight: 400; font-size: 11px;">&bull; {{ r.club_category }} Charter</span>
+                  </div>
+                  <p class="persona-perm-desc">{{ r.permissions_summary }}</p>
+                  <div class="persona-card-footer">
+                    <span class="btn-select-persona-pill">Enter Cockpit as {{ r.club_role }} &rarr;</span>
+                  </div>
+                </div>
+                {% endfor %}
+              {% endif %}
             </div>
+
+            <button type="button" id="persona-back-btn" class="btn btn-link text-secondary text-decoration-none p-0 small">
+              <i class="bi bi-arrow-left me-1"></i> Sign in with different credentials
+            </button>
           </div>
 
         </div>
@@ -957,6 +1066,46 @@
         })
         .then(res => res.json().then(data => ({ status: res.status, data })))
         .then(({ status, data }) => {
+          if (status === 200 && data.status === "select_role") {
+            // Multi-role selection screen
+            document.getElementById("auth-form-view").style.display = "none";
+            const personaView = document.getElementById("persona-selection-view");
+            personaView.style.display = "block";
+
+            document.getElementById("persona-display-name").textContent = data.user_name || "Student";
+            document.getElementById("persona-prn-badge").textContent = data.student_id || data.email;
+
+            const container = document.getElementById("persona-cards-container");
+            container.innerHTML = "";
+
+            data.roles.forEach(r => {
+              const card = document.createElement("div");
+              card.className = "persona-select-card";
+              card.innerHTML = `
+                <div class="persona-card-header">
+                  <div class="persona-club-name">
+                    <i class="bi ${r.icon || 'bi-shield'} me-1 text-primary"></i> ${r.club_name}
+                    <span class="text-secondary small font-monospace" style="font-size: 10px;">(${r.club_id})</span>
+                  </div>
+                  <span class="${r.tier_badge_class || 'badge-status info'}" style="font-size: 10.5px;">${r.tier_label || r.role_tier.toUpperCase()}</span>
+                </div>
+                <div class="persona-role-title">
+                  <span>${r.club_role}</span>
+                  <span class="text-secondary" style="font-weight: 400; font-size: 11px;">&bull; ${r.club_category} Charter</span>
+                </div>
+                <p class="persona-perm-desc">${r.permissions_summary}</p>
+                <div class="persona-card-footer">
+                  <span class="btn-select-persona-pill">Enter Cockpit as ${r.club_role} &rarr;</span>
+                </div>
+              `;
+              card.addEventListener("click", () => {
+                selectPersonaDirect(r.club_id, r.club_name, r.club_role, r.role_tier, r.role_title, data.email, data.student_id, data.user_name);
+              });
+              container.appendChild(card);
+            });
+            return;
+          }
+
           if (status === 200 && data.status === "ok") {
             // Save registered accounts in localStorage to guarantee zero serverless amnesia
             try {
@@ -1010,6 +1159,54 @@
           form.submit();
         });
       });
+      // Direct Persona Selection Handler
+      window.selectPersonaDirect = function(clubId, clubName, clubRole, roleTier, roleTitle, email, studentId, userName) {
+        fetch("{{ url_for('auth.select_role') }}", {
+          method: "POST",
+          headers: { "Content-Type": "application/json", "X-Requested-With": "XMLHttpRequest" },
+          body: JSON.stringify({
+            email: email,
+            student_id: studentId,
+            user_name: userName,
+            club_id: clubId,
+            club_name: clubName,
+            club_role: clubRole,
+            role_tier: roleTier,
+            role_title: roleTitle
+          })
+        })
+        .then(res => res.json())
+        .then(res => {
+          if (res.status === "ok") {
+            const overlay = document.getElementById("gpay-success-overlay");
+            const gpayTitle = document.getElementById("gpay-title");
+            const gpayRole = document.getElementById("gpay-role-name");
+            const gpayDesc = document.getElementById("gpay-desc");
+
+            gpayTitle.textContent = "Persona Activated";
+            gpayRole.textContent = `${clubRole} — ${clubName}`;
+            gpayDesc.textContent = `Operating privileges configured. Entering cockpit...`;
+
+            overlay.classList.add("is-active");
+
+            setTimeout(() => {
+              window.location.href = res.redirect_url || "{{ url_for('main.dashboard') }}";
+            }, 1400);
+          }
+        })
+        .catch(err => {
+          window.location.href = "{{ url_for('main.dashboard') }}";
+        });
+      };
+
+      // Back Button for Persona Selection
+      const backBtn = document.getElementById("persona-back-btn");
+      if (backBtn) {
+        backBtn.addEventListener("click", () => {
+          document.getElementById("persona-selection-view").style.display = "none";
+          document.getElementById("auth-form-view").style.display = "block";
+        });
+      }
     });
   </script>
 </body>

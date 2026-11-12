@@ -248,22 +248,22 @@
           <div class="tesla-card h-100 glow-border-hover d-flex flex-column justify-content-between">
             <div>
               <div class="d-flex justify-content-between align-items-center mb-3">
-                <span class="badge-status info">MEMBER 1</span>
+                <span class="badge-status info">LIFECYCLE</span>
                 <span class="text-info small font-mono">T1 &amp; T2</span>
               </div>
-              <h4 class="text-white fw-medium mb-2" style="font-size: 16px;">Trigger 1: Count Sync</h4>
+              <h4 class="text-white fw-medium mb-2" style="font-size: 16px;">Count Synchronization</h4>
               <p class="text-secondary small mb-3">
                 Automatic sync of <code class="font-mono text-white">Clubs.member_count</code> on active join (Trigger 1) and departure (Trigger 2).
               </p>
             </div>
-            <button type="button" class="btn-ghost-action text-info p-0 text-start small" data-bs-toggle="modal" data-bs-target="#trigger1Modal">
-              <i class="bi bi-code-square me-1"></i> Inspect Trigger 1 SQL &rarr;
-            </button>
+            <a href="{{ url_for('main.list_triggers') }}" class="btn-ghost-action text-info p-0 text-start small">
+              <i class="bi bi-lightning-charge me-1"></i> View All 8 Triggers &rarr;
+            </a>
           </div>
         </div>
         <div class="col-md-6 col-lg-3">
           <div class="tesla-card h-100 glow-border-hover">
-            <span class="badge-status success mb-3">MEMBER 2 &bull; T3 &amp; T4</span>
+            <span class="badge-status success mb-3">GOVERNANCE &bull; T3 &amp; T4</span>
             <h4 class="text-white fw-medium mb-2" style="font-size: 16px;">Single-President Rule</h4>
             <p class="text-secondary small mb-0">
               Enforces single active president per club via SQLSTATE 45000 exception handling.
@@ -272,7 +272,7 @@
         </div>
         <div class="col-md-6 col-lg-3">
           <div class="tesla-card h-100 glow-border-hover">
-            <span class="badge-status warning mb-3">MEMBER 3 &bull; T5 &amp; T6</span>
+            <span class="badge-status warning mb-3">INTEGRITY &bull; T5 &amp; T6</span>
             <h4 class="text-white fw-medium mb-2" style="font-size: 16px;">Registration &amp; Feedback</h4>
             <p class="text-secondary small mb-0">
               Blocks retrospective joins on past events &amp; validates attendee review integrity.
@@ -281,7 +281,7 @@
         </div>
         <div class="col-md-6 col-lg-3">
           <div class="tesla-card h-100 glow-border-hover">
-            <span class="badge-status neutral mb-3" style="color: var(--violet-400);">MEMBER 4 &bull; T7 &amp; T8</span>
+            <span class="badge-status neutral mb-3" style="color: var(--violet-400);">PROVISIONING &bull; T7 &amp; T8</span>
             <h4 class="text-white fw-medium mb-2" style="font-size: 16px;">Status &amp; Provisioning</h4>
             <p class="text-secondary small mb-0">
               Auto-advances event status on attendance and provisions default ClubProfile.
@@ -297,9 +297,9 @@
         <a href="{{ url_for('main.list_triggers') }}" class="btn-tesla-primary glow-border-hover">
           Explore 8 Triggers Suite
         </a>
-        <button type="button" class="btn-tesla-secondary glow-border-hover" data-bs-toggle="modal" data-bs-target="#trigger1Modal">
-          <i class="bi bi-code-square me-2 text-info"></i> Inspect Trigger 1 SQL
-        </button>
+        <a href="{{ url_for('main.procedures_hub') }}" class="btn-tesla-secondary glow-border-hover">
+          <i class="bi bi-cpu me-2 text-info"></i> Stored Procedures Hub
+        </a>
       </div>
       <a href="#procedures" class="scroll-chevron" aria-label="Scroll to Procedures Hub">
         <i class="bi bi-chevron-down"></i>

@@ -448,5 +448,32 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
+  /**
+   * IN-APP MULTI-ROLE PERSONA SWITCHER
+   * Allows students with multiple club memberships to switch operating persona on the fly
+   */
+  window.switchPersonaInApp = function(clubId, clubName, clubRole, roleTier, roleTitle) {
+    fetch('/api/auth/select-role', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'X-Requested-With': 'XMLHttpRequest' },
+      body: JSON.stringify({
+        club_id: clubId,
+        club_name: clubName,
+        club_role: clubRole,
+        role_tier: roleTier,
+        role_title: roleTitle
+      })
+    })
+    .then(res => res.json())
+    .then(data => {
+      if (data.status === 'ok') {
+        window.location.reload();
+      }
+    })
+    .catch(() => {
+      window.location.reload();
+    });
+  };
+
   console.info("ClubHub DBMS • Shneiderman 8 Golden Rules Suite Initialized");
 });
