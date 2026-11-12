@@ -134,11 +134,12 @@ html {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   scroll-behavior: smooth;
+  scroll-padding-top: 96px;
 }
 
 /* Target Anchor Offset to Prevent Fixed Header Clipping */
-section[id], [id^="trigger-"], [id^="proc-"] {
-  scroll-margin-top: 84px;
+section[id], [id^="trigger-"], [id^="proc-"], tr[id], div[id] {
+  scroll-margin-top: 96px;
 }
 
 /* Skip to Main Content Link (WCAG 2.4.1 Bypass Blocks) */
