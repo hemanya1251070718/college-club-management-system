@@ -164,3 +164,74 @@ def test_signup_validation_and_registration(client):
     res_valid = client.post("/signup", json={"email": unique_email, "password": "mypassword123", "name": "Sneha Kulkarni"})
     assert res_valid.status_code == 200
     assert res_valid.get_json()["role"] == "member"
+
+def test_all_75_students_preseeded_and_username_equals_password(client):
+    """
+    Verifies that all 75 students are pre-seeded in the authentication catalog,
+    and can log in directly with username == password (or 'password123').
+    """
+    from app.user_model import authenticate_user, MEMORY_USERS, get_all_users_count
+    
+    # Check that at least 76 accounts (75 students + 1 principal) exist in catalog
+    assert len(MEMORY_USERS) >= 76
+    assert get_all_users_count() >= 76
+
+    # Test student login with username == password
+    err, user = authenticate_user("hemanya.1251070718@vit.edu", "hemanya.1251070718@vit.edu")
+    assert err is None
+    assert user["role"] in ["coordinator", "member"]
+    assert user["student_id"] == "CE25-0718"
+
+    # Test student member login with username == password
+    err_mem, user_mem = authenticate_user("jiya.1251070870@vit.edu", "jiya.1251070870@vit.edu")
+    assert err_mem is None
+    assert user_mem["role"] == "member"
+
+    # Test president login with username == password
+    err_pres, user_pres = authenticate_user("aditya.12410214.president@vit.edu", "aditya.12410214.president@vit.edu")
+    assert err_pres is None
+    assert user_pres["role"] == "president"
+
+    # Test coordinator login with username == password
+    err_coord, user_coord = authenticate_user("priya.12410219.secretary@vit.edu", "priya.12410219.secretary@vit.edu")
+    assert err_coord is None
+    assert user_coord["role"] == "coordinator"
+
+def test_role_based_trigger_and_procedure_permissions(client):
+    """
+    Verifies granular authorization for Triggers and Procedures:
+    - Member: Triggers 1, 5, 6; Procedures 0
+    - Coordinator: Triggers 1, 2, 4, 5, 6, 7; Procedures 2, 3, 5, 6
+    - President: Triggers 1, 2, 3, 5, 6, 8; Procedures 1, 4, 7, 8
+    - Admin/Guest: All 8 Triggers and all 8 Procedures
+    """
+    from app.auth import can_test_trigger, can_test_procedure
+    from flask import session
+
+    with client.application.test_request_context():
+        # Member persona
+        session["role"] = "member"
+        assert can_test_trigger(1) is True
+        assert can_test_trigger(5) is True
+        assert can_test_trigger(6) is True
+        assert can_test_trigger(2) is False
+        assert can_test_trigger(3) is False
+        assert can_test_procedure(1) is False
+
+        # Coordinator persona
+        session["role"] = "coordinator"
+        assert can_test_trigger(1) is True
+        assert can_test_trigger(2) is True
+        assert can_test_trigger(3) is False  # Only President can test multiple presidents
+        assert can_test_procedure(2) is True
+
+        # President persona
+        session["role"] = "president"
+        assert can_test_trigger(3) is True   # President bylaws trigger
+        assert can_test_procedure(1) is True # sp_audit_club_counts
+
+        # Guest / Admin persona
+        session["role"] = "guest"
+        for i in range(1, 9):
+            assert can_test_trigger(i) is True
+            assert can_test_procedure(i) is True
