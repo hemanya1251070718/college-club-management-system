@@ -4,25 +4,37 @@
 -- PROJECT: College Club Management System (ClubHub DBMS)
 -- PURPOSE: Live Demonstration of 2 Completely Different Triggers in MySQL Editor / Workbench
 --
--- THE TWO DISTINCT TRIGGERS DEMONSTRATED:
+-- THE TWO DISTINCT ARCHITECTURAL TRIGGERS DEMONSTRATED:
 --   TRIGGER 1: trg_after_membership_insert_sync_count (AFTER INSERT - Data Propagation)
 --              Automatically increments Clubs.member_count by +1 when a student enrolls.
 --   TRIGGER 2: trg_prevent_multiple_presidents (BEFORE INSERT - Integrity Constraint)
 --              Enforces College Bylaws: Aborts transaction via SIGNAL SQLSTATE '45000'
 --              if anyone attempts to insert a second active President for the same club.
+--
+-- IMPORTANT NOTE ON DELETE:
+-- In MySQL, an AFTER INSERT trigger ONLY fires on INSERT. It NEVER fires on DELETE!
+-- Therefore, we ALSO create 'trg_after_membership_delete_sync_count' so that when
+-- you delete 'HEM-DEMO-01', the count automatically goes back down to the original 19!
 -- ======================================================================================
 
 -- STEP 0: Select the database
 USE trial_club;
 SET autocommit = 1;
 
+-- --------------------------------------------------------------------------------------
+-- QUICK ONE-LINE SYNC (Run this right now if your count was stuck at 20 instead of 19):
+-- --------------------------------------------------------------------------------------
+UPDATE Clubs 
+SET member_count = (SELECT COUNT(*) FROM Memberships WHERE club_id = 'CSI' AND status = 'Active') 
+WHERE club_id = 'CSI';
+
 
 -- ======================================================================================
--- [SECTION A] TRIGGER CREATION (Run this section once before demo)
+-- [SECTION A] TRIGGER CREATION (Run this whole section ONCE before your demo)
 -- ======================================================================================
 
 -- --------------------------------------------------------------------------------------
--- TRIGGER 1 DEFINITION: DML Data Sync Trigger (AFTER INSERT ON Memberships -> Modifies Clubs)
+-- TRIGGER 1: AFTER INSERT ON Memberships -> Automatically Increments Clubs.member_count by +1
 -- --------------------------------------------------------------------------------------
 DROP TRIGGER IF EXISTS trg_after_membership_insert_sync_count;
 
@@ -41,7 +53,27 @@ DELIMITER ;
 
 
 -- --------------------------------------------------------------------------------------
--- TRIGGER 2 DEFINITION: Business Integrity Rule (BEFORE INSERT ON Memberships -> Aborts with Error)
+-- PARTNER TRIGGER: AFTER DELETE ON Memberships -> Automatically Decrements Clubs.member_count by -1
+-- (This is what makes deleting 'HEM-DEMO-01' automatically return the count to 19!)
+-- --------------------------------------------------------------------------------------
+DROP TRIGGER IF EXISTS trg_after_membership_delete_sync_count;
+
+DELIMITER $$
+CREATE TRIGGER trg_after_membership_delete_sync_count
+AFTER DELETE ON Memberships
+FOR EACH ROW
+BEGIN
+    IF OLD.status = 'Active' THEN
+        UPDATE Clubs
+        SET member_count = member_count - 1
+        WHERE club_id = OLD.club_id;
+    END IF;
+END$$
+DELIMITER ;
+
+
+-- --------------------------------------------------------------------------------------
+-- TRIGGER 2: BEFORE INSERT ON Memberships -> Integrity Constraint (Stops 2nd President)
 -- --------------------------------------------------------------------------------------
 DROP TRIGGER IF EXISTS trg_prevent_multiple_presidents;
 
@@ -95,23 +127,23 @@ DELIMITER ;
 
 -- ======================================================================================
 -- PART 1: DEMONSTRATING TRIGGER 1 (AUTOMATED BASE TABLE DATA SYNC)
--- Demonstrates: AFTER INSERT trigger automatically modifying the original 'Clubs' table.
+-- Demonstrates: AFTER INSERT increments count to 20, and AFTER DELETE returns it to 19!
 -- ======================================================================================
 
 -- --------------------------------------------------------------------------------------
 -- STEP 1.1: [HOP TO TAB 1] -> CHECK ORIGINAL CLUBS TABLE BASELINE COUNT
--- Action: Switch to TAB 1 (or place cursor on line 96 below) and press [Ctrl + Enter].
--- What to show: Note current member_count for 'CSI' (e.g., 22).
--- Spoken Cue: "Sir, in our original base table Clubs, CSI currently has 22 members."
+-- Action: Switch to TAB 1 (or place cursor on line 125 below) and press [Ctrl + Enter].
+-- What to show: Note current member_count for 'CSI' (it is 19).
+-- Spoken Cue: "Sir, in our original base table Clubs, CSI currently has 19 active members."
 -- --------------------------------------------------------------------------------------
 SELECT club_id, club_name, member_count FROM Clubs WHERE club_id = 'CSI';
 
 
 -- --------------------------------------------------------------------------------------
 -- STEP 1.2: [HOP TO TAB 2] -> FIRE TRIGGER 1 BY ENROLLING A NEW MEMBER
--- Action: Switch to this tab (TAB 2), place cursor on line 106 below, and press [Ctrl + Enter].
+-- Action: Press [Ctrl + Tab] to switch to this tab (TAB 2), place cursor on line 135 below, and press [Ctrl + Enter].
 -- What to show: Action Output pane shows a green checkmark: 1 row(s) affected.
--- Spoken Cue: "Now I enroll a new student ME25-0898 into CSI inside Memberships."
+-- Spoken Cue: "Now I enroll student ME25-0898 into CSI inside Memberships."
 -- --------------------------------------------------------------------------------------
 INSERT INTO Memberships (membership_id, student_id, club_id, role, join_date, status)
 VALUES ('HEM-DEMO-01', 'ME25-0898', 'CSI', 'Member', CURRENT_DATE, 'Active');
@@ -119,19 +151,30 @@ VALUES ('HEM-DEMO-01', 'ME25-0898', 'CSI', 'Member', CURRENT_DATE, 'Active');
 
 -- --------------------------------------------------------------------------------------
 -- STEP 1.3: [HOP TO TAB 1] -> SHOW AUTOMATIC +1 CHANGE IN ORIGINAL CLUBS TABLE!
--- Action: Switch to TAB 1 (or place cursor on line 117 below), press [Ctrl + Enter] (or click Refresh).
--- What to show: member_count has automatically changed from 22 to 23!
--- Spoken Cue: "Look at the original Clubs table! member_count automatically incremented to 23.
+-- Action: Press [Ctrl + Tab] to switch to TAB 1, press [Ctrl + Enter] on the SELECT query.
+-- What to show: member_count has automatically changed from 19 to 20!
+-- Spoken Cue: "Look at the original Clubs table! member_count automatically incremented to 20.
 --              We never ran an UPDATE on Clubs; Trigger 1 synchronized it in real time!"
 -- --------------------------------------------------------------------------------------
 SELECT club_id, club_name, member_count FROM Clubs WHERE club_id = 'CSI';
 
 
 -- --------------------------------------------------------------------------------------
--- STEP 1.4: CLEANUP ROW FROM TRIGGER 1 DEMO
--- Action: Place cursor on line 124 below and press [Ctrl + Enter].
+-- STEP 1.4: [HOP TO TAB 2] -> DELETE THE ROW AND SHOW IT RETURNS BACK TO 19!
+-- Action: Press [Ctrl + Tab] to switch to TAB 2, place cursor on line 155 below, and press [Ctrl + Enter].
+-- What to show: The delete trigger fires and subtracts 1 from Clubs.member_count.
+-- Spoken Cue: "Now when the student is removed, the delete trigger automatically resets the count."
 -- --------------------------------------------------------------------------------------
 DELETE FROM Memberships WHERE membership_id = 'HEM-DEMO-01';
+
+
+-- --------------------------------------------------------------------------------------
+-- STEP 1.5: [HOP TO TAB 1] -> CONFIRM ORIGINAL COUNT IS SAFELY BACK TO 19!
+-- Action: Press [Ctrl + Tab] to switch to TAB 1, press [Ctrl + Enter] on the SELECT query.
+-- What to show: member_count is safely back to 19!
+-- Spoken Cue: "As you can see, CSI member_count is cleanly back to 19 with zero data drift."
+-- --------------------------------------------------------------------------------------
+SELECT club_id, club_name, member_count FROM Clubs WHERE club_id = 'CSI';
 
 
 
@@ -143,7 +186,7 @@ DELETE FROM Memberships WHERE membership_id = 'HEM-DEMO-01';
 
 -- --------------------------------------------------------------------------------------
 -- STEP 2.1: [HOP TO TAB 1] -> SHOW EXISTING PRESIDENT IN ORIGINAL MEMBERSHIPS TABLE
--- Action: Switch to TAB 1 (or place cursor on line 138 below) and press [Ctrl + Enter].
+-- Action: Switch to TAB 1 (or place cursor on line 180 below) and press [Ctrl + Enter].
 -- What to show: 'Hitaishi Bodele' (CE25-0369) is already the active President of CSI.
 -- Spoken Cue: "Sir, in our original Memberships table, CSI already has an active President."
 -- --------------------------------------------------------------------------------------
@@ -154,7 +197,7 @@ WHERE club_id = 'CSI' AND role = 'President';
 
 -- --------------------------------------------------------------------------------------
 -- STEP 2.2: [HOP TO TAB 2] -> ATTEMPT TO INSERT A 2ND PRESIDENT (FAILS WITH ERROR!)
--- Action: Switch to this tab (TAB 2), place cursor on line 150 below, and press [Ctrl + Enter].
+-- Action: Switch to this tab (TAB 2), place cursor on line 192 below, and press [Ctrl + Enter].
 -- What to show: Action Output pane shows RED 'X' with exact custom error message:
 --   "Error Code: 1644. Integrity Violation: A club cannot have more than ONE active President simultaneously."
 -- Spoken Cue: "Now an unauthorized user tries to insert a 2nd President for CSI.
@@ -166,7 +209,7 @@ VALUES ('HEM-ILLEGAL-PRES', 'ME25-0898', 'CSI', 'President', CURRENT_DATE, 'Acti
 
 -- --------------------------------------------------------------------------------------
 -- STEP 2.3: [HOP TO TAB 1] -> SHOW ORIGINAL TABLE WAS NOT CORRUPTED!
--- Action: Switch to TAB 1 (or place cursor on line 161 below) and press [Ctrl + Enter].
+-- Action: Switch to TAB 1 (or place cursor on line 203 below) and press [Ctrl + Enter].
 -- What to show: There is still ONLY ONE President in CSI. The bad row was rejected!
 -- Spoken Cue: "When we re-query the original Memberships table, the illegal row was never added.
 --              Trigger 2 prevented database corruption at the storage engine level!"
@@ -178,7 +221,7 @@ WHERE club_id = 'CSI' AND role = 'President';
 
 -- --------------------------------------------------------------------------------------
 -- STEP 2.4: PROVE THAT LEGITIMATE ENROLLMENT OF THE SAME STUDENT SUCCEEDS
--- Action: Place cursor on line 171 below and press [Ctrl + Enter].
+-- Action: Place cursor on line 213 below and press [Ctrl + Enter].
 -- What to show: The same student ME25-0898 can easily be enrolled as an ordinary 'Member'!
 -- Spoken Cue: "If we enroll this same student as an ordinary Member, it succeeds instantly."
 -- --------------------------------------------------------------------------------------
