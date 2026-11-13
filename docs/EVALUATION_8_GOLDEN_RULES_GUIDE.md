@@ -167,3 +167,4 @@
 | **"How are Secretary and Coordinator treated in your system?"** | *"Secretary and Coordinator are treated identically under the Coordinator authorization tier—both have permissions to schedule events, mark attendance, and manage club rosters."* |
 | **"What happens if a student has multiple roles in different clubs?"** | *"Upon logging in, our system detects all their memberships and presents an interactive Persona Selection card, allowing them to choose whether to operate as Secretary of CSI or as a Member of another club."* |
 | **"What database are you running on cloud?"** | *"We are running managed Google Cloud SQL (MySQL 8.0) with relational foreign keys, 8 declarative triggers, and 8 cursor-driven stored procedures."* |
+
