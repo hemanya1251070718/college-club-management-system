@@ -112,3 +112,4 @@ SELECT club_id, club_name, member_count FROM Clubs WHERE club_id = 'CSI';
 -- ======================================================================================
 -- END OF DEMONSTRATION: Both triggers proven live. Database returned to original state!
 -- ======================================================================================
+

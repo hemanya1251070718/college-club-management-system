@@ -4,7 +4,7 @@
 > **Author:** Hemanya Gillurkar  
 > **Course:** Database Management Systems Mini Project Evaluation (VIT Pune)  
 > **Target Database:** `trial_club`  
-> **Companion SQL Script:** [`hem-trigger.sql`](file:///d:/VIT%20PUNE/GDG/cloud/hem-trigger.sql)
+> **Companion SQL Script:** [`docs/hem-trigger.sql`](file:///d:/VIT%20PUNE/GDG/cloud/docs/hem-trigger.sql)
 
 ---
 
@@ -180,3 +180,4 @@ If you made a typo or ran the INSERT twice by accident:
 3. **Tab 1:** Press `Ctrl + Enter` on `SELECT` $\rightarrow$ **Count = 23 (+1!)**
 4. **Tab 2:** Put cursor on `DELETE FROM Memberships WHERE membership_id = 'HEM-DEMO-01'` $\rightarrow$ Press `Ctrl + Enter`
 5. **Tab 1:** Press `Ctrl + Enter` on `SELECT` $\rightarrow$ **Count = 22 (-1 back to original!)**
+
