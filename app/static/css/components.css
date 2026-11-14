@@ -382,27 +382,29 @@ body.has-scroll-snap {
 }
 
 /* --------------------------------------------------------------------------
-   Tesla-Style Buttons (44px Accessible Touch Height, 4px Radius, 14px / 500)
+   Tesla-Style Buttons (Outcrowd Proportional Height & Ergonomic Padding)
    -------------------------------------------------------------------------- */
 .btn-tesla-primary {
-  min-height: 44px;
-  height: 44px;
-  min-width: 220px;
+  min-height: 42px;
+  height: 42px;
+  min-width: auto;
   background-color: var(--blue-500);
   color: #FFFFFF !important;
-  font-family: var(--font-sans);
-  font-size: 14px;
-  font-weight: 500;
-  line-height: 44px;
+  font-family: var(--font-display);
+  font-size: 13.5px;
+  font-weight: 600;
+  line-height: 1;
   text-align: center;
   text-decoration: none;
-  border-radius: var(--radius-btn);
-  border: none;
-  padding: 0 24px;
+  border-radius: 9999px;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  padding: 0 22px;
   cursor: pointer;
   display: inline-flex;
   align-items: center;
   justify-content: center;
+  gap: 8px;
+  white-space: nowrap;
   transition: background-color var(--dur-fast) var(--ease-out),
               box-shadow var(--dur-base) var(--ease-out),
               transform var(--dur-fast) var(--ease-out);
@@ -419,20 +421,26 @@ body.has-scroll-snap {
 }
 
 .btn-tesla-secondary {
-  min-height: 44px;
-  height: 44px;
-  min-width: 180px;
+  min-height: 42px;
+  height: 42px;
+  min-width: auto;
   background-color: rgba(255, 255, 255, 0.08);
   border: 1px solid rgba(255, 255, 255, 0.2);
   color: var(--text-1) !important;
-  font-family: var(--font-sans);
-  font-size: 14px;
-  font-weight: 500;
-  line-height: 42px;
+  font-family: var(--font-display);
+  font-size: 13.5px;
+  font-weight: 600;
+  line-height: 1;
   text-align: center;
   text-decoration: none;
-  border-radius: var(--radius-btn);
-  padding: 0 24px;
+  border-radius: 9999px;
+  padding: 0 20px;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  white-space: nowrap;
   cursor: pointer;
   display: inline-flex;
   align-items: center;
@@ -1186,69 +1194,86 @@ main#main-content {
 .btn-guest-pill {
   display: inline-flex;
   align-items: center;
-  gap: 6px;
+  justify-content: center;
+  gap: 8px;
   background: rgba(34, 197, 94, 0.12);
-  border: 1px solid rgba(34, 197, 94, 0.32);
+  border: 1px solid rgba(34, 197, 94, 0.35);
   color: #4ADE80;
-  font-family: var(--font-sans);
-  font-size: 12.5px;
+  font-family: var(--font-display);
+  font-size: 13px;
   font-weight: 600;
-  padding: 5px 12px;
+  height: 38px;
+  min-height: 38px;
+  padding: 0 16px;
   border-radius: 9999px;
   cursor: pointer;
-  transition: all 0.25s ease;
+  line-height: 1;
+  transition: all 0.22s cubic-bezier(0.16, 1, 0.3, 1);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
 }
 
 .btn-guest-pill:hover {
-  background: rgba(34, 197, 94, 0.22);
+  background: rgba(34, 197, 94, 0.24);
   border-color: rgba(34, 197, 94, 0.6);
-  box-shadow: 0 0 14px rgba(34, 197, 94, 0.3);
-  transform: translateY(-1px);
+  box-shadow: 0 4px 16px rgba(34, 197, 94, 0.35);
+  transform: translateY(-1.5px);
+  color: #4ADE80;
 }
 
 .guest-orb {
-  width: 6px;
-  height: 6px;
+  width: 7px;
+  height: 7px;
   border-radius: 50%;
   background-color: #22C55E;
-  box-shadow: 0 0 6px #22C55E;
+  box-shadow: 0 0 8px #22C55E;
   animation: pulseGlow 2s infinite ease-in-out;
 }
 
 @keyframes pulseGlow {
   0%, 100% { opacity: 1; transform: scale(1); }
-  50% { opacity: 0.6; transform: scale(0.85); }
+  50% { opacity: 0.5; transform: scale(0.8); }
 }
 
 /* Persona Switcher Badge Button */
 .btn-role-badge {
   display: inline-flex;
   align-items: center;
-  gap: 6px;
+  justify-content: center;
+  gap: 8px;
   background: rgba(255, 255, 255, 0.06);
-  border: 1px solid rgba(255, 255, 255, 0.12);
+  border: 1px solid rgba(255, 255, 255, 0.14);
   color: var(--text-1);
-  font-family: var(--font-sans);
-  font-size: 12.5px;
-  font-weight: 500;
-  padding: 5px 12px;
+  font-family: var(--font-display);
+  font-size: 13px;
+  font-weight: 600;
+  height: 38px;
+  min-height: 38px;
+  padding: 0 16px;
   border-radius: 9999px;
   cursor: pointer;
-  transition: all 0.25s ease;
+  line-height: 1;
+  transition: all 0.22s cubic-bezier(0.16, 1, 0.3, 1);
+  text-decoration: none;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
 }
 
 .btn-role-badge:hover {
-  background: rgba(255, 255, 255, 0.12);
-  border-color: rgba(255, 255, 255, 0.24);
+  background: rgba(255, 255, 255, 0.14);
+  border-color: rgba(255, 255, 255, 0.3);
+  color: #FFFFFF;
+  transform: translateY(-1.5px);
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.25);
 }
 
-/* Round Utility Buttons (Clock Telemetry & Menu) */
+/* Round Utility Buttons (Clock Telemetry, Theme Toggle & Menu) */
 .btn-circle-utility {
-  width: 36px;
-  height: 36px;
-  border-radius: 50%;
+  width: 38px;
+  min-width: 38px;
+  height: 38px;
+  min-height: 38px;
+  border-radius: 50% !important;
   background: rgba(255, 255, 255, 0.06);
-  border: 1px solid rgba(255, 255, 255, 0.12);
+  border: 1px solid rgba(255, 255, 255, 0.14);
   color: var(--text-1);
   display: inline-flex;
   align-items: center;
@@ -1256,13 +1281,18 @@ main#main-content {
   cursor: pointer;
   font-size: 15px;
   text-decoration: none;
-  transition: all 0.2s ease;
+  padding: 0 !important;
+  line-height: 1;
+  transition: all 0.22s cubic-bezier(0.16, 1, 0.3, 1);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
 }
 
 .btn-circle-utility:hover {
-  background: rgba(255, 255, 255, 0.14);
-  border-color: rgba(255, 255, 255, 0.25);
+  background: rgba(255, 255, 255, 0.15);
+  border-color: rgba(255, 255, 255, 0.32);
   color: #FFFFFF;
+  transform: translateY(-1.5px);
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.25);
 }
 
 /* --------------------------------------------------------------------------
@@ -1821,32 +1851,39 @@ main#main-content {
 }
 
 .table-pill-btn {
-  padding: 6px 14px;
-  border-radius: 20px;
-  font-size: 12px;
-  font-weight: 500;
+  height: 36px;
+  min-height: 36px;
+  padding: 0 16px;
+  border-radius: 9999px !important;
+  font-family: var(--font-display);
+  font-size: 12.5px;
+  font-weight: 600;
+  line-height: 1;
   border: 1px solid var(--border);
   background: rgba(14, 19, 44, 0.65);
   color: var(--text-2);
   cursor: pointer;
-  transition: all 0.16s ease;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
   display: inline-flex;
   align-items: center;
+  justify-content: center;
   gap: 6px;
+  white-space: nowrap;
 }
 
 .table-pill-btn:hover {
-  background: rgba(99, 102, 241, 0.18);
-  border-color: var(--blue-400);
+  background: rgba(43, 83, 225, 0.2);
+  border-color: rgba(43, 83, 225, 0.5);
   color: #FFFFFF;
+  transform: translateY(-1px);
 }
 
 .table-pill-btn.is-active,
 .table-pill-btn.active {
-  background: var(--blue-500);
-  border-color: var(--blue-400);
-  color: #FFFFFF;
-  box-shadow: 0 2px 12px rgba(59, 130, 246, 0.4);
+  background: #2B53E1 !important;
+  border-color: #3A62F5 !important;
+  color: #FFFFFF !important;
+  box-shadow: 0 4px 14px rgba(43, 83, 225, 0.45);
 }
 
 .table-match-counter {
@@ -2020,52 +2057,154 @@ h1, h2, h3, h4,
   margin: 0 0 var(--sp-3) 0;
 }
 
-/* 2. Round Pill Button Suite (Pill Aesthetics requested by User) */
-.btn-tesla-primary,
+/* 2. Outcrowd Symmetrical & Proportional Pill Button System */
+/* Tier 1: Hero Primary & Cockpit CTAs (48px height, 26px padding, 14.5px font) */
 .btn-tidewell-primary,
 .btn-cockpit-primary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  height: 48px;
+  min-height: 48px;
+  min-width: auto;
+  padding: 0 26px;
   border-radius: 9999px !important;
   font-family: var(--font-display);
+  font-size: 14.5px;
   font-weight: 600;
   letter-spacing: -0.01em;
-  padding: 0 28px;
-  box-shadow: 0 4px 18px rgba(37, 99, 235, 0.35);
-  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  line-height: 1;
+  text-decoration: none;
+  background: linear-gradient(135deg, #2B53E1 0%, #1D4ED8 100%);
+  color: #FFFFFF !important;
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  box-shadow: 0 4px 16px rgba(43, 83, 225, 0.38), inset 0 1px 0 rgba(255, 255, 255, 0.2);
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.22s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-.btn-tesla-primary:hover,
 .btn-tidewell-primary:hover,
 .btn-cockpit-primary:hover {
   transform: translateY(-2px);
-  box-shadow: 0 8px 26px rgba(37, 99, 235, 0.55);
+  background: linear-gradient(135deg, #3A62F5 0%, #2563EB 100%);
+  box-shadow: 0 8px 26px rgba(43, 83, 225, 0.55), inset 0 1px 0 rgba(255, 255, 255, 0.3);
+  color: #FFFFFF !important;
 }
 
-.btn-tesla-primary:active,
 .btn-tidewell-primary:active,
 .btn-cockpit-primary:active {
   transform: translateY(0) scale(0.98);
 }
 
-.btn-tesla-secondary,
+/* Tier 1: Hero Secondary & Cockpit Glass CTAs */
 .btn-tidewell-secondary,
 .btn-cockpit-glass {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  height: 48px;
+  min-height: 48px;
+  min-width: auto;
+  padding: 0 24px;
   border-radius: 9999px !important;
   font-family: var(--font-display);
+  font-size: 14.5px;
   font-weight: 600;
   letter-spacing: -0.01em;
-  padding: 0 26px;
+  line-height: 1;
+  text-decoration: none;
+  background: rgba(255, 255, 255, 0.06);
+  color: var(--text-1) !important;
+  border: 1px solid rgba(255, 255, 255, 0.15);
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
-  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.22s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-.btn-tesla-secondary:hover,
 .btn-tidewell-secondary:hover,
 .btn-cockpit-glass:hover {
   transform: translateY(-2px);
+  background: rgba(255, 255, 255, 0.14);
+  border-color: rgba(255, 255, 255, 0.35);
   box-shadow: 0 6px 20px rgba(0, 0, 0, 0.25);
-  background: rgba(255, 255, 255, 0.16);
-  border-color: rgba(255, 255, 255, 0.4);
+  color: #FFFFFF !important;
+}
+
+/* Tier 2: Inner Page Action Buttons (42px height, 22px padding, 13.5px font) */
+.btn-tesla-primary,
+.action-write-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  height: 42px;
+  min-height: 42px;
+  min-width: auto;
+  padding: 0 22px;
+  border-radius: 9999px !important;
+  font-family: var(--font-display);
+  font-size: 13.5px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  line-height: 1;
+  text-decoration: none;
+  background: linear-gradient(135deg, #2B53E1 0%, #1D4ED8 100%);
+  color: #FFFFFF !important;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  box-shadow: 0 4px 14px rgba(43, 83, 225, 0.32), inset 0 1px 0 rgba(255, 255, 255, 0.2);
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.22s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.btn-tesla-primary:hover,
+.action-write-btn:hover {
+  transform: translateY(-1.5px);
+  background: linear-gradient(135deg, #3A62F5 0%, #2563EB 100%);
+  box-shadow: 0 8px 22px rgba(43, 83, 225, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.3);
+  color: #FFFFFF !important;
+}
+
+.btn-tesla-primary:active,
+.action-write-btn:active {
+  transform: translateY(0) scale(0.98);
+}
+
+.btn-tesla-secondary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  height: 42px;
+  min-height: 42px;
+  min-width: auto;
+  padding: 0 20px;
+  border-radius: 9999px !important;
+  font-family: var(--font-display);
+  font-size: 13.5px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  line-height: 1;
+  text-decoration: none;
+  background: rgba(255, 255, 255, 0.06);
+  color: var(--text-1) !important;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.22s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.btn-tesla-secondary:hover {
+  transform: translateY(-1.5px);
+  background: rgba(255, 255, 255, 0.12);
+  border-color: rgba(255, 255, 255, 0.28);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+  color: #FFFFFF !important;
 }
 
 .table-live-search,
@@ -2074,14 +2213,16 @@ h1, h2, h3, h4,
   padding-left: 42px !important;
 }
 
-/* 3. High-Impact Trigger Pill Buttons (No more simple faint links) */
+/* Tier 3: High-Impact Trigger Pill Buttons (38px height, 20px padding) */
 .btn-trigger-pill {
   display: inline-flex;
   align-items: center;
   justify-content: center;
   gap: 6px;
-  min-height: 36px;
-  padding: 6px 18px;
+  height: 38px;
+  min-height: 38px;
+  min-width: auto;
+  padding: 0 20px;
   border-radius: 9999px !important;
   font-family: var(--font-display);
   font-size: 13px;
@@ -2769,4 +2910,38 @@ h1, h2, h3, h4,
 [data-theme="light"] .modal-header,
 [data-theme="light"] .modal-footer {
   border-color: #CBD5E1 !important;
+}
+
+/* Secondary & Utility Buttons in Light Mode */
+[data-theme="light"] .btn-tesla-secondary,
+[data-theme="light"] .btn-tidewell-secondary,
+[data-theme="light"] .btn-cockpit-glass {
+  background: #FFFFFF !important;
+  border: 1.5px solid #CBD5E1 !important;
+  color: #0F172A !important;
+  box-shadow: 0 2px 8px rgba(15, 23, 42, 0.05) !important;
+}
+
+[data-theme="light"] .btn-tesla-secondary:hover,
+[data-theme="light"] .btn-tidewell-secondary:hover,
+[data-theme="light"] .btn-cockpit-glass:hover {
+  background: #F1F5F9 !important;
+  border-color: #94A3B8 !important;
+  color: #0F172A !important;
+  box-shadow: 0 4px 14px rgba(15, 23, 42, 0.1) !important;
+}
+
+[data-theme="light"] .btn-role-badge,
+[data-theme="light"] .btn-circle-utility {
+  background: #FFFFFF !important;
+  border: 1.5px solid #CBD5E1 !important;
+  color: #0F172A !important;
+  box-shadow: 0 2px 8px rgba(15, 23, 42, 0.05) !important;
+}
+
+[data-theme="light"] .btn-role-badge:hover,
+[data-theme="light"] .btn-circle-utility:hover {
+  background: #F1F5F9 !important;
+  border-color: #94A3B8 !important;
+  color: #0F172A !important;
 }

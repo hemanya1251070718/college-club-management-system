@@ -10,6 +10,7 @@ document.addEventListener("DOMContentLoaded", () => {
   initNumberCounters();
   initAlertsAutoDismiss();
   initDeleteConfirmations();
+  initOutcrowdCardTiltAndSpotlight();
 });
 
 /**
@@ -173,7 +174,6 @@ function initAlertsAutoDismiss() {
  * 6. Delete Action Confirmation Modal / Prompt
  */
 function initDeleteConfirmations() {
-  // If custom styled accessible modal is present in DOM, let main.js handle it
   if (document.getElementById("deleteConfirmModal")) return;
 
   const deleteForms = document.querySelectorAll("form.delete-form");
@@ -186,4 +186,44 @@ function initDeleteConfirmations() {
     });
   });
 }
+
+/**
+ * 7. Outcrowd Incident Platform 3D Interactive Card Tilt & Cursor Spotlight
+ */
+function initOutcrowdCardTiltAndSpotlight() {
+  if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+
+  const tiltCards = document.querySelectorAll(
+    ".kpi-card, .tidewell-glass-card, .tidewell-card-item, .trigger-action-pill-card, .table-surface-card, .tesla-card, .incident-monitor-box"
+  );
+
+  tiltCards.forEach(card => {
+    card.classList.add("card-spotlight-effect");
+
+    card.addEventListener("mousemove", (e) => {
+      const rect = card.getBoundingClientRect();
+      const x = e.clientX - rect.left;
+      const y = e.clientY - rect.top;
+
+      card.style.setProperty("--mouse-x", `${x}px`);
+      card.style.setProperty("--mouse-y", `${y}px`);
+
+      // Tactile 3D perspective tilt
+      const centerX = rect.width / 2;
+      const centerY = rect.height / 2;
+      const deltaX = (x - centerX) / centerX;
+      const deltaY = (y - centerY) / centerY;
+
+      const rotateX = -(deltaY * 4.0).toFixed(2);
+      const rotateY = (deltaX * 4.0).toFixed(2);
+
+      card.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) translateY(-4px) scale3d(1.02, 1.02, 1.02)`;
+    });
+
+    card.addEventListener("mouseleave", () => {
+      card.style.transform = "perspective(1000px) rotateX(0deg) rotateY(0deg) translateY(0px) scale3d(1, 1, 1)";
+    });
+  });
+}
+
 
