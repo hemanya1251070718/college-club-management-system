@@ -10,57 +10,69 @@
   color-scheme: dark;
 
   /* Backgrounds */
-  --bg-0: #05060B; /* Rich Black, primary page background */
-  --bg-1: #090B14; /* Alternate sections / dark bands */
+  --bg-0: #070914; /* Cosmic Deep Space Canvas */
+  --bg-1: #0B0E20; /* Deep Indigo Section Band */
 
-  /* Surfaces */
-  --surface-1: #0D1020; /* Cards, panels, input backgrounds */
-  --surface-2: #141834; /* Drawers, modals, raised panels, sticky headers */
-  --surface-3: #1B2048; /* Active hover state on surfaces */
+  /* Surfaces & Glassmorphism */
+  --surface-1: #0E132A; /* Cards, panels, input backgrounds */
+  --surface-2: #161C3D; /* Drawers, modals, raised panels, sticky headers */
+  --surface-3: #202854; /* Active hover state on surfaces */
+  --surface-glass: rgba(16, 22, 48, 0.78);
+  --surface-card-grad: linear-gradient(180deg, rgba(22, 30, 62, 0.85) 0%, rgba(12, 16, 38, 0.92) 100%);
+  --surface-card-hover: linear-gradient(180deg, rgba(28, 38, 78, 0.9) 0%, rgba(15, 20, 48, 0.95) 100%);
 
-  /* Borders & Dividers */
-  --border: rgba(255, 255, 255, 0.08);
-  --border-strong: rgba(255, 255, 255, 0.16);
-  --border-glow: rgba(79, 124, 255, 0.35);
+  /* Borders & Glows */
+  --border: rgba(255, 255, 255, 0.10);
+  --border-strong: rgba(255, 255, 255, 0.20);
+  --border-glow: rgba(99, 102, 241, 0.45);
+  --border-cyan-glow: rgba(56, 189, 248, 0.45);
 
   /* Typography / Text Levels (WCAG AA Compliant) */
-  --text-1: #F4F6FF; /* Primary headlines, titles, active labels (Contrast >= 15:1) */
-  --text-2: #B6BBD8; /* Body copy, secondary text, table data (Contrast >= 8:1) */
-  --text-3: #7A80A6; /* Captions, table headers, non-essential metadata (Contrast >= 4.6:1) */
+  --text-1: #F8FAFC; /* Crisp White, primary headlines, active labels */
+  --text-2: #C5CEE5; /* Soft Periwinkle, body copy, table data */
+  --text-3: #828BAE; /* Muted Slate, captions, metadata */
 
-  /* Tesla Action Accent: Primary Blue */
-  --blue-400: #4F7CFF; /* Focus rings, inline links, active tabs */
-  --blue-500: #2F5BEA; /* Primary CTA button background */
-  --blue-600: #2548C7; /* Primary CTA hover state */
-  --blue-700: #1A3AA8;
-  --blue-900: #0A1640;
+  /* Primary Action Accent: Electric Cyan-Blue */
+  --blue-400: #38BDF8; /* Electric Cyan accent */
+  --blue-500: #3B82F6; /* Primary CTA button */
+  --blue-600: #2563EB; /* Primary CTA hover */
+  --blue-700: #1D4ED8;
+  --blue-900: #0F172A;
 
-  /* Secondary Accent: Rich Violet (Highlights, Focus, WebGL Ambient) */
-  --violet-400: #A78BFA; /* Keyboard focus ring */
-  --violet-500: #7C3AED;
-  --violet-700: #4C1D95;
-  --violet-900: #1E0B45;
+  /* Secondary Accent: Radiant Violet & Fuchsia */
+  --violet-400: #C084FC; /* Radiant Violet */
+  --violet-500: #8B5CF6; /* Focus ring & category */
+  --violet-700: #6D28D9;
+  --violet-900: #2E1065;
+  --pink-400: #F472B6;   /* Cultural / Dance accent */
 
-  /* Brand Gradient (Used sparingly for subtle glows and skeletons) */
-  --grad-brand: linear-gradient(135deg, #2F5BEA 0%, #7C3AED 100%);
-  --grad-glow: radial-gradient(circle, rgba(79, 124, 255, 0.15) 0%, transparent 70%);
+  /* Category Identity Gradients */
+  --cat-tech-grad: linear-gradient(135deg, #0EA5E9 0%, #2563EB 100%);
+  --cat-biz-grad: linear-gradient(135deg, #F59E0B 0%, #D97706 100%);
+  --cat-art-grad: linear-gradient(135deg, #EC4899 0%, #8B5CF6 100%);
+  --cat-social-grad: linear-gradient(135deg, #10B981 0%, #059669 100%);
 
-  /* Semantics (Badge / Alert / Toast - 12% tint background) */
-  --success: #22C55E;
-  --success-bg: rgba(34, 197, 94, 0.12);
-  --success-border: rgba(34, 197, 94, 0.25);
+  /* Brand Gradients */
+  --grad-brand: linear-gradient(135deg, #3B82F6 0%, #8B5CF6 50%, #EC4899 100%);
+  --grad-glow: radial-gradient(circle, rgba(99, 102, 241, 0.25) 0%, transparent 70%);
+  --grad-card-header: linear-gradient(90deg, rgba(59, 130, 246, 0.12) 0%, rgba(139, 92, 246, 0.12) 100%);
 
-  --warning: #F5A524;
-  --warning-bg: rgba(245, 165, 36, 0.12);
-  --warning-border: rgba(245, 165, 36, 0.25);
+  /* Semantics */
+  --success: #10B981;
+  --success-bg: rgba(16, 185, 129, 0.14);
+  --success-border: rgba(16, 185, 129, 0.35);
 
-  --danger: #F43F5E;
-  --danger-bg: rgba(244, 63, 94, 0.12);
-  --danger-border: rgba(244, 63, 94, 0.25);
+  --warning: #F59E0B;
+  --warning-bg: rgba(245, 158, 11, 0.14);
+  --warning-border: rgba(245, 158, 11, 0.35);
 
-  --info: #4F7CFF;
-  --info-bg: rgba(79, 124, 255, 0.12);
-  --info-border: rgba(79, 124, 255, 0.25);
+  --danger: #EF4444;
+  --danger-bg: rgba(239, 68, 68, 0.14);
+  --danger-border: rgba(239, 68, 68, 0.35);
+
+  --info: #38BDF8;
+  --info-bg: rgba(56, 189, 248, 0.14);
+  --info-border: rgba(56, 189, 248, 0.35);
 
   /* Spacing Scale (4px base) */
   --sp-1: 4px;
@@ -168,6 +180,12 @@ section[id], [id^="trigger-"], [id^="proc-"], tr[id], div[id] {
 
 body {
   background-color: var(--bg-0);
+  background-image: 
+    radial-gradient(ellipse 90% 50% at 50% -10%, rgba(99, 102, 241, 0.16), transparent 70%),
+    radial-gradient(circle 700px at 10% 20%, rgba(56, 189, 248, 0.08), transparent 60%),
+    radial-gradient(circle 600px at 90% 55%, rgba(139, 92, 246, 0.09), transparent 60%),
+    radial-gradient(circle 500px at 45% 90%, rgba(236, 72, 153, 0.06), transparent 65%);
+  background-attachment: fixed;
   color: var(--text-2);
   font-family: var(--font-sans);
   font-size: 14px;
@@ -178,6 +196,18 @@ body {
   min-height: 100vh;
   display: flex;
   flex-direction: column;
+}
+
+@keyframes pulseGlow {
+  0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7); }
+  70% { transform: scale(1); box-shadow: 0 0 0 6px rgba(16, 185, 129, 0); }
+  100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); }
+}
+
+@keyframes pulseGlowBlue {
+  0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(56, 189, 248, 0.7); }
+  70% { transform: scale(1); box-shadow: 0 0 0 6px rgba(56, 189, 248, 0); }
+  100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(56, 189, 248, 0); }
 }
 
 /* Text Selection */

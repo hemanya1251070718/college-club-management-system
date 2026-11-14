@@ -47,3 +47,4 @@ WHERE m1.role = 'President'
   AND m2.role = 'Secretary'
   AND m1.status = 'Active' 
   AND m2.status = 'Active';
+

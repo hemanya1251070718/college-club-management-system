@@ -4,7 +4,7 @@
 
 {% block content %}
 <div class="app-container">
-  <!-- Breadcrumb (Shneiderman Rule 8: Reduce Memory Load) -->
+  <!-- Breadcrumb -->
   <nav aria-label="Breadcrumb">
     <ul class="app-breadcrumb">
       <li><a href="{{ url_for('main.dashboard') }}"><i class="bi bi-house me-1"></i>Cockpit</a></li>
@@ -17,8 +17,12 @@
   <header class="inner-page-header">
     <div class="inner-header-layout">
       <div>
+        <div class="d-flex align-items-center gap-2 mb-2">
+          <span class="badge-status info font-mono">CAMPUS ACTIVITIES</span>
+          <span class="text-secondary small">&bull; Schedule, Budget &amp; Attendance Tracking</span>
+        </div>
         <h1 class="inner-page-title">Campus Events Management</h1>
-        <p class="inner-page-subtitle">Organize, schedule, budget, and monitor events organized by college clubs.</p>
+        <p class="inner-page-subtitle">Organize, schedule, budget, and monitor flagship events hosted by collegiate student chapters.</p>
       </div>
       <div>
         {% if current_role != 'member' %}
@@ -34,6 +38,78 @@
     </div>
   </header>
 
+  <!-- Interactive KPI Metric Cards -->
+  {% set total_attendees = namespace(count=0) %}
+  {% set total_budget = namespace(amt=0) %}
+  {% set award_count = namespace(count=0) %}
+  {% for ev in events %}
+    {% set total_attendees.count = total_attendees.count + (ev.attendee_count or 0) %}
+    {% set total_budget.amt = total_budget.amt + (ev.budget_allocated or 0) %}
+    {% if ev.is_award_winning %}
+      {% set award_count.count = award_count.count + 1 %}
+    {% endif %}
+  {% endfor %}
+
+  <div class="kpi-metrics-grid mb-4">
+    <div class="kpi-card glow-border-hover" data-kpi-filter="" style="cursor: pointer;" title="Show all events">
+      <div class="kpi-icon-box" style="background: rgba(56, 189, 248, 0.15); color: #38bdf8;">
+        <i class="bi bi-calendar-event-fill"></i>
+      </div>
+      <div>
+        <div class="kpi-value text-white tabular-nums">{{ events|length }}</div>
+        <div class="kpi-label">Scheduled Events</div>
+      </div>
+    </div>
+
+    <div class="kpi-card glow-border-hover" data-kpi-filter="" style="cursor: pointer;" title="Total registered participants">
+      <div class="kpi-icon-box" style="background: rgba(16, 185, 129, 0.15); color: #34d399;">
+        <i class="bi bi-people-fill"></i>
+      </div>
+      <div>
+        <div class="kpi-value text-white tabular-nums">{{ total_attendees.count }}</div>
+        <div class="kpi-label">Total Participants</div>
+      </div>
+    </div>
+
+    <div class="kpi-card glow-border-hover" data-kpi-filter="" style="cursor: pointer;" title="Cumulative allocated budget">
+      <div class="kpi-icon-box" style="background: rgba(245, 158, 11, 0.15); color: #fbbf24;">
+        <i class="bi bi-cash-stack"></i>
+      </div>
+      <div>
+        <div class="kpi-value text-white tabular-nums">₹{{ "{:,.0f}".format(total_budget.amt) }}</div>
+        <div class="kpi-label">Allocated Budget</div>
+      </div>
+    </div>
+
+    <div class="kpi-card glow-border-hover" data-kpi-filter="Award" style="cursor: pointer;" title="Filter by Award-winning events">
+      <div class="kpi-icon-box" style="background: rgba(168, 85, 247, 0.15); color: #c084fc;">
+        <i class="bi bi-trophy-fill"></i>
+      </div>
+      <div>
+        <div class="kpi-value text-white tabular-nums">{{ award_count.count }}</div>
+        <div class="kpi-label">Award Recognitions</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Real-Time Interactive Table Toolbar -->
+  <div class="table-interactive-toolbar mb-3">
+    <div class="live-search-box">
+      <i class="bi bi-search search-icon"></i>
+      <input type="text" class="tesla-input table-live-search" placeholder="Type to filter events in real time (name, club, venue, status)..." data-target="events-table-body" aria-label="Instant search events">
+    </div>
+    <div class="table-filter-pills">
+      <button type="button" class="table-pill-btn active" data-filter="" data-target="events-table-body">All Events</button>
+      <button type="button" class="table-pill-btn" data-filter="Completed" data-target="events-table-body">Completed</button>
+      <button type="button" class="table-pill-btn" data-filter="Ongoing" data-target="events-table-body">Ongoing</button>
+      <button type="button" class="table-pill-btn" data-filter="Planned" data-target="events-table-body">Planned</button>
+      <button type="button" class="table-pill-btn" data-filter="Award" data-target="events-table-body">Award Winners</button>
+    </div>
+    <div class="table-match-counter">
+      Showing <strong class="match-count">{{ events|length }}</strong> of {{ events|length }} events
+    </div>
+  </div>
+
   <!-- Events Data Table -->
   <div class="table-surface-card glow-border-hover">
     <div class="table-responsive">
@@ -43,33 +119,65 @@
             <th>Event ID</th>
             <th>Event Name</th>
             <th>Host Club</th>
-            <th>Date</th>
-            <th>Venue</th>
+            <th>Date &amp; Venue</th>
             <th>Budget</th>
             <th>Status</th>
             <th class="text-center">Attendees</th>
             <th class="text-end">Actions</th>
           </tr>
         </thead>
-        <tbody>
+        <tbody id="events-table-body">
           {% for ev in events %}
           <tr>
-            <td><span class="badge-status neutral font-mono">{{ ev.event_id }}</span></td>
             <td>
-              <span class="fw-medium text-white">{{ ev.event_name }}</span>
-              {% if ev.is_award_winning %}
-                <span class="badge-status warning ms-1"><i class="bi bi-trophy-fill me-1"></i>Award</span>
-              {% endif %}
+              <div class="d-flex align-items-center gap-2">
+                <span class="badge-status neutral font-mono font-bold">{{ ev.event_id }}</span>
+                <button type="button" class="btn-copy-chip" data-copy="{{ ev.event_id }}" title="Copy Event ID">
+                  <i class="bi bi-copy"></i>
+                </button>
+              </div>
             </td>
-            <td><span class="badge-status neutral">{{ ev.club_name }}</span></td>
-            <td><small class="text-secondary tabular-nums">{{ ev.event_date or 'TBA' }}</small></td>
-            <td><small class="text-secondary">{{ ev.venue or 'TBA' }}</small></td>
-            <td class="tabular-nums"><small class="text-white fw-medium">₹{{ "{:,.2f}".format(ev.budget_allocated) }}</small></td>
+            <td>
+              <div class="d-flex align-items-center gap-2">
+                <div class="club-avatar-circle" style="background: rgba(168, 85, 247, 0.12); color: #c084fc; border: 1px solid rgba(168, 85, 247, 0.3);">
+                  <i class="bi bi-calendar-event"></i>
+                </div>
+                <div>
+                  <div class="fw-semibold text-white">{{ ev.event_name }}</div>
+                  {% if ev.is_award_winning %}
+                    <span class="badge-status warning" style="font-size: 11px;"><i class="bi bi-trophy-fill me-1"></i>Award Winner</span>
+                  {% endif %}
+                </div>
+              </div>
+            </td>
+            <td>
+              <div class="text-white fw-medium">{{ ev.club_name }}</div>
+              <small class="badge-status neutral font-mono" style="font-size: 11px;">{{ ev.club_id }}</small>
+            </td>
+            <td>
+              <div class="d-flex align-items-center gap-2">
+                <div class="event-date-chip">
+                  <span class="event-date-month">{{ ev.event_date[5:7] if ev.event_date else 'TBA' }}</span>
+                  <span class="event-date-day">{{ ev.event_date[8:10] if ev.event_date else '--' }}</span>
+                </div>
+                <div>
+                  <div class="text-white small tabular-nums">{{ ev.event_date or 'Date TBA' }}</div>
+                  <small class="text-secondary"><i class="bi bi-geo-alt me-1"></i>{{ ev.venue or 'Campus Venue' }}</small>
+                </div>
+              </div>
+            </td>
+            <td class="tabular-nums">
+              <span class="text-white fw-semibold">₹{{ "{:,.2f}".format(ev.budget_allocated) }}</span>
+            </td>
             <td>
               {% if ev.status == 'Completed' %}
-                <span class="badge-status success">Completed</span>
+                <span class="badge-status success d-inline-flex align-items-center gap-1">
+                  <span class="pulse-dot pulse-dot-active"></span>Completed
+                </span>
               {% elif ev.status == 'Ongoing' %}
-                <span class="badge-status info">Ongoing</span>
+                <span class="badge-status info d-inline-flex align-items-center gap-1">
+                  <span class="pulse-dot pulse-dot-info"></span>Ongoing
+                </span>
               {% elif ev.status == 'Cancelled' %}
                 <span class="badge-status danger">Cancelled</span>
               {% else %}
@@ -83,10 +191,10 @@
             </td>
             <td class="text-end">
               <div class="d-inline-flex gap-1">
-                <a href="{{ url_for('main.event_registrations', event_id=ev.event_id) }}" class="btn-ghost-action text-info" title="Attendees &amp; Triggers 5 &amp; 7" aria-label="Manage attendees for {{ ev.event_name }}">
+                <a href="{{ url_for('main.event_registrations', event_id=ev.event_id) }}" class="btn-ghost-action text-info" title="Attendees &amp; Registrations" aria-label="Manage attendees for {{ ev.event_name }}">
                   <i class="bi bi-person-check" aria-hidden="true"></i>
                 </a>
-                <a href="{{ url_for('main.event_feedback', event_id=ev.event_id) }}" class="btn-ghost-action text-warning" title="Feedback &amp; Trigger 6" aria-label="Reviews and feedback for {{ ev.event_name }}">
+                <a href="{{ url_for('main.event_feedback', event_id=ev.event_id) }}" class="btn-ghost-action text-warning" title="Feedback &amp; Reviews" aria-label="Reviews and feedback for {{ ev.event_name }}">
                   <i class="bi bi-star" aria-hidden="true"></i>
                 </a>
                 {% if current_role != 'member' %}
@@ -108,7 +216,7 @@
           </tr>
           {% else %}
           <tr>
-            <td colspan="9" class="text-center text-secondary py-5">No events found.</td>
+            <td colspan="8" class="text-center text-secondary py-5">No events found.</td>
           </tr>
           {% endfor %}
         </tbody>

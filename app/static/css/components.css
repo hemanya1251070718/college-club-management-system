@@ -567,11 +567,20 @@ main#main-content {
    Horizontal scrolling on mobile/tablet, full row 1 visibility everywhere
    -------------------------------------------------------------------------- */
 .table-surface-card {
-  background: var(--surface-1);
+  background: var(--surface-card-grad);
   border: 1px solid var(--border);
-  border-radius: var(--radius-card);
-  overflow: visible;
+  border-radius: 14px;
+  box-shadow: 0 12px 36px -4px rgba(0, 0, 0, 0.45), inset 0 1px 0 rgba(255, 255, 255, 0.08);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  overflow: hidden;
   margin-bottom: var(--sp-6);
+  transition: box-shadow var(--dur-base), border-color var(--dur-base);
+}
+
+.table-surface-card:hover {
+  border-color: rgba(99, 102, 241, 0.35);
+  box-shadow: 0 16px 44px -4px rgba(0, 0, 0, 0.55), 0 0 24px -4px rgba(99, 102, 241, 0.18), inset 0 1px 0 rgba(255, 255, 255, 0.14);
 }
 
 .table-responsive {
@@ -591,45 +600,55 @@ main#main-content {
 
 .tesla-table thead {
   position: static;
-  background: var(--surface-2);
+  background: rgba(22, 28, 60, 0.92);
+  border-bottom: 1px solid var(--border-strong);
 }
 
 .tesla-table th {
   font-family: var(--font-sans);
-  font-size: 12px;
-  font-weight: 500;
+  font-size: 11px;
+  font-weight: 600;
   color: var(--text-3);
   text-transform: uppercase;
-  letter-spacing: 0.04em;
-  padding: 16px 20px;
-  border-bottom: 1px solid var(--border);
+  letter-spacing: 0.06em;
+  padding: 14px 20px;
+  border-bottom: 1px solid var(--border-strong);
   white-space: nowrap;
-  background: var(--surface-2);
+  background: transparent;
 }
 
 .tesla-table tbody tr:first-child td {
-  padding-top: 20px;
+  padding-top: 18px;
 }
 
 .tesla-table td {
-  padding: 16px 20px;
+  padding: 14px 20px;
   border-bottom: 1px solid var(--border);
   font-size: 14px;
   line-height: 20px;
   font-weight: 400;
   color: var(--text-2);
   vertical-align: middle;
-  transition: background-color var(--dur-fast);
+  transition: all var(--dur-fast);
 }
 
 .tesla-table tbody tr {
   min-height: 56px;
-  transition: background-color var(--dur-fast) var(--ease-out);
+  transition: all 0.18s cubic-bezier(0.16, 1, 0.3, 1);
+  border-left: 3px solid transparent;
+}
+
+.tesla-table tbody tr:nth-child(even) td {
+  background: rgba(255, 255, 255, 0.012);
 }
 
 .tesla-table tbody tr:hover td {
-  background: var(--surface-2);
-  color: var(--text-1);
+  background: rgba(99, 102, 241, 0.08) !important;
+  color: #FFFFFF;
+}
+
+.tesla-table tbody tr:hover {
+  border-left-color: var(--blue-400);
 }
 
 /* --------------------------------------------------------------------------
@@ -830,16 +849,19 @@ main#main-content {
    Cards (Surface-1, 1px Border, 12px Radius, Smooth Subtle Lift)
    -------------------------------------------------------------------------- */
 .tesla-card {
-  background: var(--surface-1);
+  background: var(--surface-card-grad);
   border: 1px solid var(--border);
-  border-radius: var(--radius-card);
+  border-radius: 14px;
+  box-shadow: 0 10px 30px -4px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.08);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
   padding: var(--sp-6);
-  transition: border-color var(--dur-base) var(--ease-out),
-              transform var(--dur-base) var(--ease-out);
+  transition: all var(--dur-base) var(--ease-out);
 }
 
 .tesla-card:hover {
-  border-color: var(--border-strong);
+  border-color: rgba(99, 102, 241, 0.35);
+  box-shadow: 0 16px 40px -4px rgba(0, 0, 0, 0.55), 0 0 24px -4px rgba(99, 102, 241, 0.18), inset 0 1px 0 rgba(255, 255, 255, 0.14);
   transform: translateY(-2px);
 }
 
@@ -1627,4 +1649,294 @@ main#main-content {
   border-color: var(--blue-400);
   background: rgba(79, 124, 255, 0.12);
   box-shadow: 0 0 16px rgba(79, 124, 255, 0.25);
+}
+
+/* ==========================================================================
+   MODERN INTERACTIVE ENTERPRISE COMPONENTS & ENHANCEMENTS
+   ========================================================================== */
+
+/* 1. KPI Metric Summary Grid */
+.kpi-metrics-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.kpi-card {
+  background: var(--surface-card-grad);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 18px 20px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  cursor: pointer;
+  box-shadow: 0 8px 24px -4px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.08);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  transition: all 0.22s cubic-bezier(0.16, 1, 0.3, 1);
+  position: relative;
+  overflow: hidden;
+}
+
+.kpi-card::after {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0; height: 3px;
+  background: var(--kpi-accent, var(--blue-400));
+  opacity: 0.85;
+}
+
+.kpi-card:hover {
+  transform: translateY(-3px);
+  border-color: rgba(99, 102, 241, 0.45);
+  box-shadow: 0 14px 32px -4px rgba(0, 0, 0, 0.6), 0 0 20px -2px rgba(99, 102, 241, 0.25), inset 0 1px 0 rgba(255, 255, 255, 0.16);
+}
+
+.kpi-icon-box {
+  width: 48px;
+  height: 48px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 22px;
+  background: var(--kpi-icon-bg, rgba(56, 189, 248, 0.12));
+  color: var(--kpi-icon-color, var(--blue-400));
+  border: 1px solid var(--kpi-icon-border, rgba(56, 189, 248, 0.25));
+  flex-shrink: 0;
+}
+
+.kpi-value {
+  font-family: var(--font-sans);
+  font-size: 22px;
+  font-weight: 700;
+  color: #FFFFFF;
+  line-height: 1.2;
+  letter-spacing: -0.02em;
+}
+
+.kpi-label {
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--text-3);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-top: 2px;
+}
+
+/* 2. Interactive Live Table Toolbar */
+.table-interactive-toolbar {
+  padding: 14px 20px;
+  background: rgba(18, 24, 52, 0.7);
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.live-search-box {
+  position: relative;
+  min-width: 260px;
+  flex: 1;
+  max-width: 400px;
+}
+
+.live-search-box i {
+  position: absolute;
+  left: 14px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--text-3);
+  font-size: 14px;
+  pointer-events: none;
+}
+
+.live-search-box input {
+  width: 100%;
+  height: 38px;
+  padding: 0 14px 0 38px;
+  background: rgba(10, 14, 32, 0.75);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  color: #FFFFFF;
+  font-size: 13px;
+  outline: none;
+  transition: all var(--dur-fast);
+}
+
+.live-search-box input:focus {
+  border-color: var(--blue-400);
+  box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.18);
+  background: rgba(10, 14, 32, 0.95);
+}
+
+.table-filter-pills {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.table-pill-btn {
+  padding: 6px 14px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 500;
+  border: 1px solid var(--border);
+  background: rgba(14, 19, 44, 0.65);
+  color: var(--text-2);
+  cursor: pointer;
+  transition: all 0.16s ease;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.table-pill-btn:hover {
+  background: rgba(99, 102, 241, 0.18);
+  border-color: var(--blue-400);
+  color: #FFFFFF;
+}
+
+.table-pill-btn.is-active {
+  background: var(--blue-500);
+  border-color: var(--blue-400);
+  color: #FFFFFF;
+  box-shadow: 0 2px 12px rgba(59, 130, 246, 0.4);
+}
+
+.table-match-counter {
+  font-size: 12px;
+  color: var(--text-3);
+  font-family: var(--font-mono);
+}
+
+/* 3. Avatars & Entity Badges */
+.avatar-pill {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  color: #FFFFFF;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
+  flex-shrink: 0;
+  border: 1.5px solid rgba(255, 255, 255, 0.2);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.35);
+}
+
+.avatar-blue { background: linear-gradient(135deg, #0284c7 0%, #2563eb 100%); }
+.avatar-violet { background: linear-gradient(135deg, #7c3aed 0%, #9333ea 100%); }
+.avatar-pink { background: linear-gradient(135deg, #db2777 0%, #f43f5e 100%); }
+.avatar-amber { background: linear-gradient(135deg, #d97706 0%, #f59e0b 100%); }
+.avatar-emerald { background: linear-gradient(135deg, #059669 0%, #10b981 100%); }
+
+.club-avatar-circle {
+  width: 38px;
+  height: 38px;
+  border-radius: 10px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 17px;
+  color: #FFFFFF;
+  flex-shrink: 0;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.35);
+}
+
+.tech-avatar { background: var(--cat-tech-grad); }
+.biz-avatar { background: var(--cat-biz-grad); }
+.dance-avatar { background: var(--cat-art-grad); }
+.social-avatar { background: var(--cat-social-grad); }
+
+/* Event Date Chip */
+.event-date-chip {
+  width: 44px;
+  height: 44px;
+  border-radius: 10px;
+  background: rgba(14, 20, 46, 0.85);
+  border: 1px solid var(--border-strong);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+}
+
+.event-date-chip .month {
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  color: var(--blue-400);
+  line-height: 1;
+}
+
+.event-date-chip .day {
+  font-size: 15px;
+  font-weight: 700;
+  color: #FFFFFF;
+  line-height: 1.1;
+  margin-top: 1px;
+}
+
+/* 4. Pulsing Live Status Dots */
+.pulse-dot {
+  display: inline-block;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  margin-right: 6px;
+  vertical-align: middle;
+}
+
+.pulse-dot-active {
+  background-color: var(--success);
+  box-shadow: 0 0 8px var(--success);
+  animation: pulseGlow 2s infinite;
+}
+
+.pulse-dot-info {
+  background-color: var(--info);
+  box-shadow: 0 0 8px var(--info);
+  animation: pulseGlowBlue 2s infinite;
+}
+
+.pulse-dot-warning {
+  background-color: var(--warning);
+}
+
+.pulse-dot-inactive {
+  background-color: var(--text-3);
+}
+
+/* 5. Interactive Copy Chip */
+.btn-copy-chip {
+  padding: 3px 8px;
+  font-size: 11px;
+  border-radius: 5px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(255, 255, 255, 0.05);
+  color: var(--text-3);
+  cursor: pointer;
+  transition: all 0.15s ease;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.btn-copy-chip:hover {
+  color: #FFFFFF;
+  background: rgba(255, 255, 255, 0.14);
+  border-color: rgba(255, 255, 255, 0.25);
+  transform: translateY(-1px);
 }

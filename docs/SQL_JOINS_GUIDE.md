@@ -52,3 +52,4 @@ WHERE m1.role = 'President'
 ### Explanation:
 1. This query joins the `Memberships` table with itself to find and pair the active President and Secretary within the same club.
 2. It matches rows sharing the identical `club_id` while filtering for distinct leadership roles, linking complementary club executives together.
+

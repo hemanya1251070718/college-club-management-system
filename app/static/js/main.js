@@ -475,5 +475,107 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   };
 
+  /**
+   * ========================================================================
+   * INTERACTIVE REAL-TIME TABLE SEARCH, CATEGORY PILLS & COPY CHIPS
+   * ========================================================================
+   */
+
+  // 1. Live Instant Table Filter
+  document.querySelectorAll(".table-live-search").forEach(input => {
+    const targetSelector = input.getAttribute("data-target-table") || ".tesla-table";
+    const table = document.querySelector(targetSelector);
+    if (!table) return;
+
+    const tbody = table.querySelector("tbody");
+    if (!tbody) return;
+
+    const counter = document.querySelector(input.getAttribute("data-counter") || ".table-match-counter");
+    const allRows = Array.from(tbody.querySelectorAll("tr:not(.empty-state-row)"));
+    const totalCount = allRows.length;
+
+    function applyFilter() {
+      const q = input.value.trim().toLowerCase();
+      const activePill = document.querySelector(".table-pill-btn.is-active");
+      const activeFilter = activePill ? (activePill.getAttribute("data-filter") || "all").toLowerCase() : "all";
+
+      let visibleCount = 0;
+
+      allRows.forEach(row => {
+        const rowText = row.innerText.toLowerCase();
+        const rowCat = (row.getAttribute("data-category") || "").toLowerCase();
+
+        const matchesQuery = !q || rowText.includes(q);
+        const matchesCategory = activeFilter === "all" || rowCat.includes(activeFilter) || rowText.includes(activeFilter);
+
+        if (matchesQuery && matchesCategory) {
+          row.style.display = "";
+          visibleCount++;
+        } else {
+          row.style.display = "none";
+        }
+      });
+
+      if (counter) {
+        counter.textContent = `Showing ${visibleCount} of ${totalCount}`;
+      }
+
+      // Check if all are hidden
+      let emptyRow = tbody.querySelector(".live-filter-empty-row");
+      if (visibleCount === 0) {
+        if (!emptyRow) {
+          emptyRow = document.createElement("tr");
+          emptyRow.className = "live-filter-empty-row";
+          emptyRow.innerHTML = `<td colspan="10" class="text-center py-5 text-secondary"><i class="bi bi-search me-2"></i>No records matching "<strong>${input.value}</strong>". <button type="button" class="btn btn-sm btn-link text-info p-0 ms-2" onclick="document.querySelector('.table-live-search').value=''; document.querySelector('.table-live-search').dispatchEvent(new Event('input'));">Clear search</button></td>`;
+          tbody.appendChild(emptyRow);
+        }
+      } else if (emptyRow) {
+        emptyRow.remove();
+      }
+    }
+
+    input.addEventListener("input", applyFilter);
+
+    // Filter pills
+    document.querySelectorAll(".table-pill-btn").forEach(pill => {
+      pill.addEventListener("click", () => {
+        document.querySelectorAll(".table-pill-btn").forEach(p => p.classList.remove("is-active"));
+        pill.classList.add("is-active");
+        applyFilter();
+      });
+    });
+
+    // KPI Cards click to filter
+    document.querySelectorAll(".kpi-card[data-kpi-filter]").forEach(card => {
+      card.addEventListener("click", () => {
+        const filterVal = card.getAttribute("data-kpi-filter");
+        const matchingPill = document.querySelector(`.table-pill-btn[data-filter='${filterVal}']`);
+        if (matchingPill) {
+          matchingPill.click();
+        } else if (input) {
+          input.value = filterVal;
+          input.dispatchEvent(new Event("input"));
+        }
+      });
+    });
+  });
+
+  // 2. Interactive 1-Click Copy Chips
+  document.querySelectorAll(".btn-copy-chip").forEach(chip => {
+    chip.addEventListener("click", (e) => {
+      e.stopPropagation();
+      const textToCopy = chip.getAttribute("data-copy") || chip.innerText.trim();
+      navigator.clipboard.writeText(textToCopy).then(() => {
+        const originalHtml = chip.innerHTML;
+        chip.innerHTML = '<i class="bi bi-check2 text-success"></i> Copied!';
+        chip.style.borderColor = 'rgba(16, 185, 129, 0.4)';
+        setTimeout(() => {
+          chip.innerHTML = originalHtml;
+          chip.style.borderColor = '';
+        }, 1800);
+      });
+    });
+  });
+
   console.info("ClubHub DBMS • Shneiderman 8 Golden Rules Suite Initialized");
 });

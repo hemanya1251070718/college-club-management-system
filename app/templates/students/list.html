@@ -4,7 +4,7 @@
 
 {% block content %}
 <div class="app-container">
-  <!-- Breadcrumb (Shneiderman Rule 8: Reduce Memory Load) -->
+  <!-- Breadcrumb -->
   <nav aria-label="Breadcrumb">
     <ul class="app-breadcrumb">
       <li><a href="{{ url_for('main.dashboard') }}"><i class="bi bi-house me-1"></i>Cockpit</a></li>
@@ -17,8 +17,12 @@
   <header class="inner-page-header">
     <div class="inner-header-layout">
       <div>
+        <div class="d-flex align-items-center gap-2 mb-1">
+          <span class="badge-status success"><i class="bi bi-people-fill me-1"></i>ENGINEERS</span>
+          <span class="text-secondary small font-mono">75 Enrolled • Pre-Registered</span>
+        </div>
         <h1 class="inner-page-title">Students Directory</h1>
-        <p class="inner-page-subtitle">Manage registered campus engineers across academic departments.</p>
+        <p class="inner-page-subtitle">Undergraduate engineering scholars, institutional credentials, and club affiliations.</p>
       </div>
       <div>
         {% if current_role != 'member' %}
@@ -34,90 +38,131 @@
     </div>
   </header>
 
-  <!-- Search & Filter Bar (Rule 2: '/' Focusable & Rule 8: Visible Chips) -->
-  <div class="tesla-card mb-4 p-3 glow-border-hover">
-    <form method="GET" action="{{ url_for('main.list_students') }}" class="row g-3 align-items-center">
-      <div class="col-md-6">
-        <label for="student-search-input" class="visually-hidden">Search Students</label>
-        <div class="position-relative">
-          <input type="text" id="student-search-input" name="q" class="tesla-form-control" placeholder="Search by name, PRN, or student ID (Press '/' to focus)..." value="{{ search }}">
-        </div>
+  <!-- Interactive KPI Summary Cards -->
+  <div class="kpi-metrics-grid">
+    <div class="kpi-card" data-kpi-filter="all" style="--kpi-accent: #38bdf8;">
+      <div class="kpi-icon-box" style="--kpi-icon-bg: rgba(56, 189, 248, 0.12); --kpi-icon-color: #38bdf8; --kpi-icon-border: rgba(56, 189, 248, 0.3);">
+        <i class="bi bi-mortarboard-fill"></i>
       </div>
-      <div class="col-md-4">
-        <label for="student-dept-select" class="visually-hidden">Filter Department</label>
-        <select id="student-dept-select" name="dept" class="tesla-form-select">
-          <option value="">All Departments</option>
-          {% for d in departments %}
-          <option value="{{ d.dept_id }}" {% if selected_dept == d.dept_id %}selected{% endif %}>
-            {{ d.dept_name }} ({{ d.dept_id }})
-          </option>
-          {% endfor %}
-        </select>
+      <div>
+        <div class="kpi-value">75</div>
+        <div class="kpi-label">Registered Students</div>
       </div>
-      <div class="col-md-2 d-flex gap-2">
-        <button type="submit" class="btn-tesla-primary w-100" style="min-width: unset; height: 44px; line-height: 44px;">Filter</button>
-        {% if search or selected_dept %}
-        <a href="{{ url_for('main.list_students') }}" class="btn-tesla-secondary" style="min-width: unset; height: 44px; line-height: 44px; padding: 0 16px;">Reset</a>
-        {% endif %}
-      </div>
-    </form>
-    {% if search or selected_dept %}
-    <div class="filter-chip-bar">
-      <span class="text-secondary small">Active Filters:</span>
-      {% if search %}
-      <span class="filter-chip">
-        Search: <strong>"{{ search }}"</strong>
-        <a href="{{ url_for('main.list_students', dept=selected_dept) }}" class="filter-chip-remove" title="Remove keyword filter" aria-label="Remove search filter">&times;</a>
-      </span>
-      {% endif %}
-      {% if selected_dept %}
-      <span class="filter-chip">
-        Dept: <strong>{{ selected_dept }}</strong>
-        <a href="{{ url_for('main.list_students', q=search) }}" class="filter-chip-remove" title="Remove department filter" aria-label="Remove department filter">&times;</a>
-      </span>
-      {% endif %}
-      <a href="{{ url_for('main.list_students') }}" class="text-secondary small text-decoration-underline ms-2">Clear all</a>
     </div>
-    {% endif %}
+
+    <div class="kpi-card" data-kpi-filter="Computer Engineering" style="--kpi-accent: #3b82f6;">
+      <div class="kpi-icon-box" style="--kpi-icon-bg: rgba(59, 130, 246, 0.12); --kpi-icon-color: #60a5fa; --kpi-icon-border: rgba(59, 130, 246, 0.3);">
+        <i class="bi bi-terminal-fill"></i>
+      </div>
+      <div>
+        <div class="kpi-value">Computer Eng.</div>
+        <div class="kpi-label">Primary Branch</div>
+      </div>
+    </div>
+
+    <div class="kpi-card" data-kpi-filter="Mechanical" style="--kpi-accent: #f59e0b;">
+      <div class="kpi-icon-box" style="--kpi-icon-bg: rgba(245, 158, 11, 0.12); --kpi-icon-color: #fbbf24; --kpi-icon-border: rgba(245, 158, 11, 0.3);">
+        <i class="bi bi-gear-fill"></i>
+      </div>
+      <div>
+        <div class="kpi-value">Mechanical Eng.</div>
+        <div class="kpi-label">Mechanical &amp; Allied</div>
+      </div>
+    </div>
+
+    <div class="kpi-card" data-kpi-filter="Electronics" style="--kpi-accent: #8b5cf6;">
+      <div class="kpi-icon-box" style="--kpi-icon-bg: rgba(139, 92, 246, 0.12); --kpi-icon-color: #c084fc; --kpi-icon-border: rgba(139, 92, 246, 0.3);">
+        <i class="bi bi-cpu-fill"></i>
+      </div>
+      <div>
+        <div class="kpi-value">Electronics / EE</div>
+        <div class="kpi-label">Circuits &amp; Systems</div>
+      </div>
+    </div>
   </div>
 
-  <!-- Students Data Table -->
-  <div class="table-surface-card glow-border-hover">
+  <!-- Students Data Table Card -->
+  <div class="table-surface-card">
+    <!-- Live Search & Interactive Filter Toolbar -->
+    <div class="table-interactive-toolbar">
+      <div class="live-search-box">
+        <i class="bi bi-search"></i>
+        <input type="text" class="table-live-search" placeholder="Filter students by name, PRN, or email in real-time..." aria-label="Search students table">
+      </div>
+      <div class="d-flex align-items-center gap-3">
+        <div class="table-filter-pills">
+          <button type="button" class="table-pill-btn is-active" data-filter="all">All (75)</button>
+          <button type="button" class="table-pill-btn" data-filter="Computer Engineering"><i class="bi bi-terminal text-info"></i> CE</button>
+          <button type="button" class="table-pill-btn" data-filter="Mechanical Engineering"><i class="bi bi-gear text-warning"></i> ME</button>
+          <button type="button" class="table-pill-btn" data-filter="Electronics Engineering"><i class="bi bi-lightning text-danger"></i> EE</button>
+          <button type="button" class="table-pill-btn" data-filter="Electrical Engineering"><i class="bi bi-broadcast text-success"></i> ELE</button>
+        </div>
+        <span class="table-match-counter">Showing {{ students|length }} of {{ students|length }}</span>
+      </div>
+    </div>
+
     <div class="table-responsive">
       <table class="tesla-table">
         <thead>
           <tr>
-            <th>Student ID</th>
-            <th>PRN Number</th>
-            <th>Full Name</th>
-            <th>Email</th>
-            <th>Phone</th>
-            <th>Department</th>
-            <th>Year</th>
-            <th class="text-end">Actions</th>
+            <th style="width: 12%;">Student ID</th>
+            <th style="width: 14%;">PRN Number</th>
+            <th style="width: 26%;">Full Name &amp; Identity</th>
+            <th style="width: 22%;">Institutional Email</th>
+            <th style="width: 14%;">Department</th>
+            <th style="width: 12%;" class="text-end">Actions</th>
           </tr>
         </thead>
         <tbody>
           {% for s in students %}
-          <tr>
-            <td><span class="badge-status neutral font-mono">{{ s.student_id }}</span></td>
-            <td><code class="font-mono text-white">{{ s.prn_number }}</code></td>
-            <td class="fw-medium text-white">{{ s.name }}</td>
-            <td><small class="text-secondary">{{ s.email }}</small></td>
-            <td><small class="text-secondary">{{ s.phone or '-' }}</small></td>
-            <td><span class="badge-status neutral">{{ s.dept_name }}</span></td>
-            <td class="tabular-nums">Year {{ s.year_of_study }}</td>
+          <tr data-category="{{ s.dept_name }}">
+            <td>
+              <span class="badge-status neutral font-mono fw-bold">{{ s.student_id }}</span>
+            </td>
+            <td>
+              <span class="btn-copy-chip font-mono" data-copy="{{ s.prn_number }}" title="Click to copy PRN">
+                <i class="bi bi-clipboard"></i> {{ s.prn_number }}
+              </span>
+            </td>
+            <td>
+              <div class="d-flex align-items-center gap-3">
+                {% set initial = s.name[:2]|upper %}
+                {% if loop.index % 5 == 1 %}
+                  <span class="avatar-pill avatar-blue">{{ initial }}</span>
+                {% elif loop.index % 5 == 2 %}
+                  <span class="avatar-pill avatar-violet">{{ initial }}</span>
+                {% elif loop.index % 5 == 3 %}
+                  <span class="avatar-pill avatar-pink">{{ initial }}</span>
+                {% elif loop.index % 5 == 4 %}
+                  <span class="avatar-pill avatar-amber">{{ initial }}</span>
+                {% else %}
+                  <span class="avatar-pill avatar-emerald">{{ initial }}</span>
+                {% endif %}
+                <div>
+                  <div class="fw-semibold text-white">{{ s.name }}</div>
+                  <small class="text-secondary font-mono">Year {{ s.year_of_study }}</small>
+                </div>
+              </div>
+            </td>
+            <td>
+              <span class="btn-copy-chip" data-copy="{{ s.email }}" title="Click to copy email">
+                <i class="bi bi-envelope"></i> {{ s.email }}
+              </span>
+            </td>
+            <td>
+              <span class="badge-status neutral font-mono">{{ s.dept_name }}</span>
+            </td>
             <td class="text-end">
               <div class="d-inline-flex gap-1">
                 <a href="{{ url_for('main.proc_student_clubs', student_id=s.student_id) }}" class="btn-ghost-action text-info" title="View Enrolled Clubs via Stored Procedure">
                   <i class="bi bi-cpu"></i>
                 </a>
                 {% if current_role != 'member' %}
-                <a href="{{ url_for('main.edit_student', student_id=s.student_id) }}" class="btn-ghost-action action-write-btn" data-role-req="admin,manager,guest" title="Edit Student">
+                <a href="{{ url_for('main.edit_student', student_id=s.student_id) }}" class="btn-ghost-action text-info action-write-btn" data-role-req="admin,manager,guest" title="Edit Student">
                   <i class="bi bi-pencil"></i>
                 </a>
                 {% if current_role in ['admin', 'guest'] %}
-                <form method="POST" action="{{ url_for('main.delete_student', student_id=s.student_id) }}" class="d-inline delete-form action-write-btn" data-role-req="admin,guest" data-entity="student">
+                <form method="POST" action="{{ url_for('main.delete_student', student_id=s.student_id) }}" class="d-inline delete-form action-write-btn" data-role-req="admin,guest" data-entity="student {{ s.name }}">
                   <button type="submit" class="btn-ghost-action text-danger" title="Delete Student">
                     <i class="bi bi-trash"></i>
                   </button>
@@ -130,8 +175,8 @@
             </td>
           </tr>
           {% else %}
-          <tr>
-            <td colspan="8" class="text-center text-secondary py-5">No students found matching your criteria.</td>
+          <tr class="empty-state-row">
+            <td colspan="6" class="text-center text-secondary py-5">No students found matching your criteria.</td>
           </tr>
           {% endfor %}
         </tbody>

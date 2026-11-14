@@ -4,7 +4,7 @@
 
 {% block content %}
 <div class="app-container">
-  <!-- Breadcrumb (Shneiderman Rule 8: Reduce Memory Load) -->
+  <!-- Breadcrumb -->
   <nav aria-label="Breadcrumb">
     <ul class="app-breadcrumb">
       <li><a href="{{ url_for('main.dashboard') }}"><i class="bi bi-house me-1"></i>Cockpit</a></li>
@@ -13,12 +13,16 @@
     </ul>
   </nav>
 
-  <!-- Inner Page Header Band (Compact, NOT 100vh) -->
+  <!-- Inner Page Header Band -->
   <header class="inner-page-header">
     <div class="inner-header-layout">
       <div>
+        <div class="d-flex align-items-center gap-2 mb-1">
+          <span class="badge-status info"><i class="bi bi-diagram-3-fill me-1"></i>CHARTERS</span>
+          <span class="text-secondary small font-mono">Cloud SQL MySQL 8.0</span>
+        </div>
         <h1 class="inner-page-title">Clubs Management</h1>
-        <p class="inner-page-subtitle">Browse, register, edit, and govern campus student charters &amp; faculty coordinators.</p>
+        <p class="inner-page-subtitle">Campus student charters, leadership structures, and faculty advisory boards.</p>
       </div>
       <div>
         {% if current_role != 'member' %}
@@ -34,45 +38,140 @@
     </div>
   </header>
 
-  <!-- Clean Tesla Table (Zero 3D Tilt Glitch, Sticky Frosted Header, Hairline Separators) -->
-  <div class="table-surface-card glow-border-hover">
+  <!-- Interactive KPI Metric Summary Cards -->
+  <div class="kpi-metrics-grid">
+    <div class="kpi-card" data-kpi-filter="all" style="--kpi-accent: #38bdf8;">
+      <div class="kpi-icon-box" style="--kpi-icon-bg: rgba(56, 189, 248, 0.12); --kpi-icon-color: #38bdf8; --kpi-icon-border: rgba(56, 189, 248, 0.3);">
+        <i class="bi bi-building"></i>
+      </div>
+      <div>
+        <div class="kpi-value">5</div>
+        <div class="kpi-label">Active Charters</div>
+      </div>
+    </div>
+
+    <div class="kpi-card" data-kpi-filter="Technical" style="--kpi-accent: #2563eb;">
+      <div class="kpi-icon-box" style="--kpi-icon-bg: rgba(37, 99, 235, 0.12); --kpi-icon-color: #60a5fa; --kpi-icon-border: rgba(37, 99, 235, 0.3);">
+        <i class="bi bi-cpu"></i>
+      </div>
+      <div>
+        <div class="kpi-value">2</div>
+        <div class="kpi-label">Technical Societies</div>
+      </div>
+    </div>
+
+    <div class="kpi-card" data-kpi-filter="Entrepreneurship" style="--kpi-accent: #f59e0b;">
+      <div class="kpi-icon-box" style="--kpi-icon-bg: rgba(245, 158, 11, 0.12); --kpi-icon-color: #fbbf24; --kpi-icon-border: rgba(245, 158, 11, 0.3);">
+        <i class="bi bi-lightbulb"></i>
+      </div>
+      <div>
+        <div class="kpi-value">1</div>
+        <div class="kpi-label">Innovation / EDC</div>
+      </div>
+    </div>
+
+    <div class="kpi-card" data-kpi-filter="Dance" style="--kpi-accent: #ec4899;">
+      <div class="kpi-icon-box" style="--kpi-icon-bg: rgba(236, 72, 153, 0.12); --kpi-icon-color: #f472b6; --kpi-icon-border: rgba(236, 72, 153, 0.3);">
+        <i class="bi bi-music-note-beamed"></i>
+      </div>
+      <div>
+        <div class="kpi-value">1</div>
+        <div class="kpi-label">Arts &amp; Culture</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Interactive Table Surface Card -->
+  <div class="table-surface-card">
+    <!-- Live Search & Interactive Filter Toolbar -->
+    <div class="table-interactive-toolbar">
+      <div class="live-search-box">
+        <i class="bi bi-search"></i>
+        <input type="text" class="table-live-search" placeholder="Filter clubs, faculty, handles in real-time..." aria-label="Search clubs table">
+      </div>
+      <div class="d-flex align-items-center gap-3">
+        <div class="table-filter-pills">
+          <button type="button" class="table-pill-btn is-active" data-filter="all">All Charters</button>
+          <button type="button" class="table-pill-btn" data-filter="Technical"><i class="bi bi-cpu text-info"></i> Tech</button>
+          <button type="button" class="table-pill-btn" data-filter="Entrepreneurship"><i class="bi bi-lightbulb text-warning"></i> Startup</button>
+          <button type="button" class="table-pill-btn" data-filter="Dance"><i class="bi bi-music-note text-danger"></i> Dance</button>
+          <button type="button" class="table-pill-btn" data-filter="Social"><i class="bi bi-heart text-success"></i> Social</button>
+        </div>
+        <span class="table-match-counter">Showing 5 of 5</span>
+      </div>
+    </div>
+
     <div class="table-responsive">
       <table class="tesla-table">
         <thead>
           <tr>
-            <th>Club ID</th>
-            <th>Club Name</th>
-            <th>Category</th>
-            <th>Faculty Coordinator</th>
-            <th>Official Handles</th>
-            <th class="text-center">Enrolled</th>
-            <th class="text-end">Actions</th>
+            <th style="width: 10%;">Club ID</th>
+            <th style="width: 28%;">Club Name &amp; Identity</th>
+            <th style="width: 16%;">Category</th>
+            <th style="width: 20%;">Faculty Advisor</th>
+            <th style="width: 14%;" class="text-center">Enrolled Active</th>
+            <th style="width: 12%;" class="text-end">Actions</th>
           </tr>
         </thead>
         <tbody>
           {% for club in clubs %}
-          <tr>
-            <td><span class="badge-status neutral font-mono">{{ club.club_id }}</span></td>
-            <td class="fw-medium text-white">{{ club.club_name }}</td>
-            <td><span class="badge-status neutral">{{ club.category }}</span></td>
+          <tr data-category="{{ club.category }}">
             <td>
-              <div class="text-white">{{ club.faculty_name or 'Not Assigned' }}</div>
-              <small class="text-secondary">{{ club.faculty_email or '' }}</small>
+              <span class="badge-status neutral font-mono fw-bold">{{ club.club_id }}</span>
             </td>
             <td>
-              <small>
-                {% if club.official_email %}<div><i class="bi bi-envelope me-1 text-secondary"></i>{{ club.official_email }}</div>{% endif %}
-                {% if club.instagram_handle %}<div><i class="bi bi-instagram me-1 text-secondary"></i>@{{ club.instagram_handle }}</div>{% endif %}
-                {% if not club.official_email and not club.instagram_handle %}<span class="text-secondary">-</span>{% endif %}
-              </small>
+              <div class="d-flex align-items-center gap-3">
+                {% if club.category == 'Technical' %}
+                  <div class="club-avatar-circle tech-avatar"><i class="bi bi-cpu"></i></div>
+                {% elif club.category == 'Entrepreneurship' %}
+                  <div class="club-avatar-circle biz-avatar"><i class="bi bi-lightbulb"></i></div>
+                {% elif club.category == 'Dance' %}
+                  <div class="club-avatar-circle dance-avatar"><i class="bi bi-music-note-beamed"></i></div>
+                {% else %}
+                  <div class="club-avatar-circle social-avatar"><i class="bi bi-heart-pulse"></i></div>
+                {% endif %}
+                <div>
+                  <div class="fw-semibold text-white">{{ club.club_name }}</div>
+                  <div class="d-flex align-items-center gap-2 mt-1">
+                    {% if club.official_email %}
+                      <span class="btn-copy-chip" data-copy="{{ club.official_email }}" title="Click to copy email">
+                        <i class="bi bi-envelope"></i> {{ club.official_email }}
+                      </span>
+                    {% endif %}
+                    {% if club.instagram_handle %}
+                      <span class="btn-copy-chip" data-copy="@{{ club.instagram_handle }}" title="Click to copy handle">
+                        <i class="bi bi-instagram"></i> @{{ club.instagram_handle }}
+                      </span>
+                    {% endif %}
+                  </div>
+                </div>
+              </div>
+            </td>
+            <td>
+              {% if club.category == 'Technical' %}
+                <span class="badge-status info"><i class="bi bi-laptop me-1"></i>Technical</span>
+              {% elif club.category == 'Entrepreneurship' %}
+                <span class="badge-status warning"><i class="bi bi-rocket-takeoff me-1"></i>Entrepreneurship</span>
+              {% elif club.category == 'Dance' %}
+                <span class="badge-status neutral" style="color: var(--pink-400); border-color: rgba(244, 114, 182, 0.35); background: rgba(244, 114, 182, 0.12);"><i class="bi bi-stars me-1"></i>Dance</span>
+              {% else %}
+                <span class="badge-status success"><i class="bi bi-people me-1"></i>Social Service</span>
+              {% endif %}
+            </td>
+            <td>
+              <div class="text-white fw-medium">{{ club.faculty_name or 'Not Assigned' }}</div>
+              <small class="text-secondary font-mono">{{ club.faculty_email or '' }}</small>
             </td>
             <td class="text-center tabular-nums">
-              <span class="badge-status info fw-medium">{{ club.member_count }}</span>
+              <span class="badge-status success px-3 py-1">
+                <span class="pulse-dot pulse-dot-active"></span>
+                <strong>{{ club.member_count }}</strong> Members
+              </span>
             </td>
             <td class="text-end">
               {% if current_role != 'member' %}
               <div class="d-inline-flex gap-1 action-write-btn" data-role-req="admin,manager,guest">
-                <a href="{{ url_for('main.edit_club', club_id=club.club_id) }}" class="btn-ghost-action" title="Edit Club" aria-label="Edit club {{ club.club_name }}">
+                <a href="{{ url_for('main.edit_club', club_id=club.club_id) }}" class="btn-ghost-action text-info" title="Edit Club" aria-label="Edit club {{ club.club_name }}">
                   <i class="bi bi-pencil" aria-hidden="true"></i>
                 </a>
                 {% if current_role in ['admin', 'guest'] %}
@@ -89,8 +188,8 @@
             </td>
           </tr>
           {% else %}
-          <tr>
-            <td colspan="7" class="text-center text-secondary py-5">No clubs found in database.</td>
+          <tr class="empty-state-row">
+            <td colspan="6" class="text-center text-secondary py-5">No clubs found in database.</td>
           </tr>
           {% endfor %}
         </tbody>

@@ -4,7 +4,7 @@
 
 {% block content %}
 <div class="app-container">
-  <!-- Breadcrumb (Shneiderman Rule 8: Reduce Memory Load) -->
+  <!-- Breadcrumb -->
   <nav aria-label="Breadcrumb">
     <ul class="app-breadcrumb">
       <li><a href="{{ url_for('main.dashboard') }}"><i class="bi bi-house me-1"></i>Cockpit</a></li>
@@ -18,11 +18,11 @@
     <div class="inner-header-layout">
       <div>
         <div class="d-flex align-items-center gap-2 mb-2">
-          <span class="badge-status warning">8 PRODUCTION TRIGGERS</span>
+          <span class="badge-status warning font-mono">CLOUD SQL AUTOMATION</span>
           <span class="text-secondary small">&bull; Declarative Integrity &amp; Automation</span>
         </div>
         <h1 class="inner-page-title">8 Database Triggers Architecture</h1>
-        <p class="inner-page-subtitle">Production DBMS evaluation: 8 non-identical triggers across 8 canonical domain tables with zero audit table overhead.</p>
+        <p class="inner-page-subtitle">Production DBMS evaluation: 8 distinct triggers across 8 canonical domain tables with zero audit table overhead.</p>
       </div>
       <div class="d-flex gap-2">
         <a href="{{ url_for('main.procedures_hub') }}" class="btn-tesla-secondary">
@@ -32,90 +32,99 @@
     </div>
   </header>
 
-  <!-- Team Distribution 4-Pillar Grid -->
-  <div class="row g-4 mb-5">
-    <div class="col-md-6 col-xl-3">
-      <div class="tesla-card h-100" style="border-top: 2px solid var(--blue-400);">
-        <div class="d-flex justify-content-between align-items-center mb-3">
-          <span class="badge-status info">LIFECYCLE</span>
-          <span class="text-secondary small">Triggers 1 &amp; 2</span>
-        </div>
-        <h4 class="text-white fw-medium mb-2" style="font-size: 16px;">Club Size Automation</h4>
-        <p class="text-secondary small mb-0">
-          Automatic increment (<code class="font-mono text-white">Trigger 1</code>) and decrement (<code class="font-mono text-white">Trigger 2</code>) of <code class="font-mono text-white">Clubs.member_count</code>.
-        </p>
+  <!-- 4-Pillar Grid -->
+  <div class="kpi-metrics-grid mb-4">
+    <div class="kpi-card glow-border-hover" data-kpi-filter="Lifecycle" style="cursor: pointer;" title="Filter Lifecycle Triggers (1 & 2)">
+      <div class="kpi-icon-box" style="background: rgba(56, 189, 248, 0.15); color: #38bdf8;">
+        <i class="bi bi-arrow-repeat"></i>
+      </div>
+      <div>
+        <div class="kpi-value text-white tabular-nums">2 Triggers</div>
+        <div class="kpi-label">Size Lifecycle (T1 &amp; T2)</div>
       </div>
     </div>
 
-    <div class="col-md-6 col-xl-3">
-      <div class="tesla-card h-100" style="border-top: 2px solid var(--success);">
-        <div class="d-flex justify-content-between align-items-center mb-3">
-          <span class="badge-status success">GOVERNANCE</span>
-          <span class="text-secondary small">Triggers 3 &amp; 4</span>
-        </div>
-        <h4 class="text-white fw-medium mb-2" style="font-size: 16px;">Governance &amp; Status</h4>
-        <p class="text-secondary small mb-0">
-          Enforces single-president rule via SQLSTATE 45000 and dynamic count sync on active/inactive toggle.
-        </p>
+    <div class="kpi-card glow-border-hover" data-kpi-filter="Governance" style="cursor: pointer;" title="Filter Governance Triggers (3 & 4)">
+      <div class="kpi-icon-box" style="background: rgba(16, 185, 129, 0.15); color: #34d399;">
+        <i class="bi bi-shield-check"></i>
+      </div>
+      <div>
+        <div class="kpi-value text-white tabular-nums">2 Triggers</div>
+        <div class="kpi-label">Governance &amp; Status (T3 &amp; T4)</div>
       </div>
     </div>
 
-    <div class="col-md-6 col-xl-3">
-      <div class="tesla-card h-100" style="border-top: 2px solid var(--warning);">
-        <div class="d-flex justify-content-between align-items-center mb-3">
-          <span class="badge-status warning">INTEGRITY</span>
-          <span class="text-secondary small">Triggers 5 &amp; 6</span>
-        </div>
-        <h4 class="text-white fw-medium mb-2" style="font-size: 16px;">Event Integrity &amp; Reviews</h4>
-        <p class="text-secondary small mb-0">
-          Rejects retrospective registration on past events and blocks unverified feedback submissions.
-        </p>
+    <div class="kpi-card glow-border-hover" data-kpi-filter="Integrity" style="cursor: pointer;" title="Filter Integrity Triggers (5 & 6)">
+      <div class="kpi-icon-box" style="background: rgba(245, 158, 11, 0.15); color: #fbbf24;">
+        <i class="bi bi-exclamation-octagon"></i>
+      </div>
+      <div>
+        <div class="kpi-value text-white tabular-nums">2 Triggers</div>
+        <div class="kpi-label">Event Integrity (T5 &amp; T6)</div>
       </div>
     </div>
 
-    <div class="col-md-6 col-xl-3">
-      <div class="tesla-card h-100" style="border-top: 2px solid var(--violet-400);">
-        <div class="d-flex justify-content-between align-items-center mb-3">
-          <span class="badge-status neutral" style="color: var(--violet-400);">PROVISIONING</span>
-          <span class="text-secondary small">Triggers 7 &amp; 8</span>
-        </div>
-        <h4 class="text-white fw-medium mb-2" style="font-size: 16px;">Lifecycle &amp; Provisioning</h4>
-        <p class="text-secondary small mb-0">
-          Auto-progresses event status to Ongoing upon attendance and auto-provisions baseline ClubProfile.
-        </p>
+    <div class="kpi-card glow-border-hover" data-kpi-filter="Provisioning" style="cursor: pointer;" title="Filter Provisioning Triggers (7 & 8)">
+      <div class="kpi-icon-box" style="background: rgba(168, 85, 247, 0.15); color: #c084fc;">
+        <i class="bi bi-lightning-charge-fill"></i>
+      </div>
+      <div>
+        <div class="kpi-value text-white tabular-nums">2 Triggers</div>
+        <div class="kpi-label">Provisioning (T7 &amp; T8)</div>
       </div>
     </div>
   </div>
 
-  <!-- Triggers Detailed HUD Catalog -->
-  <div class="table-surface-card" style="overflow: visible;">
-    <div class="p-3 border-bottom d-flex justify-content-between align-items-center" style="border-color: var(--border) !important; background: var(--surface-2);">
-      <span class="text-white fw-medium">Production Trigger Specifications &amp; Live Verification</span>
-      <span class="badge-status neutral font-mono">8 Canonical Base Tables</span>
+  <!-- Real-Time Interactive Table Toolbar -->
+  <div class="table-interactive-toolbar mb-3">
+    <div class="live-search-box">
+      <i class="bi bi-search search-icon"></i>
+      <input type="text" class="tesla-input table-live-search" placeholder="Type to filter triggers in real time (name, table, timing, rule)..." data-target="triggers-table-body" aria-label="Instant search triggers">
     </div>
-    <div class="table-responsive" style="overflow-x: auto; overflow-y: visible !important;">
-      <table class="tesla-table" style="width: 100%;">
+    <div class="table-filter-pills">
+      <button type="button" class="table-pill-btn active" data-filter="" data-target="triggers-table-body">All 8 Triggers</button>
+      <button type="button" class="table-pill-btn" data-filter="Lifecycle" data-target="triggers-table-body">Lifecycle</button>
+      <button type="button" class="table-pill-btn" data-filter="Governance" data-target="triggers-table-body">Governance</button>
+      <button type="button" class="table-pill-btn" data-filter="Integrity" data-target="triggers-table-body">Integrity</button>
+      <button type="button" class="table-pill-btn" data-filter="Provisioning" data-target="triggers-table-body">Provisioning</button>
+    </div>
+    <div class="table-match-counter">
+      Showing <strong class="match-count">8</strong> of 8 production triggers
+    </div>
+  </div>
+
+  <!-- Triggers Detailed HUD Catalog -->
+  <div class="table-surface-card glow-border-hover">
+    <div class="table-responsive">
+      <table class="tesla-table">
         <thead>
           <tr>
-            <th style="width: 5%; padding: 16px 20px; background: var(--surface-2);">#</th>
-            <th style="width: 25%; padding: 16px 20px; background: var(--surface-2);">Trigger Name</th>
-            <th style="width: 15%; padding: 16px 20px; background: var(--surface-2);">Timing &amp; Table</th>
-            <th style="width: 40%; padding: 16px 20px; background: var(--surface-2);">Enforced Business Rule</th>
-            <th style="width: 15%; padding: 16px 20px; background: var(--surface-2);" class="text-end">Live Test</th>
+            <th style="width: 50px;">#</th>
+            <th>Trigger Name</th>
+            <th>Timing &amp; Table</th>
+            <th>Domain Pillar</th>
+            <th>Enforced Business Rule</th>
+            <th class="text-end">Live Test</th>
           </tr>
         </thead>
-        <tbody>
+        <tbody id="triggers-table-body">
           <!-- Trigger 1 -->
           <tr>
             <td><span class="badge-status info font-mono">1</span></td>
             <td>
-              <strong class="text-white font-mono">trg_after_membership_insert_sync_count</strong>
-              <small class="d-block text-secondary">Membership Lifecycle</small>
+              <div class="d-flex align-items-center gap-2">
+                <strong class="text-white font-mono">trg_after_membership_insert_sync_count</strong>
+                <button type="button" class="btn-copy-chip" data-copy="trg_after_membership_insert_sync_count" title="Copy Trigger Name">
+                  <i class="bi bi-copy"></i>
+                </button>
+              </div>
+              <small class="d-block text-secondary">Base Table Increment</small>
             </td>
             <td>
               <span class="badge-status success">AFTER INSERT</span>
               <small class="d-block text-secondary mt-1 font-mono">Memberships &rarr; Clubs</small>
             </td>
+            <td><span class="badge-status info">Lifecycle</span></td>
             <td>
               When a student joins a club with status <code class="font-mono text-white">'Active'</code>, <code class="font-mono text-white">Clubs.member_count</code> automatically increments by 1 directly in the Cloud SQL base table.
             </td>
@@ -134,13 +143,19 @@
           <tr>
             <td><span class="badge-status info font-mono">2</span></td>
             <td>
-              <strong class="text-white font-mono">trg_after_membership_delete_sync_count</strong>
-              <small class="d-block text-secondary">Membership Lifecycle</small>
+              <div class="d-flex align-items-center gap-2">
+                <strong class="text-white font-mono">trg_after_membership_delete_sync_count</strong>
+                <button type="button" class="btn-copy-chip" data-copy="trg_after_membership_delete_sync_count" title="Copy Trigger Name">
+                  <i class="bi bi-copy"></i>
+                </button>
+              </div>
+              <small class="d-block text-secondary">Base Table Decrement</small>
             </td>
             <td>
               <span class="badge-status danger">AFTER DELETE</span>
-              <small class="d-block text-secondary mt-1 font-mono">Memberships</small>
+              <small class="d-block text-secondary mt-1 font-mono">Memberships &rarr; Clubs</small>
             </td>
+            <td><span class="badge-status info">Lifecycle</span></td>
             <td>
               When an active membership is deleted, <code class="font-mono text-white">Clubs.member_count</code> automatically decrements by 1 directly in the base table.
             </td>
@@ -150,7 +165,7 @@
                 Delete Member
               </a>
               {% else %}
-              <span class="badge-status neutral small"><i class="bi bi-lock me-1"></i>Coordinator/President Only</span>
+              <span class="badge-status neutral small"><i class="bi bi-lock me-1"></i>Protected</span>
               {% endif %}
             </td>
           </tr>
@@ -159,13 +174,19 @@
           <tr>
             <td><span class="badge-status success font-mono">3</span></td>
             <td>
-              <strong class="text-white font-mono">trg_prevent_multiple_presidents</strong>
-              <small class="d-block text-secondary">Club Bylaws</small>
+              <div class="d-flex align-items-center gap-2">
+                <strong class="text-white font-mono">trg_prevent_multiple_presidents</strong>
+                <button type="button" class="btn-copy-chip" data-copy="trg_prevent_multiple_presidents" title="Copy Trigger Name">
+                  <i class="bi bi-copy"></i>
+                </button>
+              </div>
+              <small class="d-block text-secondary">Club Bylaws Integrity</small>
             </td>
             <td>
               <span class="badge-status warning">BEFORE INSERT</span>
               <small class="d-block text-secondary mt-1 font-mono">Memberships</small>
             </td>
+            <td><span class="badge-status success">Governance</span></td>
             <td>
               Enforces Club Bylaws: Aborts transaction via <code class="font-mono text-white">SIGNAL SQLSTATE '45000'</code> if an attempt is made to insert a second active President for the same club.
             </td>
@@ -175,23 +196,30 @@
                 Test 2nd President
               </a>
               {% else %}
-              <span class="badge-status neutral small"><i class="bi bi-lock me-1"></i>President Only</span>
+              <span class="badge-status neutral small"><i class="bi bi-lock me-1"></i>Protected</span>
               {% endif %}
             </td>
           </tr>
+
           <!-- Trigger 4 -->
           <tr>
             <td><span class="badge-status success font-mono">4</span></td>
             <td>
-              <strong class="text-white font-mono">trg_adjust_member_count_on_status_change</strong>
+              <div class="d-flex align-items-center gap-2">
+                <strong class="text-white font-mono">trg_adjust_member_count_on_status_change</strong>
+                <button type="button" class="btn-copy-chip" data-copy="trg_adjust_member_count_on_status_change" title="Copy Trigger Name">
+                  <i class="bi bi-copy"></i>
+                </button>
+              </div>
               <small class="d-block text-secondary">Membership Governance</small>
             </td>
             <td>
               <span class="badge-status info">AFTER UPDATE</span>
               <small class="d-block text-secondary mt-1 font-mono">Memberships</small>
             </td>
+            <td><span class="badge-status success">Governance</span></td>
             <td>
-              When a member's status is toggled between <code class="font-mono text-white">Active</code> and <code class="font-mono text-white">Inactive</code>, <code class="font-mono text-white">Clubs.member_count</code> is automatically incremented or decremented.
+              When a member's status is toggled between <code class="font-mono text-white">Active</code> and <code class="font-mono text-white">Inactive</code>, <code class="font-mono text-white">Clubs.member_count</code> is automatically synchronized.
             </td>
             <td class="text-end">
               {% if can_test_trigger(4) %}
@@ -199,7 +227,7 @@
                 Toggle Status
               </a>
               {% else %}
-              <span class="badge-status neutral small"><i class="bi bi-lock me-1"></i>Coordinator Only</span>
+              <span class="badge-status neutral small"><i class="bi bi-lock me-1"></i>Protected</span>
               {% endif %}
             </td>
           </tr>
@@ -208,13 +236,19 @@
           <tr>
             <td><span class="badge-status warning font-mono">5</span></td>
             <td>
-              <strong class="text-white font-mono">trg_prevent_registration_for_completed_event</strong>
-              <small class="d-block text-secondary">Event Integrity</small>
+              <div class="d-flex align-items-center gap-2">
+                <strong class="text-white font-mono">trg_prevent_registration_for_completed_event</strong>
+                <button type="button" class="btn-copy-chip" data-copy="trg_prevent_registration_for_completed_event" title="Copy Trigger Name">
+                  <i class="bi bi-copy"></i>
+                </button>
+              </div>
+              <small class="d-block text-secondary">Event Temporal Integrity</small>
             </td>
             <td>
               <span class="badge-status warning">BEFORE INSERT</span>
               <small class="d-block text-secondary mt-1 font-mono">EventRegistrations</small>
             </td>
+            <td><span class="badge-status warning">Integrity</span></td>
             <td>
               Rejects retrospective registrations for events that are already marked <code class="font-mono text-white">'Completed'</code> or <code class="font-mono text-white">'Cancelled'</code>.
             </td>
@@ -233,13 +267,19 @@
           <tr>
             <td><span class="badge-status warning font-mono">6</span></td>
             <td>
-              <strong class="text-white font-mono">trg_verify_feedback_registration</strong>
-              <small class="d-block text-secondary">Feedback Verification</small>
+              <div class="d-flex align-items-center gap-2">
+                <strong class="text-white font-mono">trg_verify_feedback_registration</strong>
+                <button type="button" class="btn-copy-chip" data-copy="trg_verify_feedback_registration" title="Copy Trigger Name">
+                  <i class="bi bi-copy"></i>
+                </button>
+              </div>
+              <small class="d-block text-secondary">Verified Reviews Gatekeeper</small>
             </td>
             <td>
               <span class="badge-status warning">BEFORE INSERT</span>
               <small class="d-block text-secondary mt-1 font-mono">Feedback</small>
             </td>
+            <td><span class="badge-status warning">Integrity</span></td>
             <td>
               Authenticity assurance: Intercepts event feedback submissions and verifies via cross-table check that the student was registered for that event.
             </td>
@@ -258,15 +298,21 @@
           <tr>
             <td><span class="badge-status neutral font-mono" style="color: var(--violet-400);">7</span></td>
             <td>
-              <strong class="text-white font-mono">trg_auto_progress_event_on_attendance</strong>
-              <small class="d-block text-secondary">Attendance Progression</small>
+              <div class="d-flex align-items-center gap-2">
+                <strong class="text-white font-mono">trg_auto_progress_event_on_attendance</strong>
+                <button type="button" class="btn-copy-chip" data-copy="trg_auto_progress_event_on_attendance" title="Copy Trigger Name">
+                  <i class="bi bi-copy"></i>
+                </button>
+              </div>
+              <small class="d-block text-secondary">State Progression</small>
             </td>
             <td>
               <span class="badge-status info">AFTER UPDATE</span>
               <small class="d-block text-secondary mt-1 font-mono">EventRegistrations</small>
             </td>
+            <td><span class="badge-status neutral" style="color: var(--violet-400);">Provisioning</span></td>
             <td>
-              When attendee status is marked <code class="font-mono text-white">'Attended'</code> at the check-in desk, if the event was <code class="font-mono text-white">'Planned'</code>, it automatically flips to <code class="font-mono text-white">'Ongoing'</code>.
+              When attendee status is marked <code class="font-mono text-white">'Attended'</code> at check-in, if the event was <code class="font-mono text-white">'Planned'</code>, it automatically flips to <code class="font-mono text-white">'Ongoing'</code>.
             </td>
             <td class="text-end">
               {% if can_test_trigger(7) %}
@@ -274,7 +320,7 @@
                 Mark Attendance
               </a>
               {% else %}
-              <span class="badge-status neutral small"><i class="bi bi-lock me-1"></i>Coordinator Only</span>
+              <span class="badge-status neutral small"><i class="bi bi-lock me-1"></i>Protected</span>
               {% endif %}
             </td>
           </tr>
@@ -283,15 +329,21 @@
           <tr>
             <td><span class="badge-status neutral font-mono" style="color: var(--violet-400);">8</span></td>
             <td>
-              <strong class="text-white font-mono">trg_auto_create_club_profile</strong>
-              <small class="d-block text-secondary">System Provisioning</small>
+              <div class="d-flex align-items-center gap-2">
+                <strong class="text-white font-mono">trg_auto_create_club_profile</strong>
+                <button type="button" class="btn-copy-chip" data-copy="trg_auto_create_club_profile" title="Copy Trigger Name">
+                  <i class="bi bi-copy"></i>
+                </button>
+              </div>
+              <small class="d-block text-secondary">Zero-Config Provisioning</small>
             </td>
             <td>
               <span class="badge-status success">AFTER INSERT</span>
-              <small class="d-block text-secondary mt-1 font-mono">Clubs</small>
+              <small class="d-block text-secondary mt-1 font-mono">Clubs &rarr; ClubProfile</small>
             </td>
+            <td><span class="badge-status neutral" style="color: var(--violet-400);">Provisioning</span></td>
             <td>
-              Zero-config provisioning: When a new club is created, automatically provisions baseline profile row with institutional email and Instagram handle in <code class="font-mono text-white">ClubProfile</code>.
+              When a new club is created, automatically provisions baseline profile row with institutional email and Instagram handle in <code class="font-mono text-white">ClubProfile</code>.
             </td>
             <td class="text-end">
               {% if can_test_trigger(8) %}
@@ -299,24 +351,7 @@
                 Create Club
               </a>
               {% else %}
-              <span class="badge-status neutral small"><i class="bi bi-lock me-1"></i>President/Admin Only</span>
-              {% endif %}
-            </td>
-          </tr>
-            <td>
-              <span class="badge-status success">AFTER INSERT</span>
-              <small class="d-block text-secondary mt-1 font-mono">Clubs</small>
-            </td>
-            <td>
-              Zero-config provisioning: When a new club is created, automatically provisions baseline profile row with institutional email and Instagram handle in <code class="font-mono text-white">ClubProfile</code>.
-            </td>
-            <td class="text-end">
-              {% if can_test_trigger(8) %}
-              <a href="{{ url_for('main.create_club') }}" class="btn-ghost-action text-success">
-                Create Club
-              </a>
-              {% else %}
-              <span class="badge-status neutral small"><i class="bi bi-lock me-1"></i>President/Admin Only</span>
+              <span class="badge-status neutral small"><i class="bi bi-lock me-1"></i>Protected</span>
               {% endif %}
             </td>
           </tr>
