@@ -26,10 +26,10 @@
   <!-- Bootstrap Icons -->
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
 
-  <!-- Design System Tokens & Components (High-Impact Hybrid Editorial Design) -->
-  <link rel="stylesheet" href="{{ url_for('static', filename='css/tokens.css') }}?v=20261114_contrast_v2">
-  <link rel="stylesheet" href="{{ url_for('static', filename='css/components.css') }}?v=20261114_contrast_v2">
-  <link rel="stylesheet" href="{{ url_for('static', filename='css/motion.css') }}?v=20261114_contrast_v2">
+  <!-- Design System Tokens & Components (Outcrowd Incident Management Platform Design) -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/tokens.css') }}?v=20261114_outcrowd_v3">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/components.css') }}?v=20261114_outcrowd_v3">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/motion.css') }}?v=20261114_outcrowd_v3">
 </head>
 <body class="{% block body_class %}{% endblock %}" data-user-role="{{ current_role|default('guest') }}">
 
@@ -44,10 +44,14 @@
   <!-- Fixed Tidewell-Inspired Header (Frosted Pill Navigation & Utility Cluster) -->
   <header class="app-header" role="banner">
     <div class="header-inner">
-      <!-- Left: Brand Wordmark with Curved Wave Icon -->
+      <!-- Left: Brand Wordmark with Outcrowd Live Incident Status Indicator -->
       <a class="header-brand" href="{{ url_for('main.dashboard') }}" title="ClubHub Enterprise DBMS">
         <span class="brand-tilde">~</span>
         <span class="brand-name">ClubHub</span>
+        <span class="nav-status-badge d-none d-xl-inline-flex ms-2" title="All Systems Operational • 8 Triggers Armed">
+          <span class="pulse-dot-green"></span>
+          <span>Operational</span>
+        </span>
       </a>
 
       <!-- Center: Frosted Pill Navigation Capsule (Matching Attached Photo) -->
@@ -577,10 +581,10 @@
   <!-- Bootstrap 5 JS Bundle -->
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
   <!-- Interaction & Motion Engine -->
-  <script src="{{ url_for('static', filename='js/motion.js') }}?v=20261114_contrast_v2"></script>
+  <script src="{{ url_for('static', filename='js/motion.js') }}?v=20261114_outcrowd_v3"></script>
   <!-- Selective WebGL Hero -->
-  <script src="{{ url_for('static', filename='js/webgl-hero.js') }}?v=20261114_contrast_v2"></script>
+  <script src="{{ url_for('static', filename='js/webgl-hero.js') }}?v=20261114_outcrowd_v3"></script>
   <!-- Main RBAC & Google Pay Rainbow Animation Bridge -->
-  <script src="{{ url_for('static', filename='js/main.js') }}?v=20261114_contrast_v2"></script>
+  <script src="{{ url_for('static', filename='js/main.js') }}?v=20261114_outcrowd_v3"></script>
 </body>
 </html>
