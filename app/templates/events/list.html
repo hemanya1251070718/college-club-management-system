@@ -38,6 +38,13 @@
     </div>
   </header>
 
+  {% if db_error %}
+  <div class="tesla-alert alert-danger mb-4">
+    <strong>Database Query Notice:</strong> {{ db_error }}
+    <pre class="font-mono mt-2" style="font-size: 11px;">{{ err_detail }}</pre>
+  </div>
+  {% endif %}
+
   <!-- Interactive KPI Metric Cards -->
   {% set total_attendees = namespace(count=0) %}
   {% set total_budget = namespace(amt=0) %}
