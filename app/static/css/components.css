@@ -1820,7 +1820,8 @@ main#main-content {
   color: #FFFFFF;
 }
 
-.table-pill-btn.is-active {
+.table-pill-btn.is-active,
+.table-pill-btn.active {
   background: var(--blue-500);
   border-color: var(--blue-400);
   color: #FFFFFF;

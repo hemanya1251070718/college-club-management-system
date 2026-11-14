@@ -40,7 +40,7 @@
 
   <!-- Interactive KPI Metric Cards -->
   <div class="kpi-metrics-grid mb-4">
-    <div class="kpi-card glow-border-hover" data-kpi-filter="" style="cursor: pointer;" title="Show all memberships">
+    <div class="kpi-card glow-border-hover" data-kpi-filter="all" style="cursor: pointer;" title="Show all memberships">
       <div class="kpi-icon-box" style="background: rgba(56, 189, 248, 0.15); color: #38bdf8;">
         <i class="bi bi-people-fill"></i>
       </div>
@@ -132,7 +132,7 @@
       <input type="text" class="tesla-input table-live-search" placeholder="Type to filter memberships in real time (student, PRN, club, role)..." data-target="memberships-table-body" aria-label="Instant search memberships">
     </div>
     <div class="table-filter-pills">
-      <button type="button" class="table-pill-btn active" data-filter="" data-target="memberships-table-body">All Roles</button>
+      <button type="button" class="table-pill-btn active is-active" data-filter="all" data-target="memberships-table-body">All Roles</button>
       <button type="button" class="table-pill-btn" data-filter="President" data-target="memberships-table-body">Presidents</button>
       <button type="button" class="table-pill-btn" data-filter="Secretary" data-target="memberships-table-body">Secretaries</button>
       <button type="button" class="table-pill-btn" data-filter="Coordinator" data-target="memberships-table-body">Coordinators</button>
@@ -163,7 +163,7 @@
         <tbody id="memberships-table-body">
           {% for m in memberships %}
           {% set avatar_variants = ['avatar-blue', 'avatar-violet', 'avatar-emerald', 'avatar-amber', 'avatar-rose'] %}
-          <tr>
+          <tr data-category="{{ m.role }} {{ m.status }} {{ m.club_name }} {{ m.club_id }}" data-role="{{ m.role }}" data-status="{{ m.status }}">
             <td>
               <div class="d-flex align-items-center gap-2">
                 <span class="badge-status neutral font-mono font-bold">{{ m.membership_id }}</span>

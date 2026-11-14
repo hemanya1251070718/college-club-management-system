@@ -82,7 +82,7 @@
       <input type="text" class="tesla-input table-live-search" placeholder="Type to filter triggers in real time (name, table, timing, rule)..." data-target="triggers-table-body" aria-label="Instant search triggers">
     </div>
     <div class="table-filter-pills">
-      <button type="button" class="table-pill-btn active" data-filter="" data-target="triggers-table-body">All 8 Triggers</button>
+      <button type="button" class="table-pill-btn active is-active" data-filter="all" data-target="triggers-table-body">All 8 Triggers</button>
       <button type="button" class="table-pill-btn" data-filter="Lifecycle" data-target="triggers-table-body">Lifecycle</button>
       <button type="button" class="table-pill-btn" data-filter="Governance" data-target="triggers-table-body">Governance</button>
       <button type="button" class="table-pill-btn" data-filter="Integrity" data-target="triggers-table-body">Integrity</button>
@@ -109,7 +109,7 @@
         </thead>
         <tbody id="triggers-table-body">
           <!-- Trigger 1 -->
-          <tr>
+          <tr data-category="Lifecycle">
             <td><span class="badge-status info font-mono">1</span></td>
             <td>
               <div class="d-flex align-items-center gap-2">
@@ -140,7 +140,7 @@
           </tr>
 
           <!-- Trigger 2 -->
-          <tr>
+          <tr data-category="Lifecycle">
             <td><span class="badge-status info font-mono">2</span></td>
             <td>
               <div class="d-flex align-items-center gap-2">
@@ -171,7 +171,7 @@
           </tr>
 
           <!-- Trigger 3 -->
-          <tr>
+          <tr data-category="Governance">
             <td><span class="badge-status success font-mono">3</span></td>
             <td>
               <div class="d-flex align-items-center gap-2">
@@ -202,7 +202,7 @@
           </tr>
 
           <!-- Trigger 4 -->
-          <tr>
+          <tr data-category="Governance">
             <td><span class="badge-status success font-mono">4</span></td>
             <td>
               <div class="d-flex align-items-center gap-2">
@@ -233,7 +233,7 @@
           </tr>
 
           <!-- Trigger 5 -->
-          <tr>
+          <tr data-category="Integrity">
             <td><span class="badge-status warning font-mono">5</span></td>
             <td>
               <div class="d-flex align-items-center gap-2">
@@ -264,7 +264,7 @@
           </tr>
 
           <!-- Trigger 6 -->
-          <tr>
+          <tr data-category="Integrity">
             <td><span class="badge-status warning font-mono">6</span></td>
             <td>
               <div class="d-flex align-items-center gap-2">
@@ -295,7 +295,7 @@
           </tr>
 
           <!-- Trigger 7 -->
-          <tr>
+          <tr data-category="Provisioning">
             <td><span class="badge-status neutral font-mono" style="color: var(--violet-400);">7</span></td>
             <td>
               <div class="d-flex align-items-center gap-2">
@@ -326,7 +326,7 @@
           </tr>
 
           <!-- Trigger 8 -->
-          <tr>
+          <tr data-category="Provisioning">
             <td><span class="badge-status neutral font-mono" style="color: var(--violet-400);">8</span></td>
             <td>
               <div class="d-flex align-items-center gap-2">

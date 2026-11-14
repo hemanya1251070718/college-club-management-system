@@ -51,7 +51,7 @@
   {% endfor %}
 
   <div class="kpi-metrics-grid mb-4">
-    <div class="kpi-card glow-border-hover" data-kpi-filter="" style="cursor: pointer;" title="Show all events">
+    <div class="kpi-card glow-border-hover" data-kpi-filter="all" style="cursor: pointer;" title="Show all events">
       <div class="kpi-icon-box" style="background: rgba(56, 189, 248, 0.15); color: #38bdf8;">
         <i class="bi bi-calendar-event-fill"></i>
       </div>
@@ -61,7 +61,7 @@
       </div>
     </div>
 
-    <div class="kpi-card glow-border-hover" data-kpi-filter="" style="cursor: pointer;" title="Total registered participants">
+    <div class="kpi-card glow-border-hover" data-kpi-filter="all" style="cursor: pointer;" title="Total registered participants">
       <div class="kpi-icon-box" style="background: rgba(16, 185, 129, 0.15); color: #34d399;">
         <i class="bi bi-people-fill"></i>
       </div>
@@ -71,7 +71,7 @@
       </div>
     </div>
 
-    <div class="kpi-card glow-border-hover" data-kpi-filter="" style="cursor: pointer;" title="Cumulative allocated budget">
+    <div class="kpi-card glow-border-hover" data-kpi-filter="all" style="cursor: pointer;" title="Cumulative allocated budget">
       <div class="kpi-icon-box" style="background: rgba(245, 158, 11, 0.15); color: #fbbf24;">
         <i class="bi bi-cash-stack"></i>
       </div>
@@ -99,7 +99,7 @@
       <input type="text" class="tesla-input table-live-search" placeholder="Type to filter events in real time (name, club, venue, status)..." data-target="events-table-body" aria-label="Instant search events">
     </div>
     <div class="table-filter-pills">
-      <button type="button" class="table-pill-btn active" data-filter="" data-target="events-table-body">All Events</button>
+      <button type="button" class="table-pill-btn active is-active" data-filter="all" data-target="events-table-body">All Events</button>
       <button type="button" class="table-pill-btn" data-filter="Completed" data-target="events-table-body">Completed</button>
       <button type="button" class="table-pill-btn" data-filter="Ongoing" data-target="events-table-body">Ongoing</button>
       <button type="button" class="table-pill-btn" data-filter="Planned" data-target="events-table-body">Planned</button>
@@ -128,7 +128,7 @@
         </thead>
         <tbody id="events-table-body">
           {% for ev in events %}
-          <tr>
+          <tr data-category="{{ ev.status }} {% if ev.is_award_winning %}Award{% endif %}" data-status="{{ ev.status }}">
             <td>
               <div class="d-flex align-items-center gap-2">
                 <span class="badge-status neutral font-mono font-bold">{{ ev.event_id }}</span>

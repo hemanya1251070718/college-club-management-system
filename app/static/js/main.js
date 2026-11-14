@@ -481,32 +481,69 @@ document.addEventListener("DOMContentLoaded", () => {
    * ========================================================================
    */
 
-  // 1. Live Instant Table Filter
-  document.querySelectorAll(".table-live-search").forEach(input => {
-    const targetSelector = input.getAttribute("data-target-table") || ".tesla-table";
-    const table = document.querySelector(targetSelector);
+  // 1. Live Instant Table Filter & Category Synchronization Engine
+  function initTableFilterEngine() {
+    const table = document.querySelector(".tesla-table");
     if (!table) return;
 
     const tbody = table.querySelector("tbody");
     if (!tbody) return;
 
-    const counter = document.querySelector(input.getAttribute("data-counter") || ".table-match-counter");
-    const allRows = Array.from(tbody.querySelectorAll("tr:not(.empty-state-row)"));
+    const searchInput = document.querySelector(".table-live-search");
+    const counter = document.querySelector(".table-match-counter");
+    const pillButtons = document.querySelectorAll(".table-pill-btn");
+    const kpiCards = document.querySelectorAll(".kpi-card[data-kpi-filter]");
+
+    const allRows = Array.from(tbody.querySelectorAll("tr:not(.empty-state-row):not(.live-filter-empty-row)"));
     const totalCount = allRows.length;
+    if (totalCount === 0) return;
+
+    let activeFilter = "all";
+
+    function updateMatchCounter(visibleCount) {
+      if (counter) {
+        const strongEl = counter.querySelector(".match-count");
+        if (strongEl) {
+          strongEl.textContent = visibleCount;
+        } else {
+          counter.textContent = `Showing ${visibleCount} of ${totalCount}`;
+        }
+      }
+    }
 
     function applyFilter() {
-      const q = input.value.trim().toLowerCase();
-      const activePill = document.querySelector(".table-pill-btn.is-active");
-      const activeFilter = activePill ? (activePill.getAttribute("data-filter") || "all").toLowerCase() : "all";
-
+      const q = searchInput ? searchInput.value.trim().toLowerCase() : "";
+      const filterKey = (activeFilter || "all").trim().toUpperCase();
       let visibleCount = 0;
 
       allRows.forEach(row => {
-        const rowText = row.innerText.toLowerCase();
+        const rowText = (row.innerText || "").toLowerCase();
+        const rowDept = (row.getAttribute("data-dept") || "").trim().toUpperCase();
+        const rowDeptName = (row.getAttribute("data-dept-name") || "").toLowerCase();
         const rowCat = (row.getAttribute("data-category") || "").toLowerCase();
 
+        // 1. Match query
         const matchesQuery = !q || rowText.includes(q);
-        const matchesCategory = activeFilter === "all" || rowCat.includes(activeFilter) || rowText.includes(activeFilter);
+
+        // 2. Match category/department
+        let matchesCategory = false;
+        if (!filterKey || filterKey === "ALL") {
+          matchesCategory = true;
+        } else if (filterKey === "CE") {
+          matchesCategory = (rowDept === "CE" || rowCat.includes("ce") || rowDeptName.includes("computer"));
+        } else if (filterKey === "ME") {
+          matchesCategory = (rowDept === "ME" || rowCat.includes("me") || rowDeptName.includes("mechanical"));
+        } else if (filterKey === "EE") {
+          matchesCategory = (rowDept === "EE" || rowCat.includes("ee") || rowDeptName.includes("electronics"));
+        } else if (filterKey === "ELE") {
+          matchesCategory = (rowDept === "ELE" || rowCat.includes("ele") || rowDeptName.includes("electrical"));
+        } else if (filterKey === "CIRCUITS" || filterKey === "ELECTRONICS" || filterKey === "CIRCUITS & SYSTEMS") {
+          matchesCategory = (rowDept === "EE" || rowDept === "ELE" || rowDeptName.includes("electronics") || rowDeptName.includes("electrical"));
+        } else {
+          // General matching for Clubs, Events, Memberships, Triggers
+          const fkLower = filterKey.toLowerCase();
+          matchesCategory = rowCat.includes(fkLower) || rowText.includes(fkLower);
+        }
 
         if (matchesQuery && matchesCategory) {
           row.style.display = "";
@@ -516,49 +553,121 @@ document.addEventListener("DOMContentLoaded", () => {
         }
       });
 
-      if (counter) {
-        counter.textContent = `Showing ${visibleCount} of ${totalCount}`;
-      }
+      updateMatchCounter(visibleCount);
 
-      // Check if all are hidden
+      // Handle Empty State Row
       let emptyRow = tbody.querySelector(".live-filter-empty-row");
       if (visibleCount === 0) {
         if (!emptyRow) {
           emptyRow = document.createElement("tr");
           emptyRow.className = "live-filter-empty-row";
-          emptyRow.innerHTML = `<td colspan="10" class="text-center py-5 text-secondary"><i class="bi bi-search me-2"></i>No records matching "<strong>${input.value}</strong>". <button type="button" class="btn btn-sm btn-link text-info p-0 ms-2" onclick="document.querySelector('.table-live-search').value=''; document.querySelector('.table-live-search').dispatchEvent(new Event('input'));">Clear search</button></td>`;
           tbody.appendChild(emptyRow);
+        }
+        const searchMsg = q ? `matching "${searchInput.value}"` : `in selected filter`;
+        emptyRow.innerHTML = `
+          <td colspan="10" class="text-center py-5 text-secondary">
+            <i class="bi bi-search me-2"></i>No records found ${searchMsg}.
+            <button type="button" class="btn btn-sm btn-link text-info p-0 ms-2 reset-table-filter-btn" style="text-decoration: underline;">
+              Show all records
+            </button>
+          </td>
+        `;
+        const resetBtn = emptyRow.querySelector(".reset-table-filter-btn");
+        if (resetBtn) {
+          resetBtn.addEventListener("click", () => {
+            resetAllFilters();
+          });
         }
       } else if (emptyRow) {
         emptyRow.remove();
       }
     }
 
-    input.addEventListener("input", applyFilter);
+    function resetAllFilters() {
+      if (searchInput) searchInput.value = "";
+      activeFilter = "all";
+      pillButtons.forEach(p => {
+        const pKey = (p.getAttribute("data-filter") || "").toLowerCase();
+        if (pKey === "all" || pKey === "") {
+          p.classList.add("is-active", "active");
+        } else {
+          p.classList.remove("is-active", "active");
+        }
+      });
+      applyFilter();
+    }
 
-    // Filter pills
-    document.querySelectorAll(".table-pill-btn").forEach(pill => {
-      pill.addEventListener("click", () => {
-        document.querySelectorAll(".table-pill-btn").forEach(p => p.classList.remove("is-active"));
-        pill.classList.add("is-active");
+    // Connect Filter Pills
+    pillButtons.forEach(pill => {
+      pill.addEventListener("click", (e) => {
+        e.preventDefault();
+        // Clear search input on category switch to avoid multi-filter collisions
+        if (searchInput) searchInput.value = "";
+        
+        pillButtons.forEach(p => p.classList.remove("is-active", "active"));
+        pill.classList.add("is-active", "active");
+
+        activeFilter = pill.getAttribute("data-filter") || "all";
         applyFilter();
       });
     });
 
-    // KPI Cards click to filter
-    document.querySelectorAll(".kpi-card[data-kpi-filter]").forEach(card => {
+    // Connect Search Input
+    if (searchInput) {
+      searchInput.addEventListener("input", () => {
+        const val = searchInput.value.trim();
+        if (val.length > 0) {
+          // When typing a custom search, activate the 'All' pill so user searches across all data
+          activeFilter = "all";
+          pillButtons.forEach(p => {
+            const pKey = (p.getAttribute("data-filter") || "").toLowerCase();
+            if (pKey === "all" || pKey === "") {
+              p.classList.add("is-active", "active");
+            } else {
+              p.classList.remove("is-active", "active");
+            }
+          });
+        }
+        applyFilter();
+      });
+    }
+
+    // Connect KPI Cards (One-click category filter with visual sync)
+    kpiCards.forEach(card => {
       card.addEventListener("click", () => {
-        const filterVal = card.getAttribute("data-kpi-filter");
-        const matchingPill = document.querySelector(`.table-pill-btn[data-filter='${filterVal}']`);
-        if (matchingPill) {
-          matchingPill.click();
-        } else if (input) {
-          input.value = filterVal;
-          input.dispatchEvent(new Event("input"));
+        const kpiVal = (card.getAttribute("data-kpi-filter") || "all").trim();
+        if (searchInput) searchInput.value = "";
+
+        if (kpiVal.toUpperCase() === "CIRCUITS" || kpiVal.toUpperCase() === "ELECTRONICS") {
+          pillButtons.forEach(p => p.classList.remove("is-active", "active"));
+          activeFilter = "CIRCUITS";
+          applyFilter();
+          return;
+        }
+
+        // Find direct matching pill
+        let matchedPill = null;
+        pillButtons.forEach(p => {
+          const pVal = (p.getAttribute("data-filter") || "").trim();
+          if (pVal.toUpperCase() === kpiVal.toUpperCase()) {
+            matchedPill = p;
+          } else if ((kpiVal === "all" || kpiVal === "") && (pVal === "all" || pVal === "")) {
+            matchedPill = p;
+          }
+        });
+
+        if (matchedPill) {
+          matchedPill.click();
+        } else {
+          pillButtons.forEach(p => p.classList.remove("is-active", "active"));
+          activeFilter = kpiVal;
+          applyFilter();
         }
       });
     });
-  });
+  }
+
+  initTableFilterEngine();
 
   // 2. Interactive 1-Click Copy Chips
   document.querySelectorAll(".btn-copy-chip").forEach(chip => {

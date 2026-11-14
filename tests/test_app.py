@@ -306,3 +306,40 @@ def test_database_records_retention_and_tables(client):
     assert "No students found." not in students_html
     assert "CE25-" in students_html
 
+
+def test_student_department_filters_and_dom_attributes(client):
+    """
+    Verifies that the students directory contains exact department attributes
+    and pills for CE, ME, EE, ELE to prevent multi-filter collisions.
+    """
+    client.get("/guest")
+    resp = client.get("/students")
+    assert resp.status_code == 200
+    html = resp.data.decode("utf-8")
+
+    # Check that department pills exist
+    assert 'data-filter="all"' in html
+    assert 'data-filter="CE"' in html
+    assert 'data-filter="ME"' in html
+    assert 'data-filter="EE"' in html
+    assert 'data-filter="ELE"' in html
+
+    # Check KPI cards
+    assert 'data-kpi-filter="all"' in html
+    assert 'data-kpi-filter="CE"' in html
+    assert 'data-kpi-filter="ME"' in html
+    assert 'data-kpi-filter="CIRCUITS"' in html
+
+    # Check row data attributes
+    assert 'data-dept="CE"' in html
+    assert 'data-dept="ME"' in html
+    assert 'data-dept="EE"' in html
+    assert 'data-dept="ELE"' in html
+
+    # Verify counts: CE (52), ME (9), EE (8), ELE (6)
+    assert 'CE (52)' in html
+    assert 'ME (9)' in html
+    assert 'EE (8)' in html
+    assert 'ELE (6)' in html
+
+

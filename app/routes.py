@@ -589,7 +589,7 @@ def list_events():
                 SELECT e.*, c.club_name,
                        (SELECT COUNT(*) FROM EventRegistrations er WHERE er.event_id = e.event_id) AS attendee_count
                 FROM Events e
-                JOIN Clubs c ON e.club_id = c.club_id
+                LEFT JOIN Clubs c ON e.club_id = c.club_id
                 ORDER BY e.event_date DESC;
             """)
             events = cursor.fetchall()

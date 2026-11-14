@@ -38,45 +38,58 @@
     </div>
   </header>
 
+  <!-- Dynamic Department Counters -->
+  {% set ce_count = namespace(n=0) %}
+  {% set me_count = namespace(n=0) %}
+  {% set ee_count = namespace(n=0) %}
+  {% set ele_count = namespace(n=0) %}
+  {% for s in students %}
+    {% if s.dept_id == 'CE' %}{% set ce_count.n = ce_count.n + 1 %}
+    {% elif s.dept_id == 'ME' %}{% set me_count.n = me_count.n + 1 %}
+    {% elif s.dept_id == 'EE' %}{% set ee_count.n = ee_count.n + 1 %}
+    {% elif s.dept_id == 'ELE' %}{% set ele_count.n = ele_count.n + 1 %}
+    {% endif %}
+  {% endfor %}
+
   <!-- Interactive KPI Summary Cards -->
-  <div class="kpi-metrics-grid">
-    <div class="kpi-card" data-kpi-filter="all" style="--kpi-accent: #38bdf8;">
+  <div class="kpi-metrics-grid mb-4">
+    <div class="kpi-card glow-border-hover" data-kpi-filter="all" style="--kpi-accent: #38bdf8; cursor: pointer;" title="Show all {{ students|length }} registered students">
       <div class="kpi-icon-box" style="--kpi-icon-bg: rgba(56, 189, 248, 0.12); --kpi-icon-color: #38bdf8; --kpi-icon-border: rgba(56, 189, 248, 0.3);">
         <i class="bi bi-mortarboard-fill"></i>
       </div>
       <div>
-        <div class="kpi-value">75</div>
+        <div class="kpi-value text-white tabular-nums">{{ students|length }}</div>
         <div class="kpi-label">Registered Students</div>
       </div>
     </div>
 
-    <div class="kpi-card" data-kpi-filter="Computer Engineering" style="--kpi-accent: #3b82f6;">
+    <div class="kpi-card glow-border-hover" data-kpi-filter="CE" style="--kpi-accent: #3b82f6; cursor: pointer;" title="Filter Computer Engineering ({{ ce_count.n }})">
       <div class="kpi-icon-box" style="--kpi-icon-bg: rgba(59, 130, 246, 0.12); --kpi-icon-color: #60a5fa; --kpi-icon-border: rgba(59, 130, 246, 0.3);">
         <i class="bi bi-terminal-fill"></i>
       </div>
       <div>
-        <div class="kpi-value">Computer Eng.</div>
-        <div class="kpi-label">Primary Branch</div>
+        <div class="kpi-value text-white tabular-nums">{{ ce_count.n }}</div>
+        <div class="kpi-label">Computer Eng. (CE)</div>
       </div>
     </div>
 
-    <div class="kpi-card" data-kpi-filter="Mechanical" style="--kpi-accent: #f59e0b;">
+    <div class="kpi-card glow-border-hover" data-kpi-filter="ME" style="--kpi-accent: #f59e0b; cursor: pointer;" title="Filter Mechanical Engineering ({{ me_count.n }})">
       <div class="kpi-icon-box" style="--kpi-icon-bg: rgba(245, 158, 11, 0.12); --kpi-icon-color: #fbbf24; --kpi-icon-border: rgba(245, 158, 11, 0.3);">
         <i class="bi bi-gear-fill"></i>
       </div>
       <div>
-        <div class="kpi-value">Mechanical Eng.</div>
-        <div class="kpi-label">Mechanical &amp; Allied</div>
+        <div class="kpi-value text-white tabular-nums">{{ me_count.n }}</div>
+        <div class="kpi-label">Mechanical Eng. (ME)</div>
       </div>
     </div>
 
-    <div class="kpi-card" data-kpi-filter="Electronics" style="--kpi-accent: #8b5cf6;">
+    <div class="kpi-card glow-border-hover" data-kpi-filter="CIRCUITS" style="--kpi-accent: #8b5cf6; cursor: pointer;" title="Filter Electronics & Electrical ({{ ee_count.n + ele_count.n }})">
       <div class="kpi-icon-box" style="--kpi-icon-bg: rgba(139, 92, 246, 0.12); --kpi-icon-color: #c084fc; --kpi-icon-border: rgba(139, 92, 246, 0.3);">
         <i class="bi bi-cpu-fill"></i>
       </div>
       <div>
-        <div class="kpi-value">Electronics / EE</div>
-        <div class="kpi-label">Circuits &amp; Systems</div>
+        <div class="kpi-value text-white tabular-nums">{{ ee_count.n + ele_count.n }}</div>
+        <div class="kpi-label">Electronics / EE ({{ ee_count.n + ele_count.n }})</div>
       </div>
     </div>
   </div>
@@ -84,20 +97,20 @@
   <!-- Students Data Table Card -->
   <div class="table-surface-card">
     <!-- Live Search & Interactive Filter Toolbar -->
-    <div class="table-interactive-toolbar">
+    <div class="table-interactive-toolbar mb-3">
       <div class="live-search-box">
-        <i class="bi bi-search"></i>
-        <input type="text" class="table-live-search" placeholder="Filter students by name, PRN, or email in real-time..." aria-label="Search students table">
+        <i class="bi bi-search search-icon"></i>
+        <input type="text" class="tesla-input table-live-search" placeholder="Type to filter students in real-time (name, PRN, email, department)..." aria-label="Search students table">
       </div>
       <div class="d-flex align-items-center gap-3">
         <div class="table-filter-pills">
-          <button type="button" class="table-pill-btn is-active" data-filter="all">All (75)</button>
-          <button type="button" class="table-pill-btn" data-filter="Computer Engineering"><i class="bi bi-terminal text-info"></i> CE</button>
-          <button type="button" class="table-pill-btn" data-filter="Mechanical Engineering"><i class="bi bi-gear text-warning"></i> ME</button>
-          <button type="button" class="table-pill-btn" data-filter="Electronics Engineering"><i class="bi bi-lightning text-danger"></i> EE</button>
-          <button type="button" class="table-pill-btn" data-filter="Electrical Engineering"><i class="bi bi-broadcast text-success"></i> ELE</button>
+          <button type="button" class="table-pill-btn is-active active" data-filter="all">All ({{ students|length }})</button>
+          <button type="button" class="table-pill-btn" data-filter="CE"><i class="bi bi-terminal text-info"></i> CE ({{ ce_count.n }})</button>
+          <button type="button" class="table-pill-btn" data-filter="ME"><i class="bi bi-gear text-warning"></i> ME ({{ me_count.n }})</button>
+          <button type="button" class="table-pill-btn" data-filter="EE"><i class="bi bi-lightning text-danger"></i> EE ({{ ee_count.n }})</button>
+          <button type="button" class="table-pill-btn" data-filter="ELE"><i class="bi bi-broadcast text-success"></i> ELE ({{ ele_count.n }})</button>
         </div>
-        <span class="table-match-counter">Showing {{ students|length }} of {{ students|length }}</span>
+        <span class="table-match-counter font-mono">Showing <strong class="match-count">{{ students|length }}</strong> of {{ students|length }}</span>
       </div>
     </div>
 
@@ -108,14 +121,14 @@
             <th style="width: 12%;">Student ID</th>
             <th style="width: 14%;">PRN Number</th>
             <th style="width: 26%;">Full Name &amp; Identity</th>
-            <th style="width: 22%;">Institutional Email</th>
-            <th style="width: 14%;">Department</th>
+            <th style="width: 20%;">Institutional Email</th>
+            <th style="width: 16%;">Department</th>
             <th style="width: 12%;" class="text-end">Actions</th>
           </tr>
         </thead>
         <tbody>
           {% for s in students %}
-          <tr data-category="{{ s.dept_name }}">
+          <tr data-dept="{{ s.dept_id }}" data-dept-name="{{ s.dept_name }}" data-category="{{ s.dept_id }} {{ s.dept_name }}">
             <td>
               <span class="badge-status neutral font-mono fw-bold">{{ s.student_id }}</span>
             </td>
@@ -150,7 +163,10 @@
               </span>
             </td>
             <td>
-              <span class="badge-status neutral font-mono">{{ s.dept_name }}</span>
+              <div class="d-flex align-items-center gap-2">
+                <span class="badge-status {% if s.dept_id == 'CE' %}info{% elif s.dept_id == 'ME' %}warning{% elif s.dept_id == 'EE' %}danger{% else %}success{% endif %} font-mono font-bold">{{ s.dept_id }}</span>
+                <span class="text-secondary small">{{ s.dept_name }}</span>
+              </div>
             </td>
             <td class="text-end">
               <div class="d-inline-flex gap-1">
