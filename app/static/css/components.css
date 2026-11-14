@@ -2299,7 +2299,15 @@ h1, h2, h3, h4,
   transform: translateY(-2px);
 }
 
-/* 4. Enhanced Table Styling & Interactivity */
+/* 4. Enhanced Table Styling & Interactivity (100% Static - Zero Tilt / Zero Movement) */
+.table-surface-card,
+.table-surface-card:hover,
+.table-responsive,
+.tesla-table {
+  transform: none !important;
+  will-change: auto !important;
+}
+
 .table-surface-card {
   border-radius: 20px;
   overflow: hidden;

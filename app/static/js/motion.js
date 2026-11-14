@@ -189,15 +189,22 @@ function initDeleteConfirmations() {
 
 /**
  * 7. Outcrowd Incident Platform 3D Interactive Card Tilt & Cursor Spotlight
+ * NOTE: Tables and table containers are strictly excluded to ensure solid tabular stability.
  */
 function initOutcrowdCardTiltAndSpotlight() {
   if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
 
+  // Only apply tilt to small KPI summary cards and hero showcase box; NEVER to tables
   const tiltCards = document.querySelectorAll(
-    ".kpi-card, .tidewell-glass-card, .tidewell-card-item, .trigger-action-pill-card, .table-surface-card, .tesla-card, .incident-monitor-box"
+    ".kpi-card, .tidewell-glass-card, .incident-monitor-box"
   );
 
   tiltCards.forEach(card => {
+    // Safety check: Never attach tilt to table surfaces
+    if (card.closest(".table-surface-card") || card.classList.contains("table-surface-card") || card.querySelector(".tesla-table")) {
+      return;
+    }
+
     card.classList.add("card-spotlight-effect");
 
     card.addEventListener("mousemove", (e) => {
@@ -208,16 +215,16 @@ function initOutcrowdCardTiltAndSpotlight() {
       card.style.setProperty("--mouse-x", `${x}px`);
       card.style.setProperty("--mouse-y", `${y}px`);
 
-      // Tactile 3D perspective tilt
+      // Gentle tactile tilt on metric cards
       const centerX = rect.width / 2;
       const centerY = rect.height / 2;
       const deltaX = (x - centerX) / centerX;
       const deltaY = (y - centerY) / centerY;
 
-      const rotateX = -(deltaY * 4.0).toFixed(2);
-      const rotateY = (deltaX * 4.0).toFixed(2);
+      const rotateX = -(deltaY * 3.0).toFixed(2);
+      const rotateY = (deltaX * 3.0).toFixed(2);
 
-      card.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) translateY(-4px) scale3d(1.02, 1.02, 1.02)`;
+      card.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) translateY(-2px) scale3d(1.01, 1.01, 1.01)`;
     });
 
     card.addEventListener("mouseleave", () => {

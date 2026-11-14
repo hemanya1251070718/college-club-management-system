@@ -116,7 +116,21 @@
   box-shadow: 0 12px 32px rgba(5, 6, 11, 0.4);
 }
 
-/* Table Rows (Smooth highlight, tabular stability) */
+/* Table Rows & Surfaces (Completely static - zero tilt, zero movement, zero transform) */
+.table-surface-card,
+.table-surface-card:hover,
+.table-responsive,
+.tesla-table,
+.tesla-table tbody,
+.tesla-table thead,
+.tesla-table tr,
+.tesla-table th,
+.tesla-table td {
+  transform: none !important;
+  transition-property: background-color, border-color, box-shadow, color !important;
+  will-change: auto !important;
+}
+
 .tesla-table tbody tr {
   transition: background-color var(--dur-fast) var(--ease-out);
 }
