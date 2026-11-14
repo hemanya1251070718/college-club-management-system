@@ -24,12 +24,13 @@ def get_writable_sqlite_path():
     
     if is_serverless:
         tmp_db = os.path.join("/tmp", "clubhub_app.db")
-        if not os.path.exists(tmp_db) and os.path.exists(CANONICAL_SQLITE_PATH):
-            try:
-                shutil.copyfile(CANONICAL_SQLITE_PATH, tmp_db)
-                os.chmod(tmp_db, 0o666)
-            except Exception:
-                pass
+        if not os.path.exists(tmp_db) or os.path.getsize(tmp_db) < 50000:
+            if os.path.exists(CANONICAL_SQLITE_PATH):
+                try:
+                    shutil.copyfile(CANONICAL_SQLITE_PATH, tmp_db)
+                    os.chmod(tmp_db, 0o666)
+                except Exception:
+                    pass
         return tmp_db
     
     # Local development
@@ -357,14 +358,21 @@ class SQLiteConnectionAdapter:
 
 def init_sqlite_tables_if_needed(raw_conn):
     """
-    Checks if canonical tables exist. If missing or empty,
+    Checks if canonical tables exist and have records. If missing or empty,
     initializes all 8 tables, views, triggers, and records from CANONICAL_STATEMENTS.
     """
     try:
         cur = raw_conn.cursor()
-        cur.execute("SELECT name FROM sqlite_master WHERE type='table' AND name='Students';")
-        has_students = cur.fetchone()
-        if not has_students:
+        need_init = False
+        try:
+            cur.execute("SELECT COUNT(*) FROM Events;")
+            row = cur.fetchone()
+            if not row or row[0] == 0:
+                need_init = True
+        except Exception:
+            need_init = True
+
+        if need_init:
             from app.canonical_sql import CANONICAL_STATEMENTS
             for stmt in CANONICAL_STATEMENTS:
                 try:
