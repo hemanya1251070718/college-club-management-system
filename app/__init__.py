@@ -27,6 +27,7 @@ def create_app(config_class=Config):
             "auth.auth_status",
             "auth.select_role",
             "main.health",
+            "main.health_json",
             "main.init_db_endpoint",
             "static"
         }

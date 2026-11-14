@@ -13,18 +13,18 @@
     </ul>
   </nav>
 
-  <!-- Inner Page Header Band -->
+  <!-- Inner Page Header Band (Centered Heading with Action Buttons Below) -->
   <header class="inner-page-header">
     <div class="inner-header-layout">
       <div>
-        <div class="d-flex align-items-center gap-2 mb-1">
+        <div class="d-flex align-items-center justify-content-center gap-2 mb-2">
           <span class="badge-status info"><i class="bi bi-diagram-3-fill me-1"></i>CHARTERS</span>
           <span class="text-secondary small font-mono">Cloud SQL MySQL 8.0</span>
         </div>
         <h1 class="inner-page-title">Clubs Management</h1>
         <p class="inner-page-subtitle">Campus student charters, leadership structures, and faculty advisory boards.</p>
       </div>
-      <div>
+      <div class="inner-header-actions">
         {% if current_role != 'member' %}
         <a href="{{ url_for('main.create_club') }}" class="btn-tesla-primary action-write-btn glow-border-hover" data-role-req="admin,manager,guest">
           <i class="bi bi-plus-lg me-2"></i> Add New Club

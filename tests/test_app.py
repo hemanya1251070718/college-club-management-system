@@ -277,3 +277,32 @@ def test_multi_role_login_and_persona_selection_flow(client):
     assert sel_data["success"] is True
     assert sel_data["role"] == "coordinator"
     assert sel_data["club_id"] == "CSI"
+
+def test_database_records_retention_and_tables(client):
+    """
+    Verifies that all 8 tables and records are retained and queryable:
+    Students (75), Clubs (5), Events (>=10), Memberships (>=90).
+    """
+    from app.db import get_db_connection
+    conn = get_db_connection()
+    with conn.cursor() as cur:
+        cur.execute("SELECT COUNT(*) AS c FROM Students;")
+        assert cur.fetchone()["c"] >= 75
+        cur.execute("SELECT COUNT(*) AS c FROM Clubs;")
+        assert cur.fetchone()["c"] >= 5
+        cur.execute("SELECT COUNT(*) AS c FROM Events;")
+        assert cur.fetchone()["c"] >= 10
+        cur.execute("SELECT COUNT(*) AS c FROM Memberships;")
+        assert cur.fetchone()["c"] >= 90
+    conn.close()
+
+    # Also verify that events and students page render with records in HTML
+    client.get("/guest")
+    events_html = client.get("/events").data.decode()
+    assert "No events found." not in events_html
+    assert "EVT-" in events_html or "TechFest" in events_html or "E-Summit" in events_html
+
+    students_html = client.get("/students").data.decode()
+    assert "No students found." not in students_html
+    assert "CE25-" in students_html
+

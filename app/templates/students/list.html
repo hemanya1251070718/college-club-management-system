@@ -13,18 +13,18 @@
     </ul>
   </nav>
 
-  <!-- Inner Page Header Band -->
+  <!-- Inner Page Header Band (Centered Heading with Action Buttons Below) -->
   <header class="inner-page-header">
     <div class="inner-header-layout">
       <div>
-        <div class="d-flex align-items-center gap-2 mb-1">
+        <div class="d-flex align-items-center justify-content-center gap-2 mb-2">
           <span class="badge-status success"><i class="bi bi-people-fill me-1"></i>ENGINEERS</span>
           <span class="text-secondary small font-mono">75 Enrolled • Pre-Registered</span>
         </div>
         <h1 class="inner-page-title">Students Directory</h1>
         <p class="inner-page-subtitle">Undergraduate engineering scholars, institutional credentials, and club affiliations.</p>
       </div>
-      <div>
+      <div class="inner-header-actions">
         {% if current_role != 'member' %}
         <a href="{{ url_for('main.create_student') }}" class="btn-tesla-primary action-write-btn glow-border-hover" data-role-req="admin,manager,guest">
           <i class="bi bi-person-plus me-2"></i> Add Student

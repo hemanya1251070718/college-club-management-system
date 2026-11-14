@@ -18,14 +18,14 @@
   <header class="inner-page-header">
     <div class="inner-header-layout">
       <div>
-        <div class="d-flex align-items-center gap-2 mb-2">
+        <div class="d-flex align-items-center justify-content-center gap-2 mb-2">
           <span class="badge-status info">STORED PROCEDURE</span>
           <span class="text-secondary small">&bull; Relational JOIN Parameterized Query</span>
         </div>
         <h1 class="inner-page-title">GetStudentClubs(IN p_student_id)</h1>
         <p class="inner-page-subtitle">Executes a parameterized stored procedure in MySQL that performs a relational JOIN across Memberships and Clubs for a designated student.</p>
       </div>
-      <div>
+      <div class="inner-header-actions">
         <a href="{{ url_for('main.procedures_hub') }}" class="btn-tesla-secondary">
           <i class="bi bi-arrow-left me-1"></i> Back to Hub
         </a>
