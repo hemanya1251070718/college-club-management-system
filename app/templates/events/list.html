@@ -38,13 +38,6 @@
     </div>
   </header>
 
-  {% if db_error %}
-  <div class="tesla-alert alert-danger mb-4">
-    <strong>Database Query Notice:</strong> {{ db_error }}
-    <pre class="font-mono mt-2" style="font-size: 11px;">{{ err_detail }}</pre>
-  </div>
-  {% endif %}
-
   <!-- Interactive KPI Metric Cards -->
   {% set total_attendees = namespace(count=0) %}
   {% set total_budget = namespace(amt=0) %}
@@ -164,8 +157,9 @@
             <td>
               <div class="d-flex align-items-center gap-2">
                 <div class="event-date-chip">
-                  <span class="event-date-month">{{ ev.event_date[5:7] if ev.event_date else 'TBA' }}</span>
-                  <span class="event-date-day">{{ ev.event_date[8:10] if ev.event_date else '--' }}</span>
+                  {% set ed_str = ev.event_date|string if ev.event_date else '' %}
+                  <span class="event-date-month">{{ ed_str[5:7] if ed_str|length >= 7 else 'TBA' }}</span>
+                  <span class="event-date-day">{{ ed_str[8:10] if ed_str|length >= 10 else '--' }}</span>
                 </div>
                 <div>
                   <div class="text-white small tabular-nums">{{ ev.event_date or 'Date TBA' }}</div>

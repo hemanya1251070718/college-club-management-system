@@ -596,10 +596,8 @@ def list_events():
         conn.close()
         return render_template("events/list.html", events=events)
     except Exception as e:
-        import traceback
-        err_detail = traceback.format_exc()
-        print(f"Error fetching events: {err_detail}")
-        return render_template("events/list.html", events=[], db_error=str(e), err_detail=err_detail)
+        flash(f"Error fetching events: {str(e)}", "danger")
+        return render_template("events/list.html", events=[])
 
 
 @main_bp.route("/events/new", methods=["GET", "POST"])
