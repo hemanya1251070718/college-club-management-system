@@ -22,27 +22,47 @@
         <div class="col-lg-7 text-start hero-animate-title">
           <div class="d-inline-flex align-items-center gap-2 mb-3 px-3 py-1 rounded-pill hero-status-pill">
             <span class="status-orb"></span>
-            <span class="text-uppercase fw-semibold font-mono" style="font-size: 11px; letter-spacing: 0.08em; color: var(--blue-400);">GCP Production Cluster &bull; Cloud Run</span>
+            <span class="text-uppercase fw-semibold font-mono" style="font-size: 11px; letter-spacing: 0.08em; color: var(--blue-400);">VIT Pune Enterprise DBMS &bull; Cloud SQL Cluster</span>
           </div>
 
           <h1 class="hero-tidewell-headline">
-            Campus life that feels boundless.
+            Next-Gen Campus Intelligence.
           </h1>
 
           <p class="hero-tidewell-subtitle">
-            Autonomous DBMS architecture for student charters, faculty coordinators, 8 real-time triggers, and 8 analytical cursors running live on Google Cloud SQL.
+            Autonomous triggers, analytical cursors, and real-time governance across 75 scholars and 5 collegiate chapters.
           </p>
 
           <!-- Dual Pill Action Buttons with Border Glow Hover -->
           <div class="d-flex flex-wrap align-items-center gap-3 pt-3 hero-animate-cta">
-            <a href="{{ url_for('main.procedures_hub') }}" class="btn-tidewell-primary glow-border-hover">
-              <span>Explore 8 Cursors</span>
-              <i class="bi bi-arrow-up-right"></i>
+            <a href="{{ url_for('main.list_triggers') }}" class="btn-tidewell-primary glow-border-hover">
+              <i class="bi bi-lightning-charge-fill me-2"></i>
+              <span>Test 8 Triggers</span>
             </a>
-            <a href="{{ url_for('main.list_triggers') }}" class="btn-tidewell-secondary glow-border-hover">
-              <span>8 Triggers Suite</span>
-              <i class="bi bi-arrow-up-right"></i>
+            <a href="{{ url_for('main.procedures_hub') }}" class="btn-tidewell-secondary glow-border-hover">
+              <i class="bi bi-cpu-fill me-2"></i>
+              <span>Explore Cursors</span>
             </a>
+          </div>
+
+          <!-- Quick Stat Dock -->
+          <div class="d-flex flex-wrap gap-4 pt-4 mt-2">
+            <div>
+              <div class="font-mono text-white fw-bold" style="font-size: 24px;">75</div>
+              <small class="text-secondary text-uppercase" style="font-size: 11px; letter-spacing: 0.05em;">Scholars</small>
+            </div>
+            <div style="border-left: 1px solid var(--border); padding-left: 16px;">
+              <div class="font-mono text-white fw-bold" style="font-size: 24px;">5</div>
+              <small class="text-secondary text-uppercase" style="font-size: 11px; letter-spacing: 0.05em;">Charters</small>
+            </div>
+            <div style="border-left: 1px solid var(--border); padding-left: 16px;">
+              <div class="font-mono text-white fw-bold" style="font-size: 24px;">12</div>
+              <small class="text-secondary text-uppercase" style="font-size: 11px; letter-spacing: 0.05em;">Events</small>
+            </div>
+            <div style="border-left: 1px solid var(--border); padding-left: 16px;">
+              <div class="font-mono text-white fw-bold" style="font-size: 24px;">8</div>
+              <small class="text-secondary text-uppercase" style="font-size: 11px; letter-spacing: 0.05em;">Live Triggers</small>
+            </div>
           </div>
         </div>
 

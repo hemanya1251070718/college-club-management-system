@@ -343,3 +343,29 @@ def test_student_department_filters_and_dom_attributes(client):
     assert 'ELE (6)' in html
 
 
+def test_theme_toggle_and_trigger_pill_buttons(client):
+    """
+    Verifies that the new theme toggle button, Outfit typography,
+    and rounded pill action buttons on triggers and procedures are present.
+    """
+    client.get("/guest")
+    
+    # 1. Base template has theme toggle button and font
+    base_html = client.get("/").data.decode("utf-8")
+    assert 'id="theme-toggle-btn"' in base_html
+    assert 'Outfit' in base_html
+    assert 'Plus+Jakarta+Sans' in base_html
+
+    # 2. Triggers page has rounded pill action buttons (btn-trigger-pill)
+    triggers_html = client.get("/triggers").data.decode("utf-8")
+    assert 'btn-trigger-pill' in triggers_html
+    assert 'btn-cyan' in triggers_html
+    assert 'Auto-increments Club member count' in triggers_html
+
+    # 3. Procedures page has condensed, punchy descriptions
+    proc_html = client.get("/procedures").data.decode("utf-8")
+    assert 'Audits cached club member counts' in proc_html
+    assert 'Auto-enrolls them as club volunteers' in proc_html or 'auto-enrolls them' in proc_html
+
+
+

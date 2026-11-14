@@ -1,9 +1,9 @@
 /* ==========================================================================
    DESIGN TOKENS - SINGLE SOURCE OF TRUTH
-   ClubHub DBMS Enterprise Design System (Tesla Minimalist + Rich Dark Palette)
+   ClubHub DBMS Enterprise Design System (Next-Gen Hybrid Editorial & Dark/Light System)
    ========================================================================== */
 
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500&family=JetBrains+Mono:wght@400;500&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@500;600;700;800;900&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap');
 
 :root {
   /* Color Scheme Definition */
@@ -91,15 +91,16 @@
   --gutter-tablet: 16px;
   --gutter-mobile: 12px;
 
-  /* Border Radii */
-  --radius-xs: 2px;
-  --radius-btn: 4px;     /* Tesla-style 4px geometric radius for CTAs & inputs */
-  --radius-input: 4px;   /* Tesla-style input radius */
-  --radius-card: 12px;   /* Cards, panels, modals */
+  /* Rounded Corner Radii - Modern Pill Aesthetics */
+  --radius-xs: 4px;
+  --radius-btn: 9999px;   /* Smooth pill buttons with round corners */
+  --radius-input: 9999px; /* Rounded pill search & input fields */
+  --radius-card: 20px;    /* Floating rounded surface cards */
   --radius-pill: 9999px;
 
-  /* Typography Font Families */
-  --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  /* Modern High-Character Editorial Fonts */
+  --font-display: 'Outfit', 'Plus Jakarta Sans', sans-serif;
+  --font-sans: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
   --font-mono: 'JetBrains Mono', SFMono-Regular, Menlo, Monaco, Consolas, monospace;
 
   /* Motion Tokens */
@@ -135,6 +136,56 @@
   --fw-medium: 500;
   --fw-semibold: 600;
   --fw-bold: 700;
+}
+
+/* ==========================================================================
+   LIGHT MODE DESIGN TOKENS
+   Activated cleanly via data-theme="light" on <html> or <body>
+   ========================================================================== */
+[data-theme="light"] {
+  color-scheme: light;
+
+  /* Crisp Light Canvas */
+  --bg-0: #F8FAFC; /* Clean off-white canvas */
+  --bg-1: #EDF2F7; /* Contrast slate band */
+
+  /* Clean White Surfaces & Subtle Elevation */
+  --surface-1: #FFFFFF;
+  --surface-2: #F8FAFC;
+  --surface-3: #EDF2F7;
+  --surface-glass: rgba(255, 255, 255, 0.88);
+  --surface-card-grad: linear-gradient(180deg, #FFFFFF 0%, #F8FAFC 100%);
+  --surface-card-hover: linear-gradient(180deg, #FFFFFF 0%, #F1F5F9 100%);
+
+  /* Borders & Glows */
+  --border: rgba(15, 23, 42, 0.09);
+  --border-strong: rgba(15, 23, 42, 0.18);
+  --border-glow: rgba(99, 102, 241, 0.22);
+  --border-cyan-glow: rgba(14, 165, 233, 0.25);
+
+  /* High-Contrast Typography */
+  --text-1: #0F172A; /* Slate 900 primary headline */
+  --text-2: #334155; /* Slate 700 readable body */
+  --text-3: #64748B; /* Slate 500 captions */
+
+  /* Vibrant Accents Optimized for Light Backgrounds */
+  --blue-400: #0284C7;
+  --blue-500: #2563EB;
+  --blue-600: #1D4ED8;
+  --blue-700: #1E40AF;
+  --blue-900: #EFF6FF;
+
+  --violet-400: #7C3AED;
+  --violet-500: #6D28D9;
+  --violet-700: #5B21B6;
+  --violet-900: #F5F3FF;
+  --pink-400: #DB2777;
+
+  /* Soft Light Shadows */
+  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.05), 0 1px 2px rgba(0, 0, 0, 0.03);
+  --shadow-md: 0 4px 14px -2px rgba(0, 0, 0, 0.08), 0 2px 6px -1px rgba(0, 0, 0, 0.04);
+  --shadow-lg: 0 20px 25px -5px rgba(0, 0, 0, 0.08), 0 8px 10px -6px rgba(0, 0, 0, 0.04);
+  --shadow-glow: 0 0 24px rgba(37, 99, 235, 0.12);
 }
 
 /* Global Reset & Prevent Flash */

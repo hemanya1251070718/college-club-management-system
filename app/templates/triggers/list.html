@@ -110,7 +110,7 @@
         <tbody id="triggers-table-body">
           <!-- Trigger 1 -->
           <tr data-category="Lifecycle">
-            <td><span class="badge-status info font-mono">1</span></td>
+            <td><span class="badge-status info font-mono fw-bold">1</span></td>
             <td>
               <div class="d-flex align-items-center gap-2">
                 <strong class="text-white font-mono">trg_after_membership_insert_sync_count</strong>
@@ -118,20 +118,20 @@
                   <i class="bi bi-copy"></i>
                 </button>
               </div>
-              <small class="d-block text-secondary">Base Table Increment</small>
+              <small class="text-secondary font-mono">Base Table Increment</small>
             </td>
             <td>
-              <span class="badge-status success">AFTER INSERT</span>
-              <small class="d-block text-secondary mt-1 font-mono">Memberships &rarr; Clubs</small>
+              <span class="badge-status success font-mono">AFTER INSERT</span>
+              <small class="d-block text-secondary mt-1">Memberships &rarr; Clubs</small>
             </td>
             <td><span class="badge-status info">Lifecycle</span></td>
             <td>
-              When a student joins a club with status <code class="font-mono text-white">'Active'</code>, <code class="font-mono text-white">Clubs.member_count</code> automatically increments by 1 directly in the Cloud SQL base table.
+              <span class="text-white fw-medium">Auto-increments Club member count on Active join</span>
             </td>
             <td class="text-end">
               {% if can_test_trigger(1) %}
-              <a href="{{ url_for('main.create_membership') }}" class="btn-ghost-action text-info">
-                Test Live
+              <a href="{{ url_for('main.create_membership') }}" class="btn-trigger-pill btn-cyan">
+                <i class="bi bi-play-circle-fill"></i> Test Live
               </a>
               {% else %}
               <span class="badge-status neutral small"><i class="bi bi-lock me-1"></i>Protected</span>
@@ -141,7 +141,7 @@
 
           <!-- Trigger 2 -->
           <tr data-category="Lifecycle">
-            <td><span class="badge-status info font-mono">2</span></td>
+            <td><span class="badge-status info font-mono fw-bold">2</span></td>
             <td>
               <div class="d-flex align-items-center gap-2">
                 <strong class="text-white font-mono">trg_after_membership_delete_sync_count</strong>
@@ -149,20 +149,20 @@
                   <i class="bi bi-copy"></i>
                 </button>
               </div>
-              <small class="d-block text-secondary">Base Table Decrement</small>
+              <small class="text-secondary font-mono">Base Table Decrement</small>
             </td>
             <td>
-              <span class="badge-status danger">AFTER DELETE</span>
-              <small class="d-block text-secondary mt-1 font-mono">Memberships &rarr; Clubs</small>
+              <span class="badge-status danger font-mono">AFTER DELETE</span>
+              <small class="d-block text-secondary mt-1">Memberships &rarr; Clubs</small>
             </td>
             <td><span class="badge-status info">Lifecycle</span></td>
             <td>
-              When an active membership is deleted, <code class="font-mono text-white">Clubs.member_count</code> automatically decrements by 1 directly in the base table.
+              <span class="text-white fw-medium">Auto-decrements Club member count on member removal</span>
             </td>
             <td class="text-end">
               {% if can_test_trigger(2) %}
-              <a href="{{ url_for('main.list_memberships') }}" class="btn-ghost-action text-danger">
-                Delete Member
+              <a href="{{ url_for('main.list_memberships') }}" class="btn-trigger-pill btn-danger">
+                <i class="bi bi-trash-fill"></i> Delete Member
               </a>
               {% else %}
               <span class="badge-status neutral small"><i class="bi bi-lock me-1"></i>Protected</span>
@@ -172,7 +172,7 @@
 
           <!-- Trigger 3 -->
           <tr data-category="Governance">
-            <td><span class="badge-status success font-mono">3</span></td>
+            <td><span class="badge-status success font-mono fw-bold">3</span></td>
             <td>
               <div class="d-flex align-items-center gap-2">
                 <strong class="text-white font-mono">trg_prevent_multiple_presidents</strong>
@@ -180,20 +180,20 @@
                   <i class="bi bi-copy"></i>
                 </button>
               </div>
-              <small class="d-block text-secondary">Club Bylaws Integrity</small>
+              <small class="text-secondary font-mono">Club Bylaws Integrity</small>
             </td>
             <td>
-              <span class="badge-status warning">BEFORE INSERT</span>
-              <small class="d-block text-secondary mt-1 font-mono">Memberships</small>
+              <span class="badge-status warning font-mono">BEFORE INSERT</span>
+              <small class="d-block text-secondary mt-1">Memberships</small>
             </td>
             <td><span class="badge-status success">Governance</span></td>
             <td>
-              Enforces Club Bylaws: Aborts transaction via <code class="font-mono text-white">SIGNAL SQLSTATE '45000'</code> if an attempt is made to insert a second active President for the same club.
+              <span class="text-white fw-medium">Blocks duplicate President insertion per charter (SIGNAL 45000)</span>
             </td>
             <td class="text-end">
               {% if can_test_trigger(3) %}
-              <a href="{{ url_for('main.create_membership') }}" class="btn-ghost-action text-warning">
-                Test 2nd President
+              <a href="{{ url_for('main.create_membership') }}" class="btn-trigger-pill btn-warning">
+                <i class="bi bi-shield-lock-fill"></i> Test 2nd President
               </a>
               {% else %}
               <span class="badge-status neutral small"><i class="bi bi-lock me-1"></i>Protected</span>
@@ -203,7 +203,7 @@
 
           <!-- Trigger 4 -->
           <tr data-category="Governance">
-            <td><span class="badge-status success font-mono">4</span></td>
+            <td><span class="badge-status success font-mono fw-bold">4</span></td>
             <td>
               <div class="d-flex align-items-center gap-2">
                 <strong class="text-white font-mono">trg_adjust_member_count_on_status_change</strong>
@@ -211,20 +211,20 @@
                   <i class="bi bi-copy"></i>
                 </button>
               </div>
-              <small class="d-block text-secondary">Membership Governance</small>
+              <small class="text-secondary font-mono">Membership Governance</small>
             </td>
             <td>
-              <span class="badge-status info">AFTER UPDATE</span>
-              <small class="d-block text-secondary mt-1 font-mono">Memberships</small>
+              <span class="badge-status info font-mono">AFTER UPDATE</span>
+              <small class="d-block text-secondary mt-1">Memberships</small>
             </td>
             <td><span class="badge-status success">Governance</span></td>
             <td>
-              When a member's status is toggled between <code class="font-mono text-white">Active</code> and <code class="font-mono text-white">Inactive</code>, <code class="font-mono text-white">Clubs.member_count</code> is automatically synchronized.
+              <span class="text-white fw-medium">Syncs count when member toggles Active / Inactive</span>
             </td>
             <td class="text-end">
               {% if can_test_trigger(4) %}
-              <a href="{{ url_for('main.list_memberships') }}" class="btn-ghost-action">
-                Toggle Status
+              <a href="{{ url_for('main.list_memberships') }}" class="btn-trigger-pill btn-cyan">
+                <i class="bi bi-arrow-left-right"></i> Toggle Status
               </a>
               {% else %}
               <span class="badge-status neutral small"><i class="bi bi-lock me-1"></i>Protected</span>
@@ -234,7 +234,7 @@
 
           <!-- Trigger 5 -->
           <tr data-category="Integrity">
-            <td><span class="badge-status warning font-mono">5</span></td>
+            <td><span class="badge-status warning font-mono fw-bold">5</span></td>
             <td>
               <div class="d-flex align-items-center gap-2">
                 <strong class="text-white font-mono">trg_prevent_registration_for_completed_event</strong>
@@ -242,20 +242,20 @@
                   <i class="bi bi-copy"></i>
                 </button>
               </div>
-              <small class="d-block text-secondary">Event Temporal Integrity</small>
+              <small class="text-secondary font-mono">Event Temporal Integrity</small>
             </td>
             <td>
-              <span class="badge-status warning">BEFORE INSERT</span>
-              <small class="d-block text-secondary mt-1 font-mono">EventRegistrations</small>
+              <span class="badge-status warning font-mono">BEFORE INSERT</span>
+              <small class="d-block text-secondary mt-1">EventRegistrations</small>
             </td>
             <td><span class="badge-status warning">Integrity</span></td>
             <td>
-              Rejects retrospective registrations for events that are already marked <code class="font-mono text-white">'Completed'</code> or <code class="font-mono text-white">'Cancelled'</code>.
+              <span class="text-white fw-medium">Rejects attendee registration for past / closed events</span>
             </td>
             <td class="text-end">
               {% if can_test_trigger(5) %}
-              <a href="{{ url_for('main.list_events') }}" class="btn-ghost-action text-warning">
-                Test on Events
+              <a href="{{ url_for('main.list_events') }}" class="btn-trigger-pill btn-warning">
+                <i class="bi bi-calendar-x"></i> Test Past Event
               </a>
               {% else %}
               <span class="badge-status neutral small"><i class="bi bi-lock me-1"></i>Protected</span>
@@ -265,7 +265,7 @@
 
           <!-- Trigger 6 -->
           <tr data-category="Integrity">
-            <td><span class="badge-status warning font-mono">6</span></td>
+            <td><span class="badge-status warning font-mono fw-bold">6</span></td>
             <td>
               <div class="d-flex align-items-center gap-2">
                 <strong class="text-white font-mono">trg_verify_feedback_registration</strong>
@@ -273,20 +273,20 @@
                   <i class="bi bi-copy"></i>
                 </button>
               </div>
-              <small class="d-block text-secondary">Verified Reviews Gatekeeper</small>
+              <small class="text-secondary font-mono">Verified Reviews Gatekeeper</small>
             </td>
             <td>
-              <span class="badge-status warning">BEFORE INSERT</span>
-              <small class="d-block text-secondary mt-1 font-mono">Feedback</small>
+              <span class="badge-status warning font-mono">BEFORE INSERT</span>
+              <small class="d-block text-secondary mt-1">Feedback</small>
             </td>
             <td><span class="badge-status warning">Integrity</span></td>
             <td>
-              Authenticity assurance: Intercepts event feedback submissions and verifies via cross-table check that the student was registered for that event.
+              <span class="text-white fw-medium">Verifies student attended event before accepting feedback</span>
             </td>
             <td class="text-end">
               {% if can_test_trigger(6) %}
-              <a href="{{ url_for('main.list_events') }}" class="btn-ghost-action text-info">
-                Test Feedback
+              <a href="{{ url_for('main.list_events') }}" class="btn-trigger-pill btn-cyan">
+                <i class="bi bi-star-fill"></i> Test Feedback
               </a>
               {% else %}
               <span class="badge-status neutral small"><i class="bi bi-lock me-1"></i>Protected</span>
@@ -296,7 +296,7 @@
 
           <!-- Trigger 7 -->
           <tr data-category="Provisioning">
-            <td><span class="badge-status neutral font-mono" style="color: var(--violet-400);">7</span></td>
+            <td><span class="badge-status neutral font-mono fw-bold" style="color: var(--violet-400);">7</span></td>
             <td>
               <div class="d-flex align-items-center gap-2">
                 <strong class="text-white font-mono">trg_auto_progress_event_on_attendance</strong>
@@ -304,20 +304,20 @@
                   <i class="bi bi-copy"></i>
                 </button>
               </div>
-              <small class="d-block text-secondary">State Progression</small>
+              <small class="text-secondary font-mono">State Progression</small>
             </td>
             <td>
-              <span class="badge-status info">AFTER UPDATE</span>
-              <small class="d-block text-secondary mt-1 font-mono">EventRegistrations</small>
+              <span class="badge-status info font-mono">AFTER UPDATE</span>
+              <small class="d-block text-secondary mt-1">EventRegistrations</small>
             </td>
             <td><span class="badge-status neutral" style="color: var(--violet-400);">Provisioning</span></td>
             <td>
-              When attendee status is marked <code class="font-mono text-white">'Attended'</code> at check-in, if the event was <code class="font-mono text-white">'Planned'</code>, it automatically flips to <code class="font-mono text-white">'Ongoing'</code>.
+              <span class="text-white fw-medium">Auto-flips Planned event to Ongoing on check-in</span>
             </td>
             <td class="text-end">
               {% if can_test_trigger(7) %}
-              <a href="{{ url_for('main.list_events') }}" class="btn-ghost-action text-primary">
-                Mark Attendance
+              <a href="{{ url_for('main.list_events') }}" class="btn-trigger-pill btn-violet">
+                <i class="bi bi-check2-all"></i> Mark Attendance
               </a>
               {% else %}
               <span class="badge-status neutral small"><i class="bi bi-lock me-1"></i>Protected</span>
@@ -327,7 +327,7 @@
 
           <!-- Trigger 8 -->
           <tr data-category="Provisioning">
-            <td><span class="badge-status neutral font-mono" style="color: var(--violet-400);">8</span></td>
+            <td><span class="badge-status neutral font-mono fw-bold" style="color: var(--violet-400);">8</span></td>
             <td>
               <div class="d-flex align-items-center gap-2">
                 <strong class="text-white font-mono">trg_auto_create_club_profile</strong>
@@ -335,20 +335,20 @@
                   <i class="bi bi-copy"></i>
                 </button>
               </div>
-              <small class="d-block text-secondary">Zero-Config Provisioning</small>
+              <small class="text-secondary font-mono">Zero-Config Provisioning</small>
             </td>
             <td>
-              <span class="badge-status success">AFTER INSERT</span>
-              <small class="d-block text-secondary mt-1 font-mono">Clubs &rarr; ClubProfile</small>
+              <span class="badge-status success font-mono">AFTER INSERT</span>
+              <small class="d-block text-secondary mt-1">Clubs &rarr; ClubProfile</small>
             </td>
             <td><span class="badge-status neutral" style="color: var(--violet-400);">Provisioning</span></td>
             <td>
-              When a new club is created, automatically provisions baseline profile row with institutional email and Instagram handle in <code class="font-mono text-white">ClubProfile</code>.
+              <span class="text-white fw-medium">Provisions default ClubProfile upon new club creation</span>
             </td>
             <td class="text-end">
               {% if can_test_trigger(8) %}
-              <a href="{{ url_for('main.create_club') }}" class="btn-ghost-action text-success">
-                Create Club
+              <a href="{{ url_for('main.create_club') }}" class="btn-trigger-pill btn-success">
+                <i class="bi bi-plus-circle-fill"></i> Create Club
               </a>
               {% else %}
               <span class="badge-status neutral small"><i class="bi bi-lock me-1"></i>Protected</span>

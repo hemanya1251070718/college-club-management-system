@@ -22,6 +22,24 @@ document.addEventListener("DOMContentLoaded", () => {
   applyRoleUI(activeRole);
 
   /**
+   * Universal Dark / Light Theme Mode Switcher
+   */
+  const themeToggleBtn = document.getElementById("theme-toggle-btn");
+  if (themeToggleBtn) {
+    themeToggleBtn.addEventListener("click", () => {
+      const currentTheme = document.documentElement.getAttribute("data-theme") || "dark";
+      const nextTheme = currentTheme === "dark" ? "light" : "dark";
+      document.documentElement.setAttribute("data-theme", nextTheme);
+      localStorage.setItem("clubhub_theme", nextTheme);
+      
+      const themeStatusEl = document.getElementById("app-live-status");
+      if (themeStatusEl) {
+        themeStatusEl.textContent = `Visual theme switched to ${nextTheme} mode.`;
+      }
+    });
+  }
+
+  /**
    * Google Pay Style Rainbow Circular Animation Trigger
    */
   function triggerGpayAnimation(title, roleName, description, callback) {

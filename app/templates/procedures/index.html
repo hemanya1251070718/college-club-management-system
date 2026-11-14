@@ -111,8 +111,8 @@
           </div>
           <span class="badge-status neutral">Audit &amp; Self-Repair</span>
         </div>
-        <p class="text-secondary small mb-4">
-          Iterates over all recognized clubs using a cursor, compares cached <code class="font-mono text-white">Clubs.member_count</code> against actual active <code class="font-mono text-white">Memberships</code> rows, and repairs drift.
+        <p class="text-secondary small mb-3">
+          Audits cached club member counts against live memberships and repairs schema drift.
         </p>
         {% if can_test_procedure(1) %}
         <form method="POST" action="{{ url_for('main.execute_proc', proc_id='audit') }}" class="mt-auto">
@@ -144,7 +144,7 @@
           <span class="badge-status neutral">Recruitment Engine</span>
         </div>
         <p class="text-secondary small mb-3">
-          Identifies non-members actively participating in campus events, detects their preferred club by attendance frequency, and auto-enrolls them as active Volunteers.
+          Identifies active non-member attendees and auto-enrolls them as club volunteers.
         </p>
         {% if can_test_procedure(2) %}
         <form method="POST" action="{{ url_for('main.execute_proc', proc_id='recruitment') }}" class="mt-auto">
@@ -183,7 +183,7 @@
           <span class="badge-status neutral">Financial Performance</span>
         </div>
         <p class="text-secondary small mb-3">
-          Evaluates Feedback ratings for all Completed events, isolates top-rated initiatives (rating &ge; threshold), and commits financial performance bonus reconciliations.
+          Rewards top-rated events with automated bonus budget allocations.
         </p>
         {% if can_test_procedure(3) %}
         <form method="POST" action="{{ url_for('main.execute_proc', proc_id='budget') }}" class="mt-auto">
@@ -225,7 +225,7 @@
           <span class="badge-status neutral">Event Lifecycle</span>
         </div>
         <p class="text-secondary small mb-3">
-          Scans past events lingering in 'Planned'. Reconciles status to 'Completed' if attendees attended, or flips to 'Cancelled' if zero attendance was recorded.
+          Reconciles past planned events to Completed or Cancelled based on attendance.
         </p>
         {% if can_test_procedure(4) %}
         <form method="POST" action="{{ url_for('main.execute_proc', proc_id='close_events') }}" class="mt-auto">
@@ -264,7 +264,7 @@
           <span class="badge-status neutral">Attendance Governance</span>
         </div>
         <p class="text-secondary small mb-3">
-          Enforces membership constitution: flags active non-executive members who registered but skipped host club events &ge; threshold, marking them Inactive.
+          Flags or deactivates members who missed consecutive flagship club events.
         </p>
         {% if can_test_procedure(5) %}
         <form method="POST" action="{{ url_for('main.execute_proc', proc_id='deactivate') }}" class="mt-auto">
@@ -302,7 +302,7 @@
           <span class="badge-status neutral">Merit Leadership</span>
         </div>
         <p class="text-secondary small mb-3">
-          Evaluates cross-campus attendance. Regular members with high verified participation (&ge; threshold) are promoted directly to 'Core Member' in Memberships.
+          Promotes high-attendance regular members directly to Core Member tier.
         </p>
         {% if can_test_procedure(6) %}
         <form method="POST" action="{{ url_for('main.execute_proc', proc_id='promote') }}" class="mt-auto">
@@ -345,7 +345,7 @@
           <span class="badge-status neutral">Alumni Exit</span>
         </div>
         <p class="text-secondary small mb-3">
-          Annual academic session transition: identifies active memberships held by final-year students (year_of_study = 4), transitions them to Alumni ('Inactive'), and updates counts.
+          Transitions graduating final-year seniors to Alumni status on academic rollover.
         </p>
         {% if can_test_procedure(7) %}
         <form method="POST" action="{{ url_for('main.execute_proc', proc_id='grad') }}" class="mt-auto">
@@ -383,7 +383,7 @@
           <span class="badge-status neutral">Privacy Protection</span>
         </div>
         <p class="text-secondary small mb-3">
-          Student Grievance Protection Policy: iterates low-rating reviews (&le; threshold) and automatically replaces comments with protected standardized tags in Feedback.
+          Redacts student identities on low-rating reviews under student privacy policy.
         </p>
         {% if can_test_procedure(8) %}
         <form method="POST" action="{{ url_for('main.execute_proc', proc_id='privacy') }}" class="mt-auto">
