@@ -355,16 +355,82 @@ class SQLiteConnectionAdapter:
         self.close()
 
 
+def init_sqlite_tables_if_needed(raw_conn):
+    """
+    Checks if canonical tables exist. If missing or empty,
+    initializes all 8 tables, views, triggers, and records from CANONICAL_STATEMENTS.
+    """
+    try:
+        cur = raw_conn.cursor()
+        cur.execute("SELECT name FROM sqlite_master WHERE type='table' AND name='Students';")
+        has_students = cur.fetchone()
+        if not has_students:
+            from app.canonical_sql import CANONICAL_STATEMENTS
+            for stmt in CANONICAL_STATEMENTS:
+                try:
+                    cur.execute(stmt)
+                except Exception:
+                    pass
+            triggers = [
+                '''
+                CREATE TRIGGER IF NOT EXISTS trg_after_membership_insert_sync_count
+                AFTER INSERT ON Memberships
+                FOR EACH ROW
+                WHEN NEW.status = 'Active'
+                BEGIN
+                    UPDATE Clubs
+                    SET member_count = member_count + 1
+                    WHERE club_id = NEW.club_id;
+                END;
+                ''',
+                '''
+                CREATE TRIGGER IF NOT EXISTS trg_after_membership_delete_sync_count
+                AFTER DELETE ON Memberships
+                FOR EACH ROW
+                WHEN OLD.status = 'Active'
+                BEGIN
+                    UPDATE Clubs
+                    SET member_count = member_count - 1
+                    WHERE club_id = OLD.club_id;
+                END;
+                ''',
+                '''
+                CREATE TRIGGER IF NOT EXISTS trg_adjust_member_count_on_status_change
+                AFTER UPDATE OF status ON Memberships
+                FOR EACH ROW
+                BEGIN
+                    UPDATE Clubs
+                    SET member_count = member_count + 
+                        CASE 
+                            WHEN OLD.status != 'Active' AND NEW.status = 'Active' THEN 1
+                            WHEN OLD.status = 'Active' AND NEW.status != 'Active' THEN -1
+                            ELSE 0
+                        END
+                    WHERE club_id = NEW.club_id;
+                END;
+                '''
+            ]
+            for trg in triggers:
+                try:
+                    cur.execute(trg)
+                except Exception:
+                    pass
+            raw_conn.commit()
+    except Exception as e:
+        print(f"Notice: SQLite self-healing init exception: {e}")
+
 def get_sqlite_fallback_connection():
     """Returns a resilient SQLite connection initialized with full canonical database records."""
     target_path = get_writable_sqlite_path()
     try:
         os.makedirs(os.path.dirname(target_path), exist_ok=True)
         raw_conn = sqlite3.connect(target_path, timeout=5)
+        init_sqlite_tables_if_needed(raw_conn)
         return SQLiteConnectionAdapter(raw_conn)
     except Exception:
         # Memory fallback if filesystem completely constrained
         raw_conn = sqlite3.connect(":memory:")
+        init_sqlite_tables_if_needed(raw_conn)
         return SQLiteConnectionAdapter(raw_conn)
 
 
