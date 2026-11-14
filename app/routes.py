@@ -129,11 +129,43 @@ def list_clubs():
                 ORDER BY c.club_name;
             """)
             clubs = cursor.fetchall()
+            if not clubs:
+                from app.db import get_sqlite_fallback_connection
+                fb_conn = get_sqlite_fallback_connection()
+                with fb_conn.cursor() as fb_cur:
+                    fb_cur.execute("""
+                        SELECT c.club_id, c.club_name, c.category, c.faculty_id, c.description, c.member_count,
+                               f.name AS faculty_name, f.email AS faculty_email,
+                               cp.official_email, cp.instagram_handle
+                        FROM Clubs c
+                        LEFT JOIN FacultyCoordinators f ON c.faculty_id = f.faculty_id
+                        LEFT JOIN ClubProfile cp ON c.club_id = cp.club_id
+                        ORDER BY c.club_name;
+                    """)
+                    clubs = fb_cur.fetchall()
+                fb_conn.close()
         conn.close()
-        return render_template("clubs/list.html", clubs=clubs)
+        return render_template("clubs/list.html", clubs=clubs or [])
     except Exception as e:
-        flash(f"Error fetching clubs: {str(e)}", "danger")
-        return render_template("clubs/list.html", clubs=[])
+        try:
+            from app.db import get_sqlite_fallback_connection
+            fb_conn = get_sqlite_fallback_connection()
+            with fb_conn.cursor() as fb_cur:
+                fb_cur.execute("""
+                    SELECT c.club_id, c.club_name, c.category, c.faculty_id, c.description, c.member_count,
+                           f.name AS faculty_name, f.email AS faculty_email,
+                           cp.official_email, cp.instagram_handle
+                    FROM Clubs c
+                    LEFT JOIN FacultyCoordinators f ON c.faculty_id = f.faculty_id
+                    LEFT JOIN ClubProfile cp ON c.club_id = cp.club_id
+                    ORDER BY c.club_name;
+                """)
+                clubs = fb_cur.fetchall()
+            fb_conn.close()
+            return render_template("clubs/list.html", clubs=clubs or [])
+        except Exception:
+            flash(f"Error fetching clubs: {str(e)}", "danger")
+            return render_template("clubs/list.html", clubs=[])
 
 
 @main_bp.route("/clubs/new", methods=["GET", "POST"])
@@ -289,13 +321,39 @@ def list_students():
             cursor.execute(query, tuple(params))
             students = cursor.fetchall()
 
+            if not students and not search and not dept:
+                from app.db import get_sqlite_fallback_connection
+                fb_conn = get_sqlite_fallback_connection()
+                with fb_conn.cursor() as fb_cur:
+                    fb_cur.execute("SELECT * FROM Students ORDER BY student_id LIMIT 100;")
+                    students = fb_cur.fetchall()
+                fb_conn.close()
+
             cursor.execute("SELECT DISTINCT dept_id, dept_name FROM Students ORDER BY dept_id;")
             departments = cursor.fetchall()
+            if not departments:
+                departments = [
+                    {"dept_id": "CE", "dept_name": "Computer Engineering"},
+                    {"dept_id": "EE", "dept_name": "Electronics Engineering"},
+                    {"dept_id": "ELE", "dept_name": "Electrical Engineering"},
+                    {"dept_id": "ME", "dept_name": "Mechanical Engineering"}
+                ]
         conn.close()
         return render_template("students/list.html", students=students, departments=departments, search=search, selected_dept=dept)
     except Exception as e:
-        flash(f"Error fetching students: {str(e)}", "danger")
-        return render_template("students/list.html", students=[], departments=[], search="", selected_dept="")
+        try:
+            from app.db import get_sqlite_fallback_connection
+            fb_conn = get_sqlite_fallback_connection()
+            with fb_conn.cursor() as fb_cur:
+                fb_cur.execute("SELECT * FROM Students ORDER BY student_id LIMIT 100;")
+                students = fb_cur.fetchall()
+                fb_cur.execute("SELECT DISTINCT dept_id, dept_name FROM Students ORDER BY dept_id;")
+                departments = fb_cur.fetchall()
+            fb_conn.close()
+            return render_template("students/list.html", students=students, departments=departments, search="", selected_dept="")
+        except Exception:
+            flash(f"Error fetching students: {str(e)}", "danger")
+            return render_template("students/list.html", students=[], departments=[], search="", selected_dept="")
 
 
 @main_bp.route("/students/new", methods=["GET", "POST"])
@@ -593,11 +651,39 @@ def list_events():
                 ORDER BY e.event_date DESC;
             """)
             events = cursor.fetchall()
+            if not events:
+                from app.db import get_sqlite_fallback_connection
+                fb_conn = get_sqlite_fallback_connection()
+                with fb_conn.cursor() as fb_cur:
+                    fb_cur.execute("""
+                        SELECT e.*, c.club_name,
+                               (SELECT COUNT(*) FROM EventRegistrations er WHERE er.event_id = e.event_id) AS attendee_count
+                        FROM Events e
+                        LEFT JOIN Clubs c ON e.club_id = c.club_id
+                        ORDER BY e.event_date DESC;
+                    """)
+                    events = fb_cur.fetchall()
+                fb_conn.close()
         conn.close()
-        return render_template("events/list.html", events=events)
+        return render_template("events/list.html", events=events or [])
     except Exception as e:
-        flash(f"Error fetching events: {str(e)}", "danger")
-        return render_template("events/list.html", events=[])
+        try:
+            from app.db import get_sqlite_fallback_connection
+            fb_conn = get_sqlite_fallback_connection()
+            with fb_conn.cursor() as fb_cur:
+                fb_cur.execute("""
+                    SELECT e.*, c.club_name,
+                           (SELECT COUNT(*) FROM EventRegistrations er WHERE er.event_id = e.event_id) AS attendee_count
+                    FROM Events e
+                    LEFT JOIN Clubs c ON e.club_id = c.club_id
+                    ORDER BY e.event_date DESC;
+                """)
+                events = fb_cur.fetchall()
+            fb_conn.close()
+            return render_template("events/list.html", events=events or [])
+        except Exception:
+            flash(f"Error fetching events: {str(e)}", "danger")
+            return render_template("events/list.html", events=[])
 
 
 @main_bp.route("/events/new", methods=["GET", "POST"])

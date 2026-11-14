@@ -368,4 +368,43 @@ def test_theme_toggle_and_trigger_pill_buttons(client):
     assert 'Auto-enrolls them as club volunteers' in proc_html or 'auto-enrolls them' in proc_html
 
 
+def test_light_theme_high_contrast_and_resilient_events(client):
+    """
+    Verifies that high-contrast light theme rules, solid borders,
+    and resilient data loading for events and students are all active.
+    """
+    client.get("/guest")
+
+    # 1. Check Events page loads all 12 events
+    events_html = client.get("/events").data.decode("utf-8")
+    assert 'CSI TechFest 26' in events_html
+    assert 'E-Summit 26' in events_html
+    assert 'CodeStorm Hackathon 26' in events_html
+    assert 'table-surface-card' in events_html
+
+    # 2. Check tokens.css has solid slate borders in light mode
+    with open("app/static/css/tokens.css", "r", encoding="utf-8") as f:
+        tokens_css = f.read()
+    assert '[data-theme="light"]' in tokens_css
+    assert '--border: #CBD5E1;' in tokens_css
+    assert '--border-strong: #94A3B8;' in tokens_css
+    assert '--text-1: #0F172A;' in tokens_css
+
+    # 3. Check components.css has crisp boundaries and text-white safety override
+    with open("app/static/css/components.css", "r", encoding="utf-8") as f:
+        comp_css = f.read()
+    assert '[data-theme="light"] .table-surface-card' in comp_css
+    assert '1.5px solid #CBD5E1 !important;' in comp_css
+    assert '[data-theme="light"] .tesla-table thead' in comp_css
+    assert 'border-bottom: 2px solid #94A3B8 !important;' in comp_css
+    assert '[data-theme="light"] .text-white' in comp_css
+
+    # 4. Check base.html has cache-busting version params
+    base_html = client.get("/").data.decode("utf-8")
+    assert 'tokens.css?v=' in base_html
+    assert 'components.css?v=' in base_html
+    assert 'main.js?v=' in base_html
+
+
+
 

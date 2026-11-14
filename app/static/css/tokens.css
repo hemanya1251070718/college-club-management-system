@@ -146,27 +146,28 @@
   color-scheme: light;
 
   /* Crisp Light Canvas */
-  --bg-0: #F8FAFC; /* Clean off-white canvas */
-  --bg-1: #EDF2F7; /* Contrast slate band */
+  --bg-0: #F8FAFC; /* Clean off-white slate canvas */
+  --bg-1: #F1F5F9; /* High-contrast slate-100 section band */
 
-  /* Clean White Surfaces & Subtle Elevation */
+  /* Clean White Surfaces & Distinct Elevation */
   --surface-1: #FFFFFF;
   --surface-2: #F8FAFC;
-  --surface-3: #EDF2F7;
-  --surface-glass: rgba(255, 255, 255, 0.88);
+  --surface-3: #F1F5F9;
+  --surface-glass: rgba(255, 255, 255, 0.94);
   --surface-card-grad: linear-gradient(180deg, #FFFFFF 0%, #F8FAFC 100%);
   --surface-card-hover: linear-gradient(180deg, #FFFFFF 0%, #F1F5F9 100%);
 
-  /* Borders & Glows */
-  --border: rgba(15, 23, 42, 0.09);
-  --border-strong: rgba(15, 23, 42, 0.18);
-  --border-glow: rgba(99, 102, 241, 0.22);
-  --border-cyan-glow: rgba(14, 165, 233, 0.25);
+  /* Crisp Visible Borders & Dividers */
+  --border: #CBD5E1;        /* Solid slate-300: crisp, distinct boundary */
+  --border-strong: #94A3B8; /* Solid slate-400: prominent table headers and cards */
+  --border-subtle: #E2E8F0; /* Solid slate-200: clean table row dividers */
+  --border-glow: rgba(37, 99, 235, 0.30);
+  --border-cyan-glow: rgba(2, 132, 199, 0.30);
 
-  /* High-Contrast Typography */
-  --text-1: #0F172A; /* Slate 900 primary headline */
-  --text-2: #334155; /* Slate 700 readable body */
-  --text-3: #64748B; /* Slate 500 captions */
+  /* High-Contrast Accessible Typography (WCAG AAA/AA) */
+  --text-1: #0F172A; /* Slate 900: primary deep slate headline */
+  --text-2: #1E293B; /* Slate 800: readable high-contrast body */
+  --text-3: #475569; /* Slate 600: prominent captions & labels */
 
   /* Vibrant Accents Optimized for Light Backgrounds */
   --blue-400: #0284C7;
@@ -181,11 +182,28 @@
   --violet-900: #F5F3FF;
   --pink-400: #DB2777;
 
-  /* Soft Light Shadows */
-  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.05), 0 1px 2px rgba(0, 0, 0, 0.03);
-  --shadow-md: 0 4px 14px -2px rgba(0, 0, 0, 0.08), 0 2px 6px -1px rgba(0, 0, 0, 0.04);
-  --shadow-lg: 0 20px 25px -5px rgba(0, 0, 0, 0.08), 0 8px 10px -6px rgba(0, 0, 0, 0.04);
-  --shadow-glow: 0 0 24px rgba(37, 99, 235, 0.12);
+  /* High-Contrast Light Mode Semantics */
+  --success: #15803D;        /* Emerald 700 */
+  --success-bg: #DCFCE7;     /* Emerald 100 */
+  --success-border: #86EFAC; /* Emerald 300 */
+
+  --warning: #B45309;        /* Amber 700 */
+  --warning-bg: #FEF3C7;     /* Amber 100 */
+  --warning-border: #FCD34D; /* Amber 300 */
+
+  --danger: #B91C1C;         /* Red 700 */
+  --danger-bg: #FEE2E2;      /* Red 100 */
+  --danger-border: #FCA5A5;  /* Red 300 */
+
+  --info: #0369A1;           /* Sky 700 */
+  --info-bg: #E0F2FE;        /* Sky 100 */
+  --info-border: #7DD3FC;    /* Sky 300 */
+
+  /* Deep Light Mode Elevation Shadows */
+  --shadow-sm: 0 1px 3px rgba(15, 23, 42, 0.08), 0 1px 2px rgba(15, 23, 42, 0.04);
+  --shadow-md: 0 4px 14px -2px rgba(15, 23, 42, 0.10), 0 2px 6px -1px rgba(15, 23, 42, 0.06);
+  --shadow-lg: 0 20px 25px -5px rgba(15, 23, 42, 0.10), 0 8px 10px -6px rgba(15, 23, 42, 0.05);
+  --shadow-glow: 0 0 24px rgba(37, 99, 235, 0.18);
 }
 
 /* Global Reset & Prevent Flash */

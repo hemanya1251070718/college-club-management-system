@@ -27,9 +27,9 @@
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
 
   <!-- Design System Tokens & Components (High-Impact Hybrid Editorial Design) -->
-  <link rel="stylesheet" href="{{ url_for('static', filename='css/tokens.css') }}">
-  <link rel="stylesheet" href="{{ url_for('static', filename='css/components.css') }}">
-  <link rel="stylesheet" href="{{ url_for('static', filename='css/motion.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/tokens.css') }}?v=20261114_contrast_v2">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/components.css') }}?v=20261114_contrast_v2">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/motion.css') }}?v=20261114_contrast_v2">
 </head>
 <body class="{% block body_class %}{% endblock %}" data-user-role="{{ current_role|default('guest') }}">
 
@@ -577,10 +577,10 @@
   <!-- Bootstrap 5 JS Bundle -->
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
   <!-- Interaction & Motion Engine -->
-  <script src="{{ url_for('static', filename='js/motion.js') }}"></script>
+  <script src="{{ url_for('static', filename='js/motion.js') }}?v=20261114_contrast_v2"></script>
   <!-- Selective WebGL Hero -->
-  <script src="{{ url_for('static', filename='js/webgl-hero.js') }}"></script>
+  <script src="{{ url_for('static', filename='js/webgl-hero.js') }}?v=20261114_contrast_v2"></script>
   <!-- Main RBAC & Google Pay Rainbow Animation Bridge -->
-  <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+  <script src="{{ url_for('static', filename='js/main.js') }}?v=20261114_contrast_v2"></script>
 </body>
 </html>
