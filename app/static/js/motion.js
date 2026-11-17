@@ -9,7 +9,6 @@ document.addEventListener("DOMContentLoaded", () => {
   initScrollReveal();
   initNumberCounters();
   initAlertsAutoDismiss();
-  initDeleteConfirmations();
   initOutcrowdCardTiltAndSpotlight();
 });
 
@@ -174,17 +173,7 @@ function initAlertsAutoDismiss() {
  * 6. Delete Action Confirmation Modal / Prompt
  */
 function initDeleteConfirmations() {
-  if (document.getElementById("deleteConfirmModal")) return;
-
-  const deleteForms = document.querySelectorAll("form.delete-form");
-  deleteForms.forEach((form) => {
-    form.addEventListener("submit", (e) => {
-      const entity = form.dataset.entity || "record";
-      if (!confirm(`Are you sure you want to delete this ${entity}? This action is irreversible.`)) {
-        e.preventDefault();
-      }
-    });
-  });
+  // Handled universally across all tabs by ClubHub theme popup modal in main.js
 }
 
 /**

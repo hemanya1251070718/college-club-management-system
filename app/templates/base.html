@@ -432,25 +432,36 @@
   </div>
 
   <!-- =========================================================================
-       ZERO-TEXT VISUAL CONFIRMATION BAR (Green for Confirm, Red for Deleting)
+       THEME-MATCHED POPUP CONFIRMATION MODAL (All Tabs)
+       Suits ClubHub Dark & Light Themes with Green (Confirm) / Red (Deleting)
        ========================================================================= -->
-  <div class="modal fade" id="minimalConfirmBarModal" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered minimal-confirm-dialog" style="max-width: 240px; margin: auto;">
-      <div class="modal-content border-0 bg-transparent shadow-none">
-        <div class="minimal-confirm-bar-card">
-          <div class="minimal-confirm-bar-inner">
-            <!-- Red Action Button: Deletes or Cancels (Color code: #EF4444) -->
-            <button type="button" id="confirmBarRedBtn" class="confirm-bar-action-btn btn-action-red" aria-label="Action Red" title="Delete">
-              <i class="bi bi-trash3-fill confirm-icon-delete"></i>
-              <i class="bi bi-x-lg confirm-icon-cancel d-none"></i>
+  <div class="modal fade" id="themeConfirmModal" tabindex="-1" aria-labelledby="themePopupTitle" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered theme-popup-dialog" style="max-width: 440px; margin: auto;">
+      <div class="modal-content theme-popup-card">
+        <div class="theme-popup-body text-center p-4">
+          <!-- Themed Glowing Icon Badge -->
+          <div id="themePopupIconWrap" class="theme-popup-icon-wrap icon-mode-delete mx-auto mb-3">
+            <i id="themePopupIcon" class="bi bi-trash3-fill fs-2"></i>
+          </div>
+          
+          <!-- Themed Heading & Dynamic Context -->
+          <h4 id="themePopupTitle" class="theme-popup-title mb-2">Delete Confirmation</h4>
+          <p id="themePopupSubtitle" class="theme-popup-subtitle mb-4">Are you sure you want to proceed? This database action updates live charter counts.</p>
+          
+          <!-- Color-Coded Themed Confirmation Bar (Red for Deleting, Green for Confirm) -->
+          <div class="theme-popup-actions d-flex align-items-center justify-content-center gap-3">
+            <!-- Red Action Button (#EF4444) -->
+            <button type="button" id="confirmBarRedBtn" class="btn-theme-popup btn-popup-red" aria-label="Delete Action" title="Delete">
+              <i class="bi bi-trash3-fill btn-icon-delete me-1"></i>
+              <i class="bi bi-x-lg btn-icon-cancel d-none me-1"></i>
+              <span id="popupRedBtnText">Delete</span>
             </button>
             
-            <!-- Minimal Center Divider -->
-            <div class="confirm-bar-divider"></div>
-            
-            <!-- Green Action Button: Confirms Submission (Color code: #10B981) -->
-            <button type="button" id="confirmBarGreenBtn" class="confirm-bar-action-btn btn-action-green" aria-label="Action Green" title="Confirm">
-              <i class="bi bi-check-lg confirm-icon-check"></i>
+            <!-- Green Action Button (#10B981) -->
+            <button type="button" id="confirmBarGreenBtn" class="btn-theme-popup btn-popup-green" aria-label="Confirm Action" title="Confirm">
+              <i class="bi bi-check-lg btn-icon-confirm me-1"></i>
+              <i class="bi bi-arrow-return-left btn-icon-keep d-none me-1"></i>
+              <span id="popupGreenBtnText">Confirm</span>
             </button>
           </div>
         </div>

@@ -369,21 +369,28 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 
   /**
-   * ZERO-TEXT VISUAL CONFIRMATION BAR
-   * Pure minimal floating bar: Green for confirm, Red for deleting.
+   * THEME-MATCHED POPUP CONFIRMATION MODAL (All Tabs)
+   * Suits ClubHub Dark & Light Themes with Green (Confirm) / Red (Deleting)
    * Intercepts:
-   * 1. Deleting membership (and all delete forms) -> Red button executes delete
+   * 1. Deleting membership, student, club, event (all delete forms) -> Red button executes delete
    * 2. Adding/editing membership -> Green button confirms submission
    * 3. Adding/editing student -> Green button confirms submission
    * 4. Giving feedback -> Green button confirms submission
    * 5. Before any event (create event, register for event) -> Green button confirms
    */
-  const minimalConfirmModalEl = document.getElementById("minimalConfirmBarModal");
-  if (minimalConfirmModalEl) {
+  const themeConfirmModalEl = document.getElementById("themeConfirmModal") ||
+                              document.getElementById("minimalConfirmBarModal") ||
+                              document.getElementById("deleteConfirmModal");
+
+  if (themeConfirmModalEl) {
     const greenBtn = document.getElementById("confirmBarGreenBtn");
     const redBtn = document.getElementById("confirmBarRedBtn");
-    const deleteIcon = redBtn ? redBtn.querySelector(".confirm-icon-delete") : null;
-    const cancelIcon = redBtn ? redBtn.querySelector(".confirm-icon-cancel") : null;
+    const iconWrap = document.getElementById("themePopupIconWrap");
+    const iconEl = document.getElementById("themePopupIcon");
+    const titleEl = document.getElementById("themePopupTitle");
+    const subtitleEl = document.getElementById("themePopupSubtitle");
+    const redBtnText = document.getElementById("popupRedBtnText");
+    const greenBtnText = document.getElementById("popupGreenBtnText");
 
     let pendingActionForm = null;
     let pendingActionMode = null; // 'delete' or 'confirm'
@@ -391,36 +398,65 @@ document.addEventListener("DOMContentLoaded", () => {
 
     const getConfirmModal = () => {
       if (typeof bootstrap !== "undefined" && bootstrap.Modal) {
-        return bootstrap.Modal.getOrCreateInstance(minimalConfirmModalEl);
+        return bootstrap.Modal.getOrCreateInstance(themeConfirmModalEl);
       }
       return null;
     };
 
-    // 1. Intercept DELETE actions (Red for deleting)
-    document.querySelectorAll("form.delete-form").forEach(form => {
+    // 1. Intercept DELETE actions across ALL tabs (Red for deleting)
+    document.querySelectorAll("form.delete-form, form[action*='delete']").forEach(form => {
       form.addEventListener("submit", (e) => {
         if (isExecutingConfirmedSubmit) return;
         e.preventDefault();
         pendingActionForm = form;
         pendingActionMode = "delete";
 
-        // Show trash icon on Red button
-        if (deleteIcon) deleteIcon.classList.remove("d-none");
-        if (cancelIcon) cancelIcon.classList.add("d-none");
+        const entity = form.dataset.entity || "record";
+
+        // Update Theme Modal for Deletion
+        if (iconWrap) {
+          iconWrap.className = "theme-popup-icon-wrap icon-mode-delete mx-auto mb-3";
+        }
+        if (iconEl) {
+          iconEl.className = "bi bi-trash3-fill fs-2";
+        }
+        if (titleEl) {
+          titleEl.textContent = `Delete ${entity.charAt(0).toUpperCase() + entity.slice(1)}`;
+        }
+        if (subtitleEl) {
+          subtitleEl.textContent = `Are you sure you want to delete this ${entity}? Live database triggers will automatically sync member counts and preserve directory records.`;
+        }
+        if (redBtnText) redBtnText.textContent = "Delete";
+        if (greenBtnText) greenBtnText.textContent = "Cancel";
+
+        // Toggle button icons
+        if (redBtn) {
+          const delIcon = redBtn.querySelector(".btn-icon-delete");
+          const cancelIcon = redBtn.querySelector(".btn-icon-cancel");
+          if (delIcon) delIcon.classList.remove("d-none");
+          if (cancelIcon) cancelIcon.classList.add("d-none");
+        }
+        if (greenBtn) {
+          const confIcon = greenBtn.querySelector(".btn-icon-confirm");
+          const keepIcon = greenBtn.querySelector(".btn-icon-keep");
+          if (confIcon) confIcon.classList.add("d-none");
+          if (keepIcon) keepIcon.classList.remove("d-none");
+        }
 
         const modal = getConfirmModal();
         if (modal) modal.show();
       });
     });
 
-    // 2. Intercept ADD/SUBMIT actions (Green for confirm)
-    // Applies to: adding membership, adding student, giving feedback, event registration/creation
+    // 2. Intercept ADD / EDIT / SUBMIT actions across ALL tabs (Green for confirm)
+    // Applies to: memberships, students, clubs, events, feedback, registrations
     const eligibleFormSelectors = [
       'form[action*="membership"]',
       'form[action*="student"]',
       'form[action*="feedback"]',
       'form[action*="register"]',
-      'form[action*="event"]'
+      'form[action*="event"]',
+      'form[action*="club"]'
     ];
 
     document.querySelectorAll("form[method='POST']:not(.delete-form):not(#login-form):not(#auth-main-form)").forEach(form => {
@@ -431,9 +467,11 @@ document.addEventListener("DOMContentLoaded", () => {
         action.includes("feedback") ||
         action.includes("register") ||
         action.includes("event") ||
+        action.includes("club") ||
         window.location.pathname.includes("/memberships/") ||
         window.location.pathname.includes("/students/") ||
-        window.location.pathname.includes("/events/");
+        window.location.pathname.includes("/events/") ||
+        window.location.pathname.includes("/clubs/");
 
       if (isTargetForm) {
         form.addEventListener("submit", (e) => {
@@ -446,9 +484,44 @@ document.addEventListener("DOMContentLoaded", () => {
           pendingActionForm = form;
           pendingActionMode = "confirm";
 
-          // Show cancel (x) icon on Red button
-          if (deleteIcon) deleteIcon.classList.add("d-none");
-          if (cancelIcon) cancelIcon.classList.remove("d-none");
+          // Determine readable action name
+          let actionName = "Record Submission";
+          if (action.includes("membership") || window.location.pathname.includes("/memberships/")) actionName = "Club Membership";
+          else if (action.includes("student") || window.location.pathname.includes("/students/")) actionName = "Student Directory";
+          else if (action.includes("feedback")) actionName = "Event Feedback";
+          else if (action.includes("register")) actionName = "Event Registration";
+          else if (action.includes("event") || window.location.pathname.includes("/events/")) actionName = "Campus Event";
+          else if (action.includes("club") || window.location.pathname.includes("/clubs/")) actionName = "Chartered Club";
+
+          // Update Theme Modal for Confirmation
+          if (iconWrap) {
+            iconWrap.className = "theme-popup-icon-wrap icon-mode-confirm mx-auto mb-3";
+          }
+          if (iconEl) {
+            iconEl.className = "bi bi-check2-circle fs-2";
+          }
+          if (titleEl) {
+            titleEl.textContent = `Confirm ${actionName}`;
+          }
+          if (subtitleEl) {
+            subtitleEl.textContent = `Ready to save and commit this ${actionName} to Google Cloud SQL. ACID database triggers will execute.`;
+          }
+          if (greenBtnText) greenBtnText.textContent = "Confirm";
+          if (redBtnText) redBtnText.textContent = "Cancel";
+
+          // Toggle button icons
+          if (redBtn) {
+            const delIcon = redBtn.querySelector(".btn-icon-delete");
+            const cancelIcon = redBtn.querySelector(".btn-icon-cancel");
+            if (delIcon) delIcon.classList.add("d-none");
+            if (cancelIcon) cancelIcon.classList.remove("d-none");
+          }
+          if (greenBtn) {
+            const confIcon = greenBtn.querySelector(".btn-icon-confirm");
+            const keepIcon = greenBtn.querySelector(".btn-icon-keep");
+            if (confIcon) confIcon.classList.remove("d-none");
+            if (keepIcon) keepIcon.classList.add("d-none");
+          }
 
           const modal = getConfirmModal();
           if (modal) modal.show();
@@ -457,8 +530,8 @@ document.addEventListener("DOMContentLoaded", () => {
     });
 
     // RED BUTTON HANDLER:
-    // If mode is 'delete' -> RED EXECUTES THE DELETE!
-    // If mode is 'confirm' -> RED CANCELS (closes bar without submitting)
+    // If mode is 'delete' -> RED EXECUTES THE DELETION (#EF4444)
+    // If mode is 'confirm' -> RED CANCELS (closes modal without submitting)
     if (redBtn) {
       redBtn.addEventListener("click", () => {
         const modal = getConfirmModal();
@@ -478,8 +551,8 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     // GREEN BUTTON HANDLER:
-    // If mode is 'confirm' -> GREEN CONFIRMS AND SUBMITS!
-    // If mode is 'delete' -> GREEN CANCELS (closes bar without deleting)
+    // If mode is 'confirm' -> GREEN CONFIRMS AND SUBMITS (#10B981)
+    // If mode is 'delete' -> GREEN CANCELS (closes modal without deleting)
     if (greenBtn) {
       greenBtn.addEventListener("click", () => {
         const modal = getConfirmModal();
