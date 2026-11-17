@@ -1,9 +1,14 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="light">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="theme-color" content="#16113A">
+  <meta name="theme-color" content="#F6F6FB">
+  <script>
+    (function() {
+      try { document.documentElement.setAttribute('data-theme', localStorage.getItem('clubhub_theme') || 'light'); } catch (e) {}
+    })();
+  </script>
   <title>ClubHub Enterprise DBMS - Identity &amp; Access Governance</title>
 
   <!-- Typography: Inter & JetBrains Mono -->
@@ -550,6 +555,8 @@
       }
     }
   </style>
+  <!-- Aurora Theme (holographic gradient skin — loaded last, visual only) -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/aurora.css') }}?v=20261117_aurora_v1">
 </head>
 <body class="login-page-body">
 

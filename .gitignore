@@ -57,3 +57,4 @@ frontend/.vinxi/
 frontend/.vite/
 .turbo/
 *.docx
+.venv/
