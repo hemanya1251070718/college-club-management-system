@@ -68,9 +68,11 @@
             <tr>
               {% for key, val in row.items() %}
               <td>
-                {% if val == 'OK' or val == 'FIXED' or 'ENROLLED' in (val|string) or 'PROMOTED' in (val|string) or 'TRANSITIONED' in (val|string) or 'ANONYMIZED' in (val|string) or 'BUDGET UPDATED' in (val|string) %}
-                  <span class="badge-status success">{{ val }}</span>
-                {% elif val == 'MISMATCH' or 'DEACTIVATED' in (val|string) or 'FLAGGED' in (val|string) or 'QUALIFIED' in (val|string) %}
+                {% if 'MISMATCH' in (val|string) %}
+                  <span class="badge-status danger fw-bold"><i class="bi bi-exclamation-triangle-fill me-1"></i>{{ val }}</span>
+                {% elif val == 'OK' or val == 'FIXED' or 'In Sync' in (val|string) or 'REPAIRED' in (val|string) or 'ENROLLED' in (val|string) or 'PROMOTED' in (val|string) or 'TRANSITIONED' in (val|string) or 'ANONYMIZED' in (val|string) or 'BUDGET UPDATED' in (val|string) %}
+                  <span class="badge-status success"><i class="bi bi-check-circle-fill me-1"></i>{{ val }}</span>
+                {% elif 'DEACTIVATED' in (val|string) or 'FLAGGED' in (val|string) or 'QUALIFIED' in (val|string) %}
                   <span class="badge-status warning">{{ val }}</span>
                 {% elif 'Cancelled' in (val|string) or 'REJECTED' in (val|string) %}
                   <span class="badge-status danger">{{ val }}</span>

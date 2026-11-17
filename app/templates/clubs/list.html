@@ -163,10 +163,12 @@
               <small class="text-secondary font-mono">{{ club.faculty_email or '' }}</small>
             </td>
             <td class="text-center tabular-nums">
-              <span class="badge-status success px-3 py-1">
-                <span class="pulse-dot pulse-dot-active"></span>
-                <strong>{{ club.member_count }}</strong> Members
-              </span>
+              <form method="POST" action="{{ url_for('main.update_club_count', club_id=club.club_id) }}" class="d-inline-flex align-items-center justify-content-center gap-1" title="Type to manually edit stored member count (Test Cursor 1 Schema Drift)">
+                <input type="number" name="member_count" value="{{ club.member_count }}" class="tesla-input py-1 px-2 text-center font-mono fw-bold" style="width: 72px; height: 32px; font-size: 13px; border-radius: 6px;" min="0" required aria-label="Manual count for {{ club.club_name }}">
+                <button type="submit" class="btn btn-sm btn-outline-warning py-1 px-2" style="height: 32px; line-height: 1;" title="Save Manual Count (Test Cursor 1)">
+                  <i class="bi bi-check-lg"></i>
+                </button>
+              </form>
             </td>
             <td class="text-end">
               {% if can_manage_lead() and is_club_authorized(club.club_id) %}

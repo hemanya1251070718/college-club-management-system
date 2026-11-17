@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 
-{% block title %}8 Production Database Triggers Architecture{% endblock %}
+{% block title %}6 Production Database Triggers Architecture{% endblock %}
 
 {% block content %}
 <div class="app-container">
@@ -9,7 +9,7 @@
     <ul class="app-breadcrumb">
       <li><a href="{{ url_for('main.dashboard') }}"><i class="bi bi-house me-1"></i>Cockpit</a></li>
       <li class="breadcrumb-separator">/</li>
-      <li class="breadcrumb-current">8 Production Triggers Architecture</li>
+      <li class="breadcrumb-current">6 Production Triggers Architecture</li>
     </ul>
   </nav>
 
@@ -21,8 +21,8 @@
           <span class="badge-status warning font-mono">CLOUD SQL AUTOMATION</span>
           <span class="text-secondary small">&bull; Declarative Integrity &amp; Automation</span>
         </div>
-        <h1 class="inner-page-title">8 Database Triggers Architecture</h1>
-        <p class="inner-page-subtitle">Production DBMS evaluation: 8 distinct triggers across 8 canonical domain tables with zero audit table overhead.</p>
+        <h1 class="inner-page-title">6 Database Triggers Architecture</h1>
+        <p class="inner-page-subtitle">Production DBMS evaluation: 6 distinct active triggers across canonical domain tables with zero audit table overhead.</p>
       </div>
       <div class="inner-header-actions">
         <a href="{{ url_for('main.procedures_hub') }}" class="btn-tesla-secondary">
@@ -44,33 +44,33 @@
       </div>
     </div>
 
-    <div class="kpi-card glow-border-hover" data-kpi-filter="Governance" style="cursor: pointer;" title="Filter Governance Triggers (3 & 4)">
+    <div class="kpi-card glow-border-hover" data-kpi-filter="Governance" style="cursor: pointer;" title="Filter Governance Trigger (3)">
       <div class="kpi-icon-box" style="background: rgba(16, 185, 129, 0.15); color: #34d399;">
         <i class="bi bi-shield-check"></i>
       </div>
       <div>
-        <div class="kpi-value text-white tabular-nums">2 Triggers</div>
-        <div class="kpi-label">Governance &amp; Status (T3 &amp; T4)</div>
+        <div class="kpi-value text-white tabular-nums">1 Trigger</div>
+        <div class="kpi-label">Governance (T3)</div>
       </div>
     </div>
 
-    <div class="kpi-card glow-border-hover" data-kpi-filter="Integrity" style="cursor: pointer;" title="Filter Integrity Triggers (5 & 6)">
+    <div class="kpi-card glow-border-hover" data-kpi-filter="Integrity" style="cursor: pointer;" title="Filter Integrity Triggers (4 & 5)">
       <div class="kpi-icon-box" style="background: rgba(245, 158, 11, 0.15); color: #fbbf24;">
         <i class="bi bi-exclamation-octagon"></i>
       </div>
       <div>
         <div class="kpi-value text-white tabular-nums">2 Triggers</div>
-        <div class="kpi-label">Event Integrity (T5 &amp; T6)</div>
+        <div class="kpi-label">Event Integrity (T4 &amp; T5)</div>
       </div>
     </div>
 
-    <div class="kpi-card glow-border-hover" data-kpi-filter="Provisioning" style="cursor: pointer;" title="Filter Provisioning Triggers (7 & 8)">
+    <div class="kpi-card glow-border-hover" data-kpi-filter="Provisioning" style="cursor: pointer;" title="Filter Provisioning Trigger (6)">
       <div class="kpi-icon-box" style="background: rgba(168, 85, 247, 0.15); color: #c084fc;">
         <i class="bi bi-lightning-charge-fill"></i>
       </div>
       <div>
-        <div class="kpi-value text-white tabular-nums">2 Triggers</div>
-        <div class="kpi-label">Provisioning (T7 &amp; T8)</div>
+        <div class="kpi-value text-white tabular-nums">1 Trigger</div>
+        <div class="kpi-label">Provisioning (T6)</div>
       </div>
     </div>
   </div>
@@ -82,14 +82,14 @@
       <input type="text" class="tesla-input table-live-search" placeholder="Type to filter triggers in real time (name, table, timing, rule)..." data-target="triggers-table-body" aria-label="Instant search triggers">
     </div>
     <div class="table-filter-pills">
-      <button type="button" class="table-pill-btn active is-active" data-filter="all" data-target="triggers-table-body">All 8 Triggers</button>
+      <button type="button" class="table-pill-btn active is-active" data-filter="all" data-target="triggers-table-body">All 6 Triggers</button>
       <button type="button" class="table-pill-btn" data-filter="Lifecycle" data-target="triggers-table-body">Lifecycle</button>
       <button type="button" class="table-pill-btn" data-filter="Governance" data-target="triggers-table-body">Governance</button>
       <button type="button" class="table-pill-btn" data-filter="Integrity" data-target="triggers-table-body">Integrity</button>
       <button type="button" class="table-pill-btn" data-filter="Provisioning" data-target="triggers-table-body">Provisioning</button>
     </div>
     <div class="table-match-counter">
-      Showing <strong class="match-count">8</strong> of 8 production triggers
+      Showing <strong class="match-count">6</strong> of 6 production triggers
     </div>
   </div>
 
@@ -201,40 +201,9 @@
             </td>
           </tr>
 
-          <!-- Trigger 4 -->
-          <tr data-category="Governance">
-            <td><span class="badge-status success font-mono fw-bold">4</span></td>
-            <td>
-              <div class="d-flex align-items-center gap-2">
-                <strong class="text-white font-mono">trg_adjust_member_count_on_status_change</strong>
-                <button type="button" class="btn-copy-chip" data-copy="trg_adjust_member_count_on_status_change" title="Copy Trigger Name">
-                  <i class="bi bi-copy"></i>
-                </button>
-              </div>
-              <small class="text-secondary font-mono">Charter Roster Integrity</small>
-            </td>
-            <td>
-              <span class="badge-status info font-mono">AFTER UPDATE</span>
-              <small class="d-block text-secondary mt-1">Memberships</small>
-            </td>
-            <td><span class="badge-status success">Governance</span></td>
-            <td>
-              <span class="text-white fw-medium">Reconciles member counts and guarantees capacity integrity on charter updates</span>
-            </td>
-            <td class="text-end">
-              {% if can_test_trigger(4) %}
-              <a href="{{ url_for('main.list_memberships') }}" class="btn-trigger-pill btn-cyan" title="Inspect Roster Integrity">
-                <i class="bi bi-shield-check"></i> Roster Integrity
-              </a>
-              {% else %}
-              <span class="badge-status neutral small"><i class="bi bi-lock me-1"></i>Protected</span>
-              {% endif %}
-            </td>
-          </tr>
-
-          <!-- Trigger 5 -->
+          <!-- Trigger 4 (formerly 5) -->
           <tr data-category="Integrity">
-            <td><span class="badge-status warning font-mono fw-bold">5</span></td>
+            <td><span class="badge-status warning font-mono fw-bold">4</span></td>
             <td>
               <div class="d-flex align-items-center gap-2">
                 <strong class="text-white font-mono">trg_prevent_registration_for_completed_event</strong>
@@ -253,7 +222,7 @@
               <span class="text-white fw-medium">Rejects attendee registration for past / closed events</span>
             </td>
             <td class="text-end">
-              {% if can_test_trigger(5) %}
+              {% if can_test_trigger(5) or can_test_trigger(4) %}
               <a href="{{ url_for('main.list_events') }}" class="btn-trigger-pill btn-warning">
                 <i class="bi bi-calendar-x"></i> Test Past Event
               </a>
@@ -263,9 +232,9 @@
             </td>
           </tr>
 
-          <!-- Trigger 6 -->
+          <!-- Trigger 5 (formerly 6) -->
           <tr data-category="Integrity">
-            <td><span class="badge-status warning font-mono fw-bold">6</span></td>
+            <td><span class="badge-status warning font-mono fw-bold">5</span></td>
             <td>
               <div class="d-flex align-items-center gap-2">
                 <strong class="text-white font-mono">trg_verify_feedback_registration</strong>
@@ -284,7 +253,7 @@
               <span class="text-white fw-medium">Verifies student attended event before accepting feedback</span>
             </td>
             <td class="text-end">
-              {% if can_test_trigger(6) %}
+              {% if can_test_trigger(6) or can_test_trigger(5) %}
               <a href="{{ url_for('main.list_events') }}" class="btn-trigger-pill btn-cyan">
                 <i class="bi bi-star-fill"></i> Test Feedback
               </a>
@@ -294,40 +263,9 @@
             </td>
           </tr>
 
-          <!-- Trigger 7 -->
+          <!-- Trigger 6 (formerly 8) -->
           <tr data-category="Provisioning">
-            <td><span class="badge-status neutral font-mono fw-bold" style="color: var(--violet-400);">7</span></td>
-            <td>
-              <div class="d-flex align-items-center gap-2">
-                <strong class="text-white font-mono">trg_auto_progress_event_on_attendance</strong>
-                <button type="button" class="btn-copy-chip" data-copy="trg_auto_progress_event_on_attendance" title="Copy Trigger Name">
-                  <i class="bi bi-copy"></i>
-                </button>
-              </div>
-              <small class="text-secondary font-mono">State Progression</small>
-            </td>
-            <td>
-              <span class="badge-status info font-mono">AFTER UPDATE</span>
-              <small class="d-block text-secondary mt-1">EventRegistrations</small>
-            </td>
-            <td><span class="badge-status neutral" style="color: var(--violet-400);">Provisioning</span></td>
-            <td>
-              <span class="text-white fw-medium">Auto-flips Planned event to Ongoing on check-in</span>
-            </td>
-            <td class="text-end">
-              {% if can_test_trigger(7) %}
-              <a href="{{ url_for('main.list_events') }}" class="btn-trigger-pill btn-violet">
-                <i class="bi bi-check2-all"></i> Mark Attendance
-              </a>
-              {% else %}
-              <span class="badge-status neutral small"><i class="bi bi-lock me-1"></i>Protected</span>
-              {% endif %}
-            </td>
-          </tr>
-
-          <!-- Trigger 8 -->
-          <tr data-category="Provisioning">
-            <td><span class="badge-status neutral font-mono fw-bold" style="color: var(--violet-400);">8</span></td>
+            <td><span class="badge-status neutral font-mono fw-bold" style="color: var(--violet-400);">6</span></td>
             <td>
               <div class="d-flex align-items-center gap-2">
                 <strong class="text-white font-mono">trg_auto_create_club_profile</strong>
@@ -346,7 +284,7 @@
               <span class="text-white fw-medium">Provisions default ClubProfile upon new club creation</span>
             </td>
             <td class="text-end">
-              {% if can_test_trigger(8) %}
+              {% if can_test_trigger(8) or can_test_trigger(6) %}
               <a href="{{ url_for('main.create_club') }}" class="btn-trigger-pill btn-success">
                 <i class="bi bi-plus-circle-fill"></i> Create Club
               </a>

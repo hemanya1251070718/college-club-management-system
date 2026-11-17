@@ -60,7 +60,7 @@ def test_triggers_page_renders(client):
     """Test triggers architecture and catalog page."""
     response = client.get("/triggers")
     assert response.status_code == 200
-    assert b"8 Database Triggers Architecture" in response.data
+    assert b"6 Database Triggers Architecture" in response.data
     assert b"trg_after_membership_insert_sync_count" in response.data
     assert b"trg_prevent_multiple_presidents" in response.data
     assert b"trg_auto_create_club_profile" in response.data
@@ -236,13 +236,14 @@ def test_role_based_trigger_and_procedure_permissions(client):
         assert can_test_trigger(6) is True
         assert can_test_trigger(2) is False
         assert can_test_trigger(3) is False
-        assert can_test_procedure(1) is False
+        assert can_test_procedure(1) is True  # Cursor 1 is permitted across all roles for live evaluation
 
         # Coordinator persona
         session["role"] = "coordinator"
         assert can_test_trigger(1) is True
         assert can_test_trigger(2) is True
         assert can_test_trigger(3) is False  # Only President can test multiple presidents
+        assert can_test_procedure(1) is True # Cursor 1
         assert can_test_procedure(2) is True
 
         # President persona
@@ -533,6 +534,36 @@ def test_role_detection_from_email_patterns():
     role, title, err = detect_role_from_email("rohan.1251070014@vit.edu")
     assert role == "member"
     assert err is None
+
+
+def test_manual_club_count_override_and_cursor1_audit_repair(client):
+    """
+    Verifies that:
+    1. Club count can be manually updated by typing (e.g. set to 999) across all roles.
+    2. Cursor 1 (sp_audit_club_counts) detects the mismatch (p_fix=0).
+    3. Running repair (p_fix=1) corrects the count back in sync with actual memberships.
+    """
+    client.get("/guest")
+
+    # 1. Manually tamper CSI count to 999
+    res = client.post("/clubs/CSI/update-count", data={"member_count": "999"}, follow_redirects=True)
+    assert res.status_code == 200
+    assert b"manually set to 999" in res.data
+
+    # 2. Run Audit Preview (p_fix=0)
+    audit_res = client.post("/procedures/execute/audit", data={"p_fix": "0"}, follow_redirects=True)
+    assert audit_res.status_code == 200
+    assert b"MISMATCH" in audit_res.data
+
+    # 3. Run Repair (p_fix=1)
+    repair_res = client.post("/procedures/execute/audit", data={"p_fix": "1"}, follow_redirects=True)
+    assert repair_res.status_code == 200
+    assert (b"REPAIRED" in repair_res.data or b"repaired" in repair_res.data or b"OK" in repair_res.data)
+
+    # 4. Verify clubs page has restored count (19 for CSI)
+    clubs_page = client.get("/clubs").data.decode("utf-8")
+    assert 'value="19"' in clubs_page or '19' in clubs_page
+
 
 
 

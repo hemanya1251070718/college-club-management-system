@@ -122,9 +122,9 @@ class SQLiteDictCursor:
             p_fix = int(args[0]) if args else 0
             self.execute("""
                 SELECT c.club_id, c.club_name, c.member_count AS stored_count,
-                       (SELECT COUNT(*) FROM Memberships m WHERE m.club_id = c.club_id AND m.status = 'Active') AS actual_count,
+                       (SELECT COUNT(*) FROM Memberships m WHERE m.club_id = c.club_id) AS actual_count,
                        CASE 
-                           WHEN c.member_count = (SELECT COUNT(*) FROM Memberships m WHERE m.club_id = c.club_id AND m.status = 'Active') THEN 'OK (In Sync)'
+                           WHEN c.member_count = (SELECT COUNT(*) FROM Memberships m WHERE m.club_id = c.club_id) THEN 'OK (In Sync)'
                            ELSE 'MISMATCH DETECTED'
                        END AS audit_status
                 FROM Clubs c
@@ -135,6 +135,14 @@ class SQLiteDictCursor:
                 for r in rows:
                     self.execute("UPDATE Clubs SET member_count = ? WHERE club_id = ?;", (r["actual_count"], r["club_id"]))
                 self.conn.commit()
+                self.execute("""
+                    SELECT c.club_id, c.club_name, c.member_count AS stored_count,
+                           (SELECT COUNT(*) FROM Memberships m WHERE m.club_id = c.club_id) AS actual_count,
+                           'REPAIRED (In Sync)' AS audit_status
+                    FROM Clubs c
+                    ORDER BY c.club_id;
+                """)
+                rows = self.fetchall()
             self._cached_results = rows
 
         # 3. sp_recruitment_leads_and_auto_invite(p_min_events, p_auto_invite)

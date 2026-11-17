@@ -80,8 +80,8 @@ ROLE_METADATA = {
         "can_events": True,
         "can_memberships": False,
         "can_leads": False,
-        "allowed_triggers": [1, 2, 4, 5, 6, 7],
-        "allowed_procs": ["recruitment", "budget", "close_events", "deactivate", "promote", "privacy", 2, 3, 4, 5, 6, 8]
+        "allowed_triggers": [1, 2, 5, 6],
+        "allowed_procs": ["audit", "recruitment", "budget", "close_events", "deactivate", "promote", "privacy", 1, 2, 3, 4, 5, 6, 8]
     },
     "secretary": {
         "title": "Club Secretary",
@@ -93,7 +93,7 @@ ROLE_METADATA = {
         "can_events": False,
         "can_memberships": True,
         "can_leads": False,
-        "allowed_triggers": [1, 2, 3, 4],
+        "allowed_triggers": [1, 2, 3],
         "allowed_procs": ["audit", "recruitment", "deactivate", "promote", 1, 2, 5, 6]
     },
     "manager": {  # Backwards compatibility alias for lead
@@ -106,7 +106,7 @@ ROLE_METADATA = {
         "can_events": True,
         "can_memberships": True,
         "can_leads": True,
-        "allowed_triggers": [1, 2, 3, 4, 5, 6, 7, 8],
+        "allowed_triggers": [1, 2, 3, 5, 6, 8],
         "allowed_procs": ["audit", "recruitment", "budget", "close_events", "deactivate", "promote", "grad", "privacy", 1, 2, 3, 4, 5, 6, 7, 8]
     },
     "member": {
@@ -114,13 +114,13 @@ ROLE_METADATA = {
         "badge_class": "badge-status neutral",
         "description": "Exploratory directory access, self-service event registration, and verified review submissions.",
         "can_edit": False,
-        "can_execute_procs": False,
+        "can_execute_procs": True,
         "can_view_triggers": True,
         "can_events": False,
         "can_memberships": False,
         "can_leads": False,
         "allowed_triggers": [1, 5, 6],
-        "allowed_procs": []
+        "allowed_procs": ["audit", 1]
     }
 }
 
@@ -174,6 +174,9 @@ def can_test_trigger(trigger_num):
 
 def can_test_procedure(proc_id):
     """Checks whether the currently active role is authorized to execute Procedure N."""
+    # Cursor 1 (sp_audit_club_counts) is globally permitted across all roles for live evaluation
+    if str(proc_id).strip().lower() in ["audit", "1", "sp_audit_club_counts"]:
+        return True
     role = get_current_role() or "guest"
     meta = ROLE_METADATA.get(role, ROLE_METADATA["guest"])
     allowed = meta.get("allowed_procs", [])
@@ -266,11 +269,14 @@ def write_required(redirect_endpoint="main.dashboard"):
 def execute_required(redirect_endpoint="main.procedures_hub"):
     """
     Decorator for stored procedure execution.
-    Denies 'member' role.
+    Permits Cursor 1 (Audit) for all roles; restricts other procedures for 'member'.
     """
     def decorator(view_func):
         @functools.wraps(view_func)
         def wrapper(*args, **kwargs):
+            proc_id = kwargs.get("proc_id")
+            if str(proc_id).strip().lower() in ["audit", "1", "sp_audit_club_counts"]:
+                return view_func(*args, **kwargs)
             role = get_current_role()
             if role == "member":
                 flash("Access Restricted: Student Members are restricted from running backend stored procedure cursors. Switch to President, Lead, Coordinator, Secretary, or Guest mode.", "warning")

@@ -72,12 +72,13 @@
                   <td class="text-center tabular-nums fw-medium text-white">{{ row.stored_count }}</td>
                   <td class="text-center tabular-nums fw-medium text-white">{{ row.actual_count }}</td>
                   <td class="text-center">
-                    {% if row.result == 'OK' %}
+                    {% set status_val = row.result or row.audit_status or '' %}
+                    {% if status_val == 'OK' or 'OK' in status_val %}
                       <span class="badge-status success"><i class="bi bi-check2-circle me-1"></i>OK (In Sync)</span>
-                    {% elif row.result == 'FIXED' %}
-                      <span class="badge-status warning"><i class="bi bi-tools me-1"></i>FIXED</span>
+                    {% elif status_val == 'FIXED' or 'REPAIR' in status_val or 'FIX' in status_val %}
+                      <span class="badge-status success" style="background: rgba(16, 185, 129, 0.2); color: #34d399;"><i class="bi bi-tools me-1"></i>FIXED (Repaired)</span>
                     {% else %}
-                      <span class="badge-status danger"><i class="bi bi-exclamation-triangle-fill me-1"></i>MISMATCH</span>
+                      <span class="badge-status danger"><i class="bi bi-exclamation-triangle-fill me-1"></i>MISMATCH DETECTED</span>
                     {% endif %}
                   </td>
                 </tr>

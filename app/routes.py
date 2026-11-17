@@ -354,13 +354,21 @@ def edit_club(club_id):
             flash("Club Name, Category, and Faculty Coordinator are required.", "warning")
             return redirect(url_for("main.edit_club", club_id=club_id))
 
+        custom_count = request.form.get("member_count")
         try:
             with conn.cursor() as cursor:
-                cursor.execute("""
-                    UPDATE Clubs
-                    SET club_name = %s, category = %s, faculty_id = %s, description = %s
-                    WHERE club_id = %s;
-                """, (club_name, category, faculty_id, description, club_id))
+                if custom_count is not None and custom_count.strip() != "":
+                    cursor.execute("""
+                        UPDATE Clubs
+                        SET club_name = %s, category = %s, faculty_id = %s, description = %s, member_count = %s
+                        WHERE club_id = %s;
+                    """, (club_name, category, faculty_id, description, int(custom_count.strip()), club_id))
+                else:
+                    cursor.execute("""
+                        UPDATE Clubs
+                        SET club_name = %s, category = %s, faculty_id = %s, description = %s
+                        WHERE club_id = %s;
+                    """, (club_name, category, faculty_id, description, club_id))
 
                 # Upsert profile
                 cursor.execute("""
@@ -420,6 +428,33 @@ def delete_club(club_id):
         flash(f"Club '{club_id}' deleted successfully.", "info")
     except Exception as e:
         flash(f"Error deleting club: {str(e)}", "danger")
+    return redirect(url_for("main.list_clubs"))
+
+
+@main_bp.route("/clubs/<club_id>/update-count", methods=["POST"])
+def update_club_count(club_id):
+    """
+    Directly updates the stored member count in Clubs table for any club across all roles.
+    Enables live interactive demonstration of Cursor 1 (sp_audit_club_counts) schema drift and self-repair.
+    """
+    raw_count = request.form.get("member_count", "").strip()
+    try:
+        new_count = int(raw_count)
+        if new_count < 0:
+            raise ValueError("Count cannot be negative")
+    except ValueError:
+        flash("Invalid member count. Please enter a positive number.", "warning")
+        return redirect(url_for("main.list_clubs"))
+
+    try:
+        conn = get_db_connection()
+        with conn.cursor() as cursor:
+            cursor.execute("UPDATE Clubs SET member_count = %s WHERE club_id = %s;", (new_count, club_id))
+        conn.close()
+        flash(f"Charter '{club_id}' member count manually set to {new_count}! Open Procedures &bull; Cursor 1 (sp_audit_club_counts) to detect drift and self-repair.", "info")
+    except Exception as e:
+        flash(f"Error updating count: {str(e)}", "danger")
+
     return redirect(url_for("main.list_clubs"))
 
 
@@ -713,21 +748,14 @@ def edit_membership(membership_id):
                 club_id = old_row["club_id"]
                 old_status = old_row["status"]
 
-                # UPDATE - TRIGGER 'trg_adjust_member_count_on_status_change' fires on status change!
                 cursor.execute("""
                     UPDATE Memberships
                     SET role = %s, status = %s, join_date = %s
                     WHERE membership_id = %s;
                 """, (role, status, join_date, membership_id))
 
-                cursor.execute("SELECT member_count FROM Clubs WHERE club_id = %s;", (club_id,))
-                new_count = cursor.fetchone()["member_count"]
-
             conn.close()
-            if old_status != status:
-                flash(f"Membership updated! Trigger 4 (trg_adjust_member_count_on_status_change) dynamically adjusted '{club_id}' count to {new_count}.", "success")
-            else:
-                flash("Membership updated successfully.", "success")
+            flash("Membership updated successfully.", "success")
             return redirect(url_for("main.list_memberships"))
         except Exception as e:
             flash(f"Error updating membership: {str(e)}", "danger")
@@ -1059,23 +1087,14 @@ def mark_attendance(event_id, reg_id):
                 flash(f"Tenant Boundary Guard: You are an officer of {session.get('club_name', session.get('club_id'))} and cannot mark attendance for '{ev_row['club_id']}'.", "danger")
                 return redirect(url_for("main.event_registrations", event_id=event_id))
 
-            status_before = ev_row["status"]
-
-            # TRIGGER 7 (trg_auto_progress_event_on_attendance) FIRES on attendance update!
             cursor.execute("""
                 UPDATE EventRegistrations
                 SET attendance_status = 'Attended'
                 WHERE registration_id = %s;
             """, (reg_id,))
-
-            cursor.execute("SELECT status FROM Events WHERE event_id = %s;", (event_id,))
-            status_after = cursor.fetchone()["status"]
         conn.close()
 
-        if status_before == 'Planned' and status_after == 'Ongoing':
-            flash(f"Attendance marked! Trigger 7 (trg_auto_progress_event_on_attendance) automatically progressed event status from 'Planned' to 'Ongoing'!", "success")
-        else:
-            flash("Attendance marked as Attended.", "success")
+        flash("Attendance marked as Attended.", "success")
     except Exception as e:
         flash(f"Error marking attendance: {str(e)}", "danger")
 

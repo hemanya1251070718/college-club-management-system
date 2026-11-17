@@ -85,6 +85,12 @@
                 <input type="text" name="instagram_handle" class="tesla-form-control" style="border-radius: 0 4px 4px 0;" placeholder="vit_club" value="{{ club.instagram_handle if club else '' }}">
               </div>
             </div>
+
+            <div class="col-md-6">
+              <label class="tesla-form-label">Member Count (Stored Count)</label>
+              <input type="number" name="member_count" class="tesla-form-control" placeholder="19" value="{{ club.member_count if club else 0 }}" min="0">
+              <small class="text-secondary mt-1 d-block" style="font-size: 12px;">Stored count in Clubs table. Edit manually to demonstrate Cursor 1 drift audit.</small>
+            </div>
           </div>
 
           <hr class="my-4" style="border-color: var(--border);">
