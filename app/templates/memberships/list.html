@@ -25,10 +25,14 @@
         <p class="inner-page-subtitle">Manage student affiliations, executive leadership appointments, and active memberships across campus charters.</p>
       </div>
       <div class="inner-header-actions">
-        {% if current_role != 'member' %}
-        <a href="{{ url_for('main.create_membership') }}" class="btn-tesla-primary action-write-btn glow-border-hover" data-role-req="admin,manager,guest">
+        {% if can_manage_memberships() %}
+        <a href="{{ url_for('main.create_membership') }}" class="btn-tesla-primary action-write-btn glow-border-hover">
           <i class="bi bi-person-plus-fill me-2"></i> Enroll Member
         </a>
+        {% elif current_role == 'coordinator' %}
+        <span class="badge-status neutral px-3 py-2" title="Event Coordinators manage events">
+          <i class="bi bi-shield-lock me-1 text-warning"></i>Roster Managed by Secretary &amp; Leads
+        </span>
         {% else %}
         <span class="badge-status neutral px-3 py-2 role-member-locked-badge">
           <i class="bi bi-lock me-1 text-warning"></i>Read-Only View (Student)
@@ -217,8 +221,8 @@
               </span>
             </td>
             <td class="text-end">
-              {% if current_role != 'member' %}
-              <div class="d-inline-flex align-items-center gap-1 action-write-btn" data-role-req="admin,manager,guest">
+              {% if can_manage_memberships() and is_club_authorized(m.club_id) %}
+              <div class="d-inline-flex align-items-center gap-1 action-write-btn">
                 <a href="{{ url_for('main.edit_membership', membership_id=m.membership_id) }}" class="btn-ghost-action" title="Edit Membership">
                   <i class="bi bi-pencil"></i>
                 </a>
@@ -228,6 +232,10 @@
                   </button>
                 </form>
               </div>
+              {% elif can_manage_memberships() and not is_club_authorized(m.club_id) %}
+              <span class="badge-status neutral small font-mono" title="Restricted to {{ m.club_id }} Secretariat"><i class="bi bi-shield-lock me-1"></i>{{ m.club_id }} Only</span>
+              {% elif current_role == 'coordinator' %}
+              <span class="text-secondary small font-mono opacity-60" title="Event Coordinators manage events"><i class="bi bi-calendar-event me-1"></i>Events Only</span>
               {% else %}
               <span class="text-secondary small font-mono opacity-60"><i class="bi bi-lock me-1"></i>Protected</span>
               {% endif %}

@@ -96,7 +96,9 @@ def detect_role_from_email(email):
     Validates and classifies role strictly by institutional email pattern:
       - Principal / Admin:     *.principal@vit.edu                           -> 'admin'
       - Club President:        *.*.president@vit.edu                         -> 'president'
-      - Coordinator/Secretary: *.*.(secretary|coordinator|cordinator)@vit.edu -> 'coordinator'
+      - Club Lead:             *.*.lead@vit.edu                              -> 'lead'
+      - Event Coordinator:     *.*.(coordinator|cordinator)@vit.edu          -> 'coordinator'
+      - Club Secretary:        *.*.(secretary|treasurer)@vit.edu             -> 'secretary'
       - Student Member:        *.*@vit.edu (or any @vit.edu)                 -> 'member'
     Returns: (role, role_title, error_message)
     """
@@ -111,18 +113,26 @@ def detect_role_from_email(email):
     parts = prefix.split(".")
 
     # 1. Principal / Super Admin
-    if "principal" in parts:
+    if "principal" in parts or "admin" in parts:
         return "admin", "Super Admin / Principal", None
     
     # 2. Club President
     if "president" in parts:
         return "president", "Club President (Executive Governance)", None
 
-    # 3. Club Coordinator & Club Secretary (Treated as identical tier for authorization)
-    if "coordinator" in parts or "cordinator" in parts or "secretary" in parts or "treasurer" in parts:
-        return "coordinator", "Club Coordinator / Secretary", None
+    # 3. Club Lead
+    if "lead" in parts:
+        return "lead", "Club Lead (Charter & Operations)", None
+
+    # 4. Event Coordinator
+    if "coordinator" in parts or "cordinator" in parts:
+        return "coordinator", "Event Coordinator (Events & Logistics)", None
+
+    # 5. Club Secretary / Treasurer
+    if "secretary" in parts or "treasurer" in parts:
+        return "secretary", "Club Secretary (Memberships & Records)", None
     
-    # 4. Student Member & Core Member (Treated as identical tier for authorization)
+    # 6. Student Member & Core Member
     return "member", "Student Member / Core Member", None
 
 def init_users_db():
@@ -283,18 +293,38 @@ def register_user(email, password, name=""):
         "prn": prn
     }
 
-def finalize_authenticated_user(user_record, bypass_role_select=False):
+def finalize_authenticated_user(user_record, bypass_role_select=False, login_email=None):
     """
     Checks student's club memberships across campus charters.
+    If the user authenticated using a specific role alias (e.g. .president, .lead, .coordinator, .secretary),
+    it automatically binds the matching club persona.
     If multiple memberships exist and bypass_role_select is False,
     returns ('SELECT_ROLE', {'user': user_record, 'personas': personas}).
     Otherwise auto-binds single/default persona and returns (None, user_record).
     """
     sid = user_record.get("student_id")
     prn = user_record.get("prn")
-    email = user_record.get("email")
+    email = login_email or user_record.get("email") or ""
     personas = get_student_personas(student_id=sid, prn=prn, email=email)
     
+    # 1. If user authenticated with an explicit role tag (.president, .lead, .coordinator, .secretary), bind that persona
+    login_email_clean = (login_email or "").lower()
+    has_explicit_role_tag = any(f".{tag}@" in login_email_clean or f".{tag}." in login_email_clean for tag in ["president", "lead", "coordinator", "secretary", "principal"])
+    
+    if has_explicit_role_tag:
+        role_from_tag, _, _ = detect_role_from_email(login_email_clean)
+        target_role = role_from_tag or user_record.get("role")
+        matching_persona = next((p for p in personas if p["role_tier"] == target_role), None)
+        if matching_persona:
+            user_record["role"] = matching_persona["role_tier"]
+            user_record["role_title"] = matching_persona["role_title"]
+            user_record["club_id"] = matching_persona["club_id"]
+            user_record["club_name"] = matching_persona["club_name"]
+            user_record["club_role"] = matching_persona["club_role"]
+            user_record["personas"] = personas
+            return None, user_record
+    
+    # 2. If student has multiple personas and logged in with generic email, prompt role selection
     if len(personas) > 1 and not bypass_role_select:
         return "SELECT_ROLE", {"user": user_record, "personas": personas}
     elif len(personas) >= 1:
@@ -358,7 +388,7 @@ def authenticate_user(email, password, bypass_role_select=False):
                 "prn": mem_user.get("prn"),
                 "club_id": mem_user.get("club_id"),
                 "club_role": mem_user.get("club_role")
-            }, bypass_role_select=bypass_role_select)
+            }, bypass_role_select=bypass_role_select, login_email=email_clean)
         else:
             return "Incorrect password. Enter your email as the password, or use 'password123'.", None
 
@@ -390,7 +420,7 @@ def authenticate_user(email, password, bypass_role_select=False):
                 "club_role": matched_seed.get("club_role")
             }
             MEMORY_USERS[email_clean] = user_record
-            return finalize_authenticated_user(user_record, bypass_role_select=bypass_role_select)
+            return finalize_authenticated_user(user_record, bypass_role_select=bypass_role_select, login_email=email_clean)
 
     # 3. Check SQLite database
     try:
@@ -404,7 +434,7 @@ def authenticate_user(email, password, bypass_role_select=False):
             row_dict = dict(row)
             if check_valid_pwd(row_dict):
                 MEMORY_USERS[email_clean] = row_dict
-                return finalize_authenticated_user(row_dict, bypass_role_select=bypass_role_select)
+                return finalize_authenticated_user(row_dict, bypass_role_select=bypass_role_select, login_email=email_clean)
             else:
                 return "Incorrect password. Enter your email as the password, or use 'password123'.", None
     except Exception as e:
@@ -438,7 +468,7 @@ def authenticate_user(email, password, bypass_role_select=False):
         except Exception:
             pass
 
-        return finalize_authenticated_user(user_record, bypass_role_select=bypass_role_select)
+        return finalize_authenticated_user(user_record, bypass_role_select=bypass_role_select, login_email=email_clean)
 
     return "No account found with this email. Please check your VIT email address.", None
 

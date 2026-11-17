@@ -21,60 +21,104 @@ ROLE_METADATA = {
     "guest": {
         "title": "Guest (Full Demo)",
         "badge_class": "badge-status success",
-        "description": "Unrestricted presentation access to all 8 triggers, 8 cursors, and CRUD interfaces.",
+        "description": "Unrestricted presentation access to all 8 triggers, 8 cursors, and CRUD interfaces across all clubs.",
         "can_edit": True,
         "can_execute_procs": True,
         "can_view_triggers": True,
+        "can_events": True,
+        "can_memberships": True,
+        "can_leads": True,
         "allowed_triggers": [1, 2, 3, 4, 5, 6, 7, 8],
-        "allowed_procs": [1, 2, 3, 4, 5, 6, 7, 8]
+        "allowed_procs": ["audit", "recruitment", "budget", "close_events", "deactivate", "promote", "grad", "privacy", 1, 2, 3, 4, 5, 6, 7, 8]
     },
     "admin": {
         "title": "Super Admin / Principal",
         "badge_class": "badge-status success",
-        "description": "Full administrative control, database schema initialization, and raw SQL cursor triggers.",
+        "description": "Full administrative control, database schema management, and raw SQL cursor triggers campus-wide.",
         "can_edit": True,
         "can_execute_procs": True,
         "can_view_triggers": True,
+        "can_events": True,
+        "can_memberships": True,
+        "can_leads": True,
         "allowed_triggers": [1, 2, 3, 4, 5, 6, 7, 8],
-        "allowed_procs": [1, 2, 3, 4, 5, 6, 7, 8]
+        "allowed_procs": ["audit", "recruitment", "budget", "close_events", "deactivate", "promote", "grad", "privacy", 1, 2, 3, 4, 5, 6, 7, 8]
     },
     "president": {
         "title": "Club President",
         "badge_class": "badge-status warning",
-        "description": "Executive club governance, single-president enforcement, and administrative procedures.",
+        "description": "Executive club governance: full operational authority over their designated club's events, memberships, and procedures.",
         "can_edit": True,
         "can_execute_procs": True,
         "can_view_triggers": True,
-        "allowed_triggers": [1, 2, 3, 5, 6, 8],
-        "allowed_procs": [1, 6, 7, 8]
+        "can_events": True,
+        "can_memberships": True,
+        "can_leads": True,
+        "allowed_triggers": [1, 2, 3, 4, 5, 6, 7, 8],
+        "allowed_procs": ["audit", "recruitment", "budget", "close_events", "deactivate", "promote", "grad", "privacy", 1, 2, 3, 4, 5, 6, 7, 8]
+    },
+    "lead": {
+        "title": "Club Lead",
+        "badge_class": "badge-status info",
+        "description": "Club leadership: authorized for club charter updates, event management, membership roster records, and triggers/procedures.",
+        "can_edit": True,
+        "can_execute_procs": True,
+        "can_view_triggers": True,
+        "can_events": True,
+        "can_memberships": True,
+        "can_leads": True,
+        "allowed_triggers": [1, 2, 3, 4, 5, 6, 7, 8],
+        "allowed_procs": ["audit", "recruitment", "budget", "close_events", "deactivate", "promote", "grad", "privacy", 1, 2, 3, 4, 5, 6, 7, 8]
     },
     "coordinator": {
-        "title": "Faculty Coordinator / Secretary",
+        "title": "Event Coordinator",
         "badge_class": "badge-status info",
-        "description": "Authorized to manage student charters, schedule events, record attendance, and run operational procedures.",
+        "description": "Event management and attendance operations for their designated club. (Cannot modify memberships or club charters).",
         "can_edit": True,
         "can_execute_procs": True,
         "can_view_triggers": True,
+        "can_events": True,
+        "can_memberships": False,
+        "can_leads": False,
         "allowed_triggers": [1, 2, 4, 5, 6, 7],
-        "allowed_procs": [2, 3, 4, 5]
+        "allowed_procs": ["recruitment", "budget", "close_events", "deactivate", "promote", "privacy", 2, 3, 4, 5, 6, 8]
     },
-    "manager": {  # Backwards compatibility alias for coordinator
-        "title": "Faculty Coordinator / Secretary",
+    "secretary": {
+        "title": "Club Secretary",
         "badge_class": "badge-status info",
-        "description": "Authorized to manage student charters, schedule events, record attendance, and run operational procedures.",
+        "description": "Membership roster management and student enrollment for their designated club. (Cannot create/manage events or charters).",
         "can_edit": True,
         "can_execute_procs": True,
         "can_view_triggers": True,
-        "allowed_triggers": [1, 2, 4, 5, 6, 7],
-        "allowed_procs": [2, 3, 4, 5]
+        "can_events": False,
+        "can_memberships": True,
+        "can_leads": False,
+        "allowed_triggers": [1, 2, 3, 4],
+        "allowed_procs": ["audit", "recruitment", "deactivate", "promote", 1, 2, 5, 6]
+    },
+    "manager": {  # Backwards compatibility alias for lead
+        "title": "Club Lead / Manager",
+        "badge_class": "badge-status info",
+        "description": "Club leadership operations.",
+        "can_edit": True,
+        "can_execute_procs": True,
+        "can_view_triggers": True,
+        "can_events": True,
+        "can_memberships": True,
+        "can_leads": True,
+        "allowed_triggers": [1, 2, 3, 4, 5, 6, 7, 8],
+        "allowed_procs": ["audit", "recruitment", "budget", "close_events", "deactivate", "promote", "grad", "privacy", 1, 2, 3, 4, 5, 6, 7, 8]
     },
     "member": {
-        "title": "Student Member / Core Member",
+        "title": "Student Member",
         "badge_class": "badge-status neutral",
         "description": "Exploratory directory access, self-service event registration, and verified review submissions.",
         "can_edit": False,
         "can_execute_procs": False,
         "can_view_triggers": True,
+        "can_events": False,
+        "can_memberships": False,
+        "can_leads": False,
         "allowed_triggers": [1, 5, 6],
         "allowed_procs": []
     }
@@ -92,30 +136,128 @@ def get_current_student_id():
     """Retrieve logged-in student's student_id (e.g. 'CE25-0718'), or None."""
     return session.get("student_id")
 
+def is_club_authorized(target_club_id):
+    """
+    Tenant Boundary Guard:
+    Verifies if active user is authorized to perform operations for target_club_id.
+    - 'admin' and 'guest' have campus-wide access across all clubs.
+    - 'president', 'lead', 'coordinator', and 'secretary' are strictly locked to session['club_id'].
+    """
+    role = get_current_role() or "guest"
+    if role in ["admin", "guest"]:
+        return True
+    user_club = session.get("club_id")
+    if not user_club or not target_club_id:
+        return False
+    return str(target_club_id).strip().upper() == str(user_club).strip().upper()
+
+def can_manage_events():
+    """Event operations can ONLY be handled by President, Lead, and Coordinator (plus Admin and Guest)."""
+    role = get_current_role() or "guest"
+    return role in ["admin", "guest", "president", "lead", "coordinator", "manager"]
+
+def can_manage_memberships():
+    """Membership operations (Secretary duties) can ONLY be handled by Secretary, President, and Lead (plus Admin and Guest)."""
+    role = get_current_role() or "guest"
+    return role in ["admin", "guest", "president", "lead", "secretary", "manager"]
+
+def can_manage_lead():
+    """Club charter & lead operations can ONLY be handled by Lead and President (plus Admin and Guest)."""
+    role = get_current_role() or "guest"
+    return role in ["admin", "guest", "president", "lead", "manager"]
+
 def can_test_trigger(trigger_num):
     """Checks whether the currently active role is authorized to fire Trigger N."""
     role = get_current_role() or "guest"
     meta = ROLE_METADATA.get(role, ROLE_METADATA["guest"])
     return int(trigger_num) in meta.get("allowed_triggers", [1, 2, 3, 4, 5, 6, 7, 8])
 
-def can_test_procedure(proc_num):
+def can_test_procedure(proc_id):
     """Checks whether the currently active role is authorized to execute Procedure N."""
     role = get_current_role() or "guest"
     meta = ROLE_METADATA.get(role, ROLE_METADATA["guest"])
-    return int(proc_num) in meta.get("allowed_procs", [1, 2, 3, 4, 5, 6, 7, 8])
+    allowed = meta.get("allowed_procs", [])
+    try:
+        p_int = int(proc_id)
+        if p_int in allowed:
+            return True
+    except (ValueError, TypeError):
+        pass
+    return str(proc_id).strip().lower() in [str(x).strip().lower() for x in allowed]
+
+def event_write_required(redirect_endpoint="main.list_events"):
+    """
+    Decorator for Event CRUD operations.
+    Allowed: 'admin', 'guest', 'president', 'lead', 'coordinator'.
+    Denied: 'secretary', 'member'.
+    """
+    def decorator(view_func):
+        @functools.wraps(view_func)
+        def wrapper(*args, **kwargs):
+            role = get_current_role()
+            if role == "secretary":
+                flash("Access Restricted: Club Secretaries handle membership records and cannot create, edit, or delete campus events. Event operations are reserved for Event Coordinators, Leads, and Presidents.", "warning")
+                return redirect(url_for(redirect_endpoint))
+            elif role == "member":
+                flash("Access Restricted: Student Members cannot create, edit, or delete campus events. Switch to Coordinator, Lead, President, or Guest mode.", "warning")
+                return redirect(url_for(redirect_endpoint))
+            elif not can_manage_events():
+                flash("Access Restricted: Insufficient privileges for event operations.", "warning")
+                return redirect(url_for(redirect_endpoint))
+            return view_func(*args, **kwargs)
+        return wrapper
+    return decorator
+
+def membership_write_required(redirect_endpoint="main.list_memberships"):
+    """
+    Decorator for Membership CRUD operations.
+    Allowed: 'admin', 'guest', 'president', 'lead', 'secretary'.
+    Denied: 'coordinator', 'member'.
+    """
+    def decorator(view_func):
+        @functools.wraps(view_func)
+        def wrapper(*args, **kwargs):
+            role = get_current_role()
+            if role == "coordinator":
+                flash("Access Restricted: Event Coordinators manage event logistics and cannot modify membership rosters or enroll members. Membership operations are reserved for Club Secretaries, Leads, and Presidents.", "warning")
+                return redirect(url_for(redirect_endpoint))
+            elif role == "member":
+                flash("Access Restricted: Student Members cannot enroll, edit, or delete club memberships. Switch to Secretary, Lead, President, or Guest mode.", "warning")
+                return redirect(url_for(redirect_endpoint))
+            elif not can_manage_memberships():
+                flash("Access Restricted: Insufficient privileges for membership operations.", "warning")
+                return redirect(url_for(redirect_endpoint))
+            return view_func(*args, **kwargs)
+        return wrapper
+    return decorator
+
+def lead_write_required(redirect_endpoint="main.list_clubs"):
+    """
+    Decorator for Club Charter operations.
+    Allowed: 'admin', 'guest', 'president', 'lead'.
+    Denied: 'coordinator', 'secretary', 'member'.
+    """
+    def decorator(view_func):
+        @functools.wraps(view_func)
+        def wrapper(*args, **kwargs):
+            role = get_current_role()
+            if not can_manage_lead():
+                flash("Access Restricted: Club charter updates require Club Lead or President authority. Coordinators, Secretaries, and Members cannot modify charters.", "warning")
+                return redirect(url_for(redirect_endpoint))
+            return view_func(*args, **kwargs)
+        return wrapper
+    return decorator
 
 def write_required(redirect_endpoint="main.dashboard"):
     """
-    Decorator for write endpoints (create, edit, delete).
-    Allows 'admin', 'president', 'coordinator', 'manager', and 'guest'.
-    Restricts 'member' role and redirects with informative notification.
+    General write decorator for legacy routes.
     """
     def decorator(view_func):
         @functools.wraps(view_func)
         def wrapper(*args, **kwargs):
             role = get_current_role()
             if role == "member":
-                flash("Access Restricted: Student Members cannot modify club charters or core database records. Switch to Coordinator, President, or Guest mode to edit.", "warning")
+                flash("Access Restricted: Student Members cannot modify core database records. Switch to Lead, President, or Guest mode to edit.", "warning")
                 return redirect(url_for(redirect_endpoint))
             return view_func(*args, **kwargs)
         return wrapper
@@ -124,18 +266,33 @@ def write_required(redirect_endpoint="main.dashboard"):
 def execute_required(redirect_endpoint="main.procedures_hub"):
     """
     Decorator for stored procedure execution.
-    Denies 'member' role. Permits 'admin', 'president', 'coordinator', and 'guest'.
+    Denies 'member' role.
     """
     def decorator(view_func):
         @functools.wraps(view_func)
         def wrapper(*args, **kwargs):
             role = get_current_role()
             if role == "member":
-                flash("Access Restricted: Student Members are restricted from running backend stored procedure cursors. Switch to President, Coordinator, or Guest mode.", "warning")
+                flash("Access Restricted: Student Members are restricted from running backend stored procedure cursors. Switch to President, Lead, Coordinator, Secretary, or Guest mode.", "warning")
                 return redirect(url_for(redirect_endpoint))
             return view_func(*args, **kwargs)
         return wrapper
     return decorator
+
+@auth_bp.app_context_processor
+def inject_auth_helpers():
+    return {
+        "is_club_authorized": is_club_authorized,
+        "can_manage_events": can_manage_events,
+        "can_manage_memberships": can_manage_memberships,
+        "can_manage_lead": can_manage_lead,
+        "can_test_trigger": can_test_trigger,
+        "can_test_procedure": can_test_procedure,
+        "current_role": get_current_role(),
+        "current_user_name": get_current_user(),
+        "current_club_id": session.get("club_id"),
+        "current_club_name": session.get("club_name")
+    }
 
 @auth_bp.route("/api/auth/status")
 def auth_status():

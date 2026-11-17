@@ -169,9 +169,9 @@
               </span>
             </td>
             <td class="text-end">
-              {% if current_role != 'member' %}
-              <div class="d-inline-flex gap-1 action-write-btn" data-role-req="admin,manager,guest">
-                <a href="{{ url_for('main.edit_club', club_id=club.club_id) }}" class="btn-ghost-action text-info" title="Edit Club" aria-label="Edit club {{ club.club_name }}">
+              {% if can_manage_lead() and is_club_authorized(club.club_id) %}
+              <div class="d-inline-flex gap-1 action-write-btn">
+                <a href="{{ url_for('main.edit_club', club_id=club.club_id) }}" class="btn-ghost-action text-info" title="Edit Club Charter" aria-label="Edit club {{ club.club_name }}">
                   <i class="bi bi-pencil" aria-hidden="true"></i>
                 </a>
                 {% if current_role in ['admin', 'guest'] %}
@@ -182,8 +182,10 @@
                 </form>
                 {% endif %}
               </div>
+              {% elif can_manage_lead() and not is_club_authorized(club.club_id) %}
+              <span class="badge-status neutral small font-mono" title="Restricted to {{ club.club_id }} Leadership"><i class="bi bi-shield-lock me-1"></i>{{ club.club_id }} Only</span>
               {% else %}
-              <span class="text-secondary small font-mono opacity-60"><i class="bi bi-lock me-1"></i>Protected</span>
+              <span class="text-secondary small font-mono opacity-60" title="Protected charter"><i class="bi bi-lock me-1"></i>Protected</span>
               {% endif %}
             </td>
           </tr>

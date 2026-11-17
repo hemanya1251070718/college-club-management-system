@@ -27,11 +27,11 @@
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
 
   <!-- Design System Tokens & Components (Outcrowd Incident Management Platform Design) -->
-  <link rel="stylesheet" href="{{ url_for('static', filename='css/tokens.css') }}?v=20261114_static_table_v6">
-  <link rel="stylesheet" href="{{ url_for('static', filename='css/components.css') }}?v=20261114_static_table_v6">
-  <link rel="stylesheet" href="{{ url_for('static', filename='css/motion.css') }}?v=20261114_static_table_v6">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/tokens.css') }}?v=20261117_rbac_v2">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/components.css') }}?v=20261117_rbac_v2">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/motion.css') }}?v=20261117_rbac_v2">
   <!-- Lovable Theme Overlay (Spectrum Gradient, OKLCH, Manrope) -->
-  <link rel="stylesheet" href="{{ url_for('static', filename='css/lovable.css') }}?v=20261117_lovable_v1">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/lovable.css') }}?v=20261117_rbac_v2">
 </head>
 <body class="{% block body_class %}{% endblock %}" data-user-role="{{ current_role|default('guest') }}">
 
@@ -115,7 +115,13 @@
         <!-- Role Badge & Switcher Modal Trigger -->
         <button id="role-switcher-btn" class="btn-role-badge" type="button" data-bs-toggle="modal" data-bs-target="#roleModal" title="Switch User Role Persona">
           <i class="bi bi-person-badge"></i>
-          <span id="current-role-badge-text">{{ role_meta.title|default('Guest (Full Demo)') }}</span>
+          <span id="current-role-badge-text">
+            {% if session.get('club_id') and session.get('role') not in ['admin', 'guest'] %}
+              {{ session.get('club_id') }} &bull; {{ session.get('club_role', role_meta.title|default('Officer')) }}
+            {% else %}
+              {{ role_meta.title|default('Guest (Full Demo)') }}
+            {% endif %}
+          </span>
         </button>
 
         <!-- Logout Link -->
@@ -491,10 +497,10 @@
   <!-- Bootstrap 5 JS Bundle -->
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
   <!-- Interaction & Motion Engine -->
-  <script src="{{ url_for('static', filename='js/motion.js') }}?v=20261114_static_table_v6"></script>
+  <script src="{{ url_for('static', filename='js/motion.js') }}?v=20261117_rbac_v2"></script>
   <!-- Selective WebGL Hero -->
-  <script src="{{ url_for('static', filename='js/webgl-hero.js') }}?v=20261114_static_table_v6"></script>
+  <script src="{{ url_for('static', filename='js/webgl-hero.js') }}?v=20261117_rbac_v2"></script>
   <!-- Main RBAC & Google Pay Rainbow Animation Bridge -->
-  <script src="{{ url_for('static', filename='js/main.js') }}?v=20261114_static_table_v6"></script>
+  <script src="{{ url_for('static', filename='js/main.js') }}?v=20261117_rbac_v2"></script>
 </body>
 </html>

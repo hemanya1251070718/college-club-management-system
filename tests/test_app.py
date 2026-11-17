@@ -202,10 +202,20 @@ def test_all_75_students_preseeded_and_username_equals_password(client):
     assert err_pres is None
     assert user_pres["role"] == "president"
 
+    # Test secretary login with username == password
+    err_sec, user_sec = authenticate_user("priya.12410219.secretary@vit.edu", "priya.12410219.secretary@vit.edu")
+    assert err_sec is None
+    assert user_sec["role"] == "secretary"
+
     # Test coordinator login with username == password
-    err_coord, user_coord = authenticate_user("priya.12410219.secretary@vit.edu", "priya.12410219.secretary@vit.edu")
+    err_coord, user_coord = authenticate_user("harshal.1251071053.coordinator@vit.edu", "harshal.1251071053.coordinator@vit.edu")
     assert err_coord is None
     assert user_coord["role"] == "coordinator"
+
+    # Test lead login with username == password
+    err_lead, user_lead = authenticate_user("ayush.1251070541.lead@vit.edu", "ayush.1251070541.lead@vit.edu")
+    assert err_lead is None
+    assert user_lead["role"] == "lead"
 
 def test_role_based_trigger_and_procedure_permissions(client):
     """
@@ -404,6 +414,126 @@ def test_light_theme_high_contrast_and_resilient_events(client):
     assert 'tokens.css?v=' in base_html
     assert 'components.css?v=' in base_html
     assert 'main.js?v=' in base_html
+
+
+def test_rbac_multi_club_role_hierarchy_and_permissions(client):
+    """
+    Verifies the multi-club role hierarchy and granular operational permissions:
+      - Event operations: President, Lead, Coordinator only (no Secretary, no Member).
+      - Secretary operations (Memberships): Secretary, President, Lead only (no Coordinator, no Member).
+      - Lead operations: Lead, President only.
+    """
+    from app.auth import can_manage_events, can_manage_memberships, can_manage_lead
+
+    # 1. Test Event Coordinator: Events YES, Memberships NO
+    with client.session_transaction() as sess:
+        sess["role"] = "coordinator"
+        sess["club_id"] = "CSI"
+        sess["club_name"] = "Computer Society of India"
+    with client:
+        client.get("/")
+        assert can_manage_events() is True
+        assert can_manage_memberships() is False
+        assert can_manage_lead() is False
+
+    # 2. Test Club Secretary: Memberships YES, Events NO
+    with client.session_transaction() as sess:
+        sess["role"] = "secretary"
+        sess["club_id"] = "CSI"
+        sess["club_name"] = "Computer Society of India"
+    with client:
+        client.get("/")
+        assert can_manage_events() is False
+        assert can_manage_memberships() is True
+        assert can_manage_lead() is False
+
+    # 3. Test Club Lead: Events YES, Memberships YES, Lead YES
+    with client.session_transaction() as sess:
+        sess["role"] = "lead"
+        sess["club_id"] = "CSI"
+        sess["club_name"] = "Computer Society of India"
+    with client:
+        client.get("/")
+        assert can_manage_events() is True
+        assert can_manage_memberships() is True
+        assert can_manage_lead() is True
+
+    # 4. Test Student Member: All NO
+    with client.session_transaction() as sess:
+        sess["role"] = "member"
+    with client:
+        client.get("/")
+        assert can_manage_events() is False
+        assert can_manage_memberships() is False
+        assert can_manage_lead() is False
+
+
+def test_tenant_isolation_officer_boundary(client):
+    """
+    Verifies that club officers cannot modify events or memberships belonging to another club.
+    """
+    # Officer of ZEPHYR logged in
+    with client.session_transaction() as sess:
+        sess["role"] = "lead"
+        sess["club_id"] = "ZEPHYR"
+        sess["club_name"] = "Zephyr"
+
+    # Attempt to edit CSI event (CSI26-TF) -> MUST BE BLOCKED
+    res = client.post("/events/CSI26-TF/edit", data={
+        "club_id": "CSI",
+        "event_name": "Unauthorized Hack",
+        "budget_allocated": "10000",
+        "status": "Planned"
+    }, follow_redirects=True)
+    assert res.status_code == 200
+    assert b"Tenant Boundary Guard" in res.data or b"strictly restricted" in res.data
+
+    # Attempt to edit CSI club charter -> MUST BE BLOCKED
+    res2 = client.post("/clubs/CSI/edit", data={
+        "club_name": "Hacked CSI",
+        "category": "Technical",
+        "faculty_id": "FAC-001"
+    }, follow_redirects=True)
+    assert res2.status_code == 200
+    assert b"Tenant Boundary Guard" in res2.data or b"strictly restricted" in res2.data
+
+
+def test_role_detection_from_email_patterns():
+    """
+    Verifies real-time institutional email role classification:
+      - .president -> 'president'
+      - .lead -> 'lead'
+      - .coordinator -> 'coordinator'
+      - .secretary -> 'secretary'
+      - .principal -> 'admin'
+      - default -> 'member'
+    """
+    from app.user_model import detect_role_from_email
+
+    role, title, err = detect_role_from_email("hitaishi.1251070369.president@vit.edu")
+    assert role == "president"
+    assert err is None
+
+    role, title, err = detect_role_from_email("ayush.1251070541.lead@vit.edu")
+    assert role == "lead"
+    assert err is None
+
+    role, title, err = detect_role_from_email("harshal.1251071053.coordinator@vit.edu")
+    assert role == "coordinator"
+    assert err is None
+
+    role, title, err = detect_role_from_email("hemanya.1251070718.secretary@vit.edu")
+    assert role == "secretary"
+    assert err is None
+
+    role, title, err = detect_role_from_email("sharma.principal@vit.edu")
+    assert role == "admin"
+    assert err is None
+
+    role, title, err = detect_role_from_email("rohan.1251070014@vit.edu")
+    assert role == "member"
+    assert err is None
+
 
 
 

@@ -58,11 +58,18 @@
             </div>
             {% endif %}
             <div class="col-md-6">
-              <label class="tesla-form-label">Club *</label>
+              <label class="tesla-form-label">
+                Club *
+                {% if session.get('club_id') and current_role not in ['admin', 'guest'] %}
+                <span class="badge-status info ms-2 font-mono" style="font-size: 11px;"><i class="bi bi-shield-check me-1"></i>Locked to {{ session.get('club_name', session.get('club_id')) }}</span>
+                {% endif %}
+              </label>
               <select name="club_id" class="tesla-form-select" required>
+                {% if current_role in ['admin', 'guest'] or not session.get('club_id') %}
                 <option value="" disabled selected>Select club...</option>
+                {% endif %}
                 {% for c in clubs %}
-                <option value="{{ c.club_id }}">
+                <option value="{{ c.club_id }}" {% if session.get('club_id') == c.club_id %}selected{% endif %}>
                   {{ c.club_name }} ({{ c.club_id }})
                 </option>
                 {% endfor %}

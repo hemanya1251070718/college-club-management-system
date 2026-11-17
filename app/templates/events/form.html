@@ -39,11 +39,18 @@
               <input type="text" name="event_id" class="tesla-form-control font-mono text-uppercase" placeholder="e.g. CSI26-HACK" value="{{ event.event_id if event else '' }}" {% if event %}readonly{% endif %} required>
             </div>
             <div class="col-md-8">
-              <label class="tesla-form-label">Host Club *</label>
+              <label class="tesla-form-label">
+                Host Club *
+                {% if session.get('club_id') and current_role not in ['admin', 'guest'] %}
+                <span class="badge-status info ms-2 font-mono" style="font-size: 11px;"><i class="bi bi-shield-check me-1"></i>Locked to {{ session.get('club_name', session.get('club_id')) }}</span>
+                {% endif %}
+              </label>
               <select name="club_id" class="tesla-form-select" required>
+                {% if current_role in ['admin', 'guest'] or not session.get('club_id') %}
                 <option value="" disabled {% if not event %}selected{% endif %}>Select host club...</option>
+                {% endif %}
                 {% for c in clubs %}
-                <option value="{{ c.club_id }}" {% if event and event.club_id == c.club_id %}selected{% endif %}>
+                <option value="{{ c.club_id }}" {% if (event and event.club_id == c.club_id) or (not event and session.get('club_id') == c.club_id) %}selected{% endif %}>
                   {{ c.club_name }} ({{ c.club_id }})
                 </option>
                 {% endfor %}

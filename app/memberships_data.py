@@ -1196,9 +1196,11 @@ STUDENT_MEMBERSHIPS = CANONICAL_STUDENT_MEMBERSHIPS
 
 def classify_role_tier(role_name):
     """
-    Classifies raw role string into one of the 3 authorization tiers:
+    Classifies raw role string into one of the authorization tiers:
       - 'president': Club President
-      - 'coordinator': Secretary, Coordinator, Treasurer, Lead, Event Coordinator
+      - 'lead': Club Lead
+      - 'coordinator': Event Coordinator
+      - 'secretary': Secretary, Treasurer
       - 'member': Member, Core Member, Volunteer
     """
     if not role_name:
@@ -1206,8 +1208,12 @@ def classify_role_tier(role_name):
     r = role_name.strip().lower()
     if 'president' in r:
         return 'president'
-    if any(k in r for k in ['secretary', 'coordinator', 'cordinator', 'treasurer', 'lead', 'head', 'vice president']):
+    if 'lead' in r or 'head' in r:
+        return 'lead'
+    if 'event' in r or 'coordinator' in r or 'cordinator' in r:
         return 'coordinator'
+    if 'secretary' in r or 'treasurer' in r:
+        return 'secretary'
     return 'member'
 
 def get_persona_metadata(club_id, club_name, role_name, role_tier):
@@ -1220,15 +1226,31 @@ def get_persona_metadata(club_id, club_name, role_name, role_tier):
             'tier_label': 'President Tier',
             'tier_badge_class': 'badge-status warning',
             'icon': 'bi-award-fill',
-            'permissions_summary': 'Executive Governance: Single-president enforcement, budget allocations, and administrative oversight.'
+            'permissions_summary': 'Executive Governance: Single-president enforcement, budget allocations, events, and membership management.'
+        }
+    elif tier == 'lead':
+        return {
+            'tier': 'lead',
+            'tier_label': 'Lead Tier',
+            'tier_badge_class': 'badge-status info',
+            'icon': 'bi-star-fill',
+            'permissions_summary': 'Charter & Operations: Club charter management, event scheduling, and membership roster updates.'
         }
     elif tier == 'coordinator':
         return {
             'tier': 'coordinator',
-            'tier_label': 'Coordinator Tier',
+            'tier_label': 'Event Coordinator Tier',
             'tier_badge_class': 'badge-status info',
-            'icon': 'bi-person-badge-fill',
-            'permissions_summary': 'Operations & Events: Schedule campus events, record check-in attendance, and manage student memberships.'
+            'icon': 'bi-calendar-event-fill',
+            'permissions_summary': 'Events & Attendance: Schedule campus events and record check-in attendance. (No membership modifications).'
+        }
+    elif tier == 'secretary':
+        return {
+            'tier': 'secretary',
+            'tier_label': 'Secretary Tier',
+            'tier_badge_class': 'badge-status info',
+            'icon': 'bi-card-checklist',
+            'permissions_summary': 'Memberships & Records: Manage student enrollments and member roster. (No event modifications).'
         }
     else:
         return {
@@ -1242,25 +1264,87 @@ def get_persona_metadata(club_id, club_name, role_name, role_tier):
 def get_student_personas(student_id=None, prn=None, email=None):
     """
     Retrieves formatted list of available personas for a student.
+    Queries the live SQLite database first, falling back to static mapping.
     Returns: list of persona dicts with club details, role, authorization tier, and display badges.
     """
     mems = []
-    if student_id and student_id in STUDENT_MEMBERSHIPS:
-        mems = STUDENT_MEMBERSHIPS[student_id]
-    elif prn:
-        for sid, roles in STUDENT_MEMBERSHIPS.items():
-            if sid.endswith(prn[-4:]) or prn in sid:
-                mems = roles
-                break
-    elif email:
-        email_clean = email.strip().lower()
-        prn_match = re.search(r'\d{6,10}', email_clean)
-        if prn_match:
-            prn_str = prn_match.group(0)
+    
+    # Try querying live SQLite database first
+    try:
+        import sqlite3
+        db_path = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "database", "clubhub_app.db")
+        if os.path.exists(db_path):
+            conn = sqlite3.connect(db_path, timeout=3)
+            conn.row_factory = sqlite3.Row
+            cursor = conn.cursor()
+            
+            target_sid = student_id
+            target_prn = prn
+            if not target_sid and not target_prn and email:
+                email_clean = email.strip().lower()
+                cursor.execute("SELECT student_id, prn_number FROM Students WHERE LOWER(email) = ?;", (email_clean,))
+                srow = cursor.fetchone()
+                if srow:
+                    target_sid = srow["student_id"]
+                    target_prn = srow["prn_number"]
+                else:
+                    prn_match = re.search(r'\d{6,10}', email_clean)
+                    if prn_match:
+                        target_prn = prn_match.group(0)
+            
+            query = """
+                SELECT m.membership_id, m.club_id, c.club_name, c.category AS club_category,
+                       m.role, m.join_date, m.status
+                FROM Memberships m
+                JOIN Clubs c ON m.club_id = c.club_id
+                JOIN Students s ON m.student_id = s.student_id
+                WHERE (m.student_id = ? OR s.prn_number = ?)
+                ORDER BY CASE 
+                    WHEN m.role = 'President' THEN 1
+                    WHEN m.role = 'Lead' THEN 2
+                    WHEN m.role = 'Secretary' THEN 3
+                    WHEN m.role = 'Event Coordinator' THEN 4
+                    WHEN m.role = 'Treasurer' THEN 5
+                    ELSE 6
+                END, m.join_date DESC;
+            """
+            cursor.execute(query, (target_sid or "", target_prn or ""))
+            db_rows = cursor.fetchall()
+            conn.close()
+            
+            if db_rows:
+                for r in db_rows:
+                    tier = classify_role_tier(r["role"])
+                    mems.append({
+                        "membership_id": r["membership_id"],
+                        "club_id": r["club_id"],
+                        "club_name": r["club_name"],
+                        "club_category": r["club_category"],
+                        "role": r["role"],
+                        "role_tier": tier,
+                        "join_date": r["join_date"],
+                        "status": r["status"]
+                    })
+    except Exception:
+        mems = []
+
+    if not mems:
+        if student_id and student_id in STUDENT_MEMBERSHIPS:
+            mems = STUDENT_MEMBERSHIPS[student_id]
+        elif prn:
             for sid, roles in STUDENT_MEMBERSHIPS.items():
-                if sid.endswith(prn_str[-4:]) or prn_str in sid:
+                if sid.endswith(prn[-4:]) or prn in sid:
                     mems = roles
                     break
+        elif email:
+            email_clean = email.strip().lower()
+            prn_match = re.search(r'\d{6,10}', email_clean)
+            if prn_match:
+                prn_str = prn_match.group(0)
+                for sid, roles in STUDENT_MEMBERSHIPS.items():
+                    if sid.endswith(prn_str[-4:]) or prn_str in sid:
+                        mems = roles
+                        break
 
     personas = []
     for m in mems:

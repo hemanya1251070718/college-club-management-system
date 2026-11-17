@@ -2,7 +2,12 @@ import os
 import re
 from flask import Blueprint, render_template, request, redirect, url_for, flash, jsonify, session, send_file
 from app.db import get_db_connection, check_db_health
-from app.auth import write_required, execute_required, get_current_role
+from app.auth import (
+    write_required, execute_required, get_current_role,
+    event_write_required, membership_write_required, lead_write_required,
+    is_club_authorized, can_manage_events, can_manage_memberships, can_manage_lead,
+    can_test_trigger, can_test_procedure
+)
 
 main_bp = Blueprint("main", __name__)
 
@@ -281,7 +286,7 @@ def list_clubs():
 
 
 @main_bp.route("/clubs/new", methods=["GET", "POST"])
-@write_required("main.list_clubs")
+@lead_write_required("main.list_clubs")
 def create_club():
     conn = get_db_connection()
     if request.method == "POST":
@@ -330,8 +335,12 @@ def create_club():
 
 
 @main_bp.route("/clubs/<club_id>/edit", methods=["GET", "POST"])
-@write_required("main.list_clubs")
+@lead_write_required("main.list_clubs")
 def edit_club(club_id):
+    if not is_club_authorized(club_id):
+        flash(f"Tenant Boundary Guard: You are an officer of {session.get('club_name', session.get('club_id'))} and are strictly restricted from modifying the charter of '{club_id}'.", "danger")
+        return redirect(url_for("main.list_clubs"))
+
     conn = get_db_connection()
     if request.method == "POST":
         club_name = request.form.get("club_name", "").strip()
@@ -388,8 +397,12 @@ def edit_club(club_id):
 
 
 @main_bp.route("/clubs/<club_id>/delete", methods=["POST"])
-@write_required("main.list_clubs")
+@lead_write_required("main.list_clubs")
 def delete_club(club_id):
+    if not is_club_authorized(club_id):
+        flash(f"Tenant Boundary Guard: You are an officer of {session.get('club_name', session.get('club_id'))} and cannot delete '{club_id}'.", "danger")
+        return redirect(url_for("main.list_clubs"))
+
     try:
         conn = get_db_connection()
         with conn.cursor() as cursor:
@@ -595,9 +608,12 @@ def list_memberships():
 
 
 @main_bp.route("/memberships/new", methods=["GET", "POST"])
+@membership_write_required("main.list_memberships")
 def create_membership():
     conn = get_db_connection()
     current_role = get_current_role() or "guest"
+    officer_club = session.get("club_id")
+
     if request.method == "POST":
         student_id = request.form.get("student_id", "").strip()
         if not student_id and session.get("student_id"):
@@ -607,6 +623,12 @@ def create_membership():
         role = request.form.get("role", "Member").strip()
         join_date = request.form.get("join_date", "").strip()
         status = request.form.get("status", "Active").strip()
+
+        # Tenant boundary check: Club officers can only enroll students into their designated club
+        if current_role not in ["admin", "guest"] and officer_club:
+            if club_id != officer_club:
+                flash(f"Tenant Boundary Guard: You are an officer of {session.get('club_name', officer_club)} and can only enroll students into your club ('{officer_club}').", "warning")
+                club_id = officer_club
 
         # Governance rule: Student Members can only enroll as Member or Volunteer
         if current_role == "member" and role in ["President", "Secretary"]:
@@ -654,16 +676,33 @@ def create_membership():
     with conn.cursor() as cursor:
         cursor.execute("SELECT student_id, name, prn_number FROM Students ORDER BY name;")
         students = cursor.fetchall()
-        cursor.execute("SELECT club_id, club_name FROM Clubs ORDER BY club_name;")
+        if current_role not in ["admin", "guest"] and officer_club:
+            cursor.execute("SELECT club_id, club_name FROM Clubs WHERE club_id = %s ORDER BY club_name;", (officer_club,))
+        else:
+            cursor.execute("SELECT club_id, club_name FROM Clubs ORDER BY club_name;")
         clubs = cursor.fetchall()
     conn.close()
     return render_template("memberships/form.html", membership=None, students=students, clubs=clubs, title="Add Member")
 
 
 @main_bp.route("/memberships/<membership_id>/edit", methods=["GET", "POST"])
-@write_required("main.list_memberships")
+@membership_write_required("main.list_memberships")
 def edit_membership(membership_id):
     conn = get_db_connection()
+    with conn.cursor() as cursor:
+        cursor.execute("SELECT club_id, status FROM Memberships WHERE membership_id = %s;", (membership_id,))
+        old_row = cursor.fetchone()
+
+    if not old_row:
+        conn.close()
+        flash("Membership record not found.", "warning")
+        return redirect(url_for("main.list_memberships"))
+
+    if not is_club_authorized(old_row["club_id"]):
+        conn.close()
+        flash(f"Tenant Boundary Guard: You are an officer of {session.get('club_name', session.get('club_id'))} and are strictly restricted from editing memberships for '{old_row['club_id']}'.", "danger")
+        return redirect(url_for("main.list_memberships"))
+
     if request.method == "POST":
         role = request.form.get("role", "Member").strip()
         status = request.form.get("status", "Active").strip()
@@ -671,8 +710,6 @@ def edit_membership(membership_id):
 
         try:
             with conn.cursor() as cursor:
-                cursor.execute("SELECT club_id, status FROM Memberships WHERE membership_id = %s;", (membership_id,))
-                old_row = cursor.fetchone()
                 club_id = old_row["club_id"]
                 old_status = old_row["status"]
 
@@ -714,7 +751,7 @@ def edit_membership(membership_id):
 
 
 @main_bp.route("/memberships/<membership_id>/delete", methods=["POST"])
-@write_required("main.list_memberships")
+@membership_write_required("main.list_memberships")
 def delete_membership(membership_id):
     try:
         conn = get_db_connection()
@@ -724,6 +761,11 @@ def delete_membership(membership_id):
             if not row:
                 flash("Membership record not found.", "warning")
                 conn.close()
+                return redirect(url_for("main.list_memberships"))
+
+            if not is_club_authorized(row["club_id"]):
+                conn.close()
+                flash(f"Tenant Boundary Guard: You are an officer of {session.get('club_name', session.get('club_id'))} and cannot delete memberships belonging to '{row['club_id']}'.", "danger")
                 return redirect(url_for("main.list_memberships"))
 
             club_id = row["club_id"]
@@ -800,9 +842,12 @@ def list_events():
 
 
 @main_bp.route("/events/new", methods=["GET", "POST"])
-@write_required("main.list_events")
+@event_write_required("main.list_events")
 def create_event():
     conn = get_db_connection()
+    current_role = get_current_role() or "guest"
+    officer_club = session.get("club_id")
+
     if request.method == "POST":
         event_id = request.form.get("event_id", "").strip().upper()
         club_id = request.form.get("club_id", "").strip()
@@ -812,6 +857,12 @@ def create_event():
         budget = request.form.get("budget_allocated", "0").strip()
         event_type = request.form.get("event_type", "").strip() or None
         status = request.form.get("status", "Planned").strip()
+
+        # Tenant boundary check: Club officers can only create events for their designated club
+        if current_role not in ["admin", "guest"] and officer_club:
+            if club_id != officer_club:
+                flash(f"Tenant Boundary Guard: You are an officer of {session.get('club_name', officer_club)} and can only create events for '{officer_club}'.", "warning")
+                club_id = officer_club
 
         if not event_id or not club_id or not event_name:
             flash("Event ID, Club, and Event Name are required.", "warning")
@@ -830,16 +881,33 @@ def create_event():
             flash(f"Error creating event: {str(e)}", "danger")
 
     with conn.cursor() as cursor:
-        cursor.execute("SELECT club_id, club_name FROM Clubs ORDER BY club_name;")
+        if current_role not in ["admin", "guest"] and officer_club:
+            cursor.execute("SELECT club_id, club_name FROM Clubs WHERE club_id = %s ORDER BY club_name;", (officer_club,))
+        else:
+            cursor.execute("SELECT club_id, club_name FROM Clubs ORDER BY club_name;")
         clubs = cursor.fetchall()
     conn.close()
     return render_template("events/form.html", event=None, clubs=clubs, title="Create Event")
 
 
 @main_bp.route("/events/<event_id>/edit", methods=["GET", "POST"])
-@write_required("main.list_events")
+@event_write_required("main.list_events")
 def edit_event(event_id):
     conn = get_db_connection()
+    with conn.cursor() as cursor:
+        cursor.execute("SELECT * FROM Events WHERE event_id = %s;", (event_id,))
+        event = cursor.fetchone()
+
+    if not event:
+        conn.close()
+        flash("Event not found.", "warning")
+        return redirect(url_for("main.list_events"))
+
+    if not is_club_authorized(event["club_id"]):
+        conn.close()
+        flash(f"Tenant Boundary Guard: You are an officer of {session.get('club_name', session.get('club_id'))} and are strictly restricted from editing events for '{event['club_id']}'.", "danger")
+        return redirect(url_for("main.list_events"))
+
     if request.method == "POST":
         club_id = request.form.get("club_id", "").strip()
         event_name = request.form.get("event_name", "").strip()
@@ -863,25 +931,31 @@ def edit_event(event_id):
             flash(f"Error updating event: {str(e)}", "danger")
 
     with conn.cursor() as cursor:
-        cursor.execute("SELECT * FROM Events WHERE event_id = %s;", (event_id,))
-        event = cursor.fetchone()
         cursor.execute("SELECT club_id, club_name FROM Clubs ORDER BY club_name;")
         clubs = cursor.fetchall()
     conn.close()
-
-    if not event:
-        flash("Event not found.", "warning")
-        return redirect(url_for("main.list_events"))
 
     return render_template("events/form.html", event=event, clubs=clubs, title=f"Edit Event: {event['event_name']}")
 
 
 @main_bp.route("/events/<event_id>/delete", methods=["POST"])
-@write_required("main.list_events")
+@event_write_required("main.list_events")
 def delete_event(event_id):
     try:
         conn = get_db_connection()
         with conn.cursor() as cursor:
+            cursor.execute("SELECT club_id FROM Events WHERE event_id = %s;", (event_id,))
+            event = cursor.fetchone()
+            if not event:
+                flash("Event not found.", "warning")
+                conn.close()
+                return redirect(url_for("main.list_events"))
+
+            if not is_club_authorized(event["club_id"]):
+                conn.close()
+                flash(f"Tenant Boundary Guard: You are an officer of {session.get('club_name', session.get('club_id'))} and cannot delete events belonging to '{event['club_id']}'.", "danger")
+                return redirect(url_for("main.list_events"))
+
             # Delete registrations first to respect foreign key
             cursor.execute("DELETE FROM EventRegistrations WHERE event_id = %s;", (event_id,))
             cursor.execute("DELETE FROM Feedback WHERE event_id = %s;", (event_id,))
@@ -968,13 +1042,24 @@ def register_for_event(event_id):
 
 
 @main_bp.route("/events/<event_id>/attendance/<reg_id>", methods=["POST"])
-@write_required("main.event_registrations")
+@event_write_required("main.event_registrations")
 def mark_attendance(event_id, reg_id):
     try:
         conn = get_db_connection()
         with conn.cursor() as cursor:
-            cursor.execute("SELECT status FROM Events WHERE event_id = %s;", (event_id,))
-            status_before = cursor.fetchone()["status"]
+            cursor.execute("SELECT club_id, status FROM Events WHERE event_id = %s;", (event_id,))
+            ev_row = cursor.fetchone()
+            if not ev_row:
+                flash("Event not found.", "warning")
+                conn.close()
+                return redirect(url_for("main.list_events"))
+
+            if not is_club_authorized(ev_row["club_id"]):
+                conn.close()
+                flash(f"Tenant Boundary Guard: You are an officer of {session.get('club_name', session.get('club_id'))} and cannot mark attendance for '{ev_row['club_id']}'.", "danger")
+                return redirect(url_for("main.event_registrations", event_id=event_id))
+
+            status_before = ev_row["status"]
 
             # TRIGGER 7 (trg_auto_progress_event_on_attendance) FIRES on attendance update!
             cursor.execute("""
@@ -1095,6 +1180,11 @@ def procedures_hub():
 @main_bp.route("/procedures/execute/<proc_id>", methods=["POST"])
 @execute_required("main.procedures_hub")
 def execute_proc(proc_id):
+    if not can_test_procedure(proc_id):
+        role_label = session.get("role_title", session.get("role", "Current Role"))
+        flash(f"Access Restricted: {role_label} is not authorized to execute procedure '{proc_id}'. This procedure requires specific club officer permissions.", "danger")
+        return redirect(url_for("main.procedures_hub"))
+
     results = []
     proc_name = ""
     try:
@@ -1164,6 +1254,22 @@ def execute_proc(proc_id):
                 results = cursor.fetchall()
                 proc_name = f"sp_anonymize_sensitive_feedback(threshold={p_low_rating_threshold}, apply={p_apply})"
                 flash(f"Executed {proc_name}: {'Critical reviews protected with anonymous standard tags!' if p_apply == 1 else 'Privacy audit preview complete.'}", "success")
+
+            # Tenant Isolation for Club Officers: Scope results strictly to their active club
+            officer_club = session.get("club_id")
+            if officer_club and get_current_role() not in ["admin", "guest"] and results:
+                filtered = []
+                for r in results:
+                    r_dict = dict(r) if hasattr(r, "keys") else r
+                    if "club_id" in r_dict:
+                        if str(r_dict["club_id"]).strip().upper() == str(officer_club).strip().upper():
+                            filtered.append(r)
+                    elif "event_id" in r_dict:
+                        if str(officer_club).strip().upper() in str(r_dict["event_id"]).strip().upper():
+                            filtered.append(r)
+                    else:
+                        filtered.append(r)
+                results = filtered
 
         conn.close()
     except Exception as e:

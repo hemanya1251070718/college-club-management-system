@@ -824,21 +824,36 @@
                 <button type="button" class="demo-chip-btn" data-fill-email="sharma.principal@vit.edu" data-fill-role="Principal">
                   <span>👑 Principal (Admin)</span>
                 </button>
-                <button type="button" class="demo-chip-btn" data-fill-email="aditya.12410214.president@vit.edu" data-fill-role="President">
+                <button type="button" class="demo-chip-btn" data-fill-email="hitaishi.1251070369.president@vit.edu" data-fill-role="President">
                   <span>🏆 CSI President</span>
                 </button>
-                <button type="button" class="demo-chip-btn" data-fill-email="priya.12410219.secretary@vit.edu" data-fill-role="Secretary">
+                <button type="button" class="demo-chip-btn" data-fill-email="ayush.1251070541.lead@vit.edu" data-fill-role="Lead">
+                  <span>⭐ CSI Lead</span>
+                </button>
+                <button type="button" class="demo-chip-btn" data-fill-email="harshal.1251071053.coordinator@vit.edu" data-fill-role="Coordinator">
+                  <span>📅 CSI Coordinator</span>
+                </button>
+                <button type="button" class="demo-chip-btn" data-fill-email="hemanya.1251070718.secretary@vit.edu" data-fill-role="Secretary">
                   <span>👔 CSI Secretary</span>
+                </button>
+                <button type="button" class="demo-chip-btn" data-fill-email="jyuthika.1251070187.president@vit.edu" data-fill-role="President">
+                  <span>💃 ZEPHYR President</span>
+                </button>
+                <button type="button" class="demo-chip-btn" data-fill-email="rishabh.1251070307.lead@vit.edu" data-fill-role="Lead">
+                  <span>⭐ ZEPHYR Lead</span>
+                </button>
+                <button type="button" class="demo-chip-btn" data-fill-email="kadam.1251070203.coordinator@vit.edu" data-fill-role="Coordinator">
+                  <span>📅 ZEPHYR Coordinator</span>
                 </button>
                 <button type="button" class="demo-chip-btn" data-fill-email="hemanya.1251070718@vit.edu" data-fill-role="Member">
                   <span>🎓 Hemanya (Multi-Role)</span>
                 </button>
-                <button type="button" class="demo-chip-btn" data-fill-email="rohan.1251070725@vit.edu" data-fill-role="Student">
+                <button type="button" class="demo-chip-btn" data-fill-email="rohan.1251070014@vit.edu" data-fill-role="Student">
                   <span>👤 Rohan (Student)</span>
                 </button>
               </div>
               <div style="color: #92929D; font-size: 11.5px; line-height: 1.4;">
-                💡 <strong>All 75 students &amp; faculty pre-registered:</strong> Username and password are identical (e.g. <code style="color: #A78BFA;">hemanya.1251070718@vit.edu</code>), or enter <code style="color: #A78BFA;">password123</code>.
+                💡 <strong>All 75 students &amp; faculty pre-registered:</strong> Username and password are identical (e.g. <code style="color: #A78BFA;">hemanya.1251070718.secretary@vit.edu</code>), or enter <code style="color: #A78BFA;">password123</code>.
               </div>
             </div>
           </div>
@@ -997,7 +1012,7 @@
         const parts = prefix.split(".");
 
         // 1. Principal / Super Admin
-        if (parts.includes("principal")) {
+        if (parts.includes("principal") || parts.includes("admin")) {
           roleBox.className = "role-detection-pill admin";
           roleText.innerHTML = '<i class="bi bi-shield-lock-fill me-1"></i> <strong>Detected Role:</strong> Principal / Super Admin (Full Governance)';
           return;
@@ -1010,14 +1025,28 @@
           return;
         }
 
-        // 3. Coordinator / Secretary / Treasurer
-        if (parts.includes("coordinator") || parts.includes("cordinator") || parts.includes("secretary") || parts.includes("treasurer")) {
+        // 3. Club Lead
+        if (parts.includes("lead")) {
           roleBox.className = "role-detection-pill manager";
-          roleText.innerHTML = '<i class="bi bi-person-workspace me-1"></i> <strong>Detected Role:</strong> Club Coordinator / Secretary (Operations &amp; Events)';
+          roleText.innerHTML = '<i class="bi bi-star-fill me-1"></i> <strong>Detected Role:</strong> Club Lead (Charter &amp; Operations)';
           return;
         }
 
-        // 4. Student Member / Core Member
+        // 4. Event Coordinator
+        if (parts.includes("coordinator") || parts.includes("cordinator")) {
+          roleBox.className = "role-detection-pill manager";
+          roleText.innerHTML = '<i class="bi bi-calendar-event-fill me-1"></i> <strong>Detected Role:</strong> Event Coordinator (Events &amp; Logistics)';
+          return;
+        }
+
+        // 5. Club Secretary / Treasurer
+        if (parts.includes("secretary") || parts.includes("treasurer")) {
+          roleBox.className = "role-detection-pill manager";
+          roleText.innerHTML = '<i class="bi bi-card-checklist me-1"></i> <strong>Detected Role:</strong> Club Secretary (Memberships &amp; Records)';
+          return;
+        }
+
+        // 6. Student Member / Core Member
         roleBox.className = "role-detection-pill member";
         roleText.innerHTML = '<i class="bi bi-mortarboard-fill me-1"></i> <strong>Detected Role:</strong> Student Member / Core Member (Self-Enrolment &amp; Feedback)';
       }

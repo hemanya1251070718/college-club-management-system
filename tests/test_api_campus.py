@@ -24,6 +24,6 @@ def test_campus_data_endpoint(client):
     assert len(data["students"]) == 75
     assert len(data["clubs"]) == 5
     assert len(data["events"]) == 12
-    assert len(data["memberships"]) == 92
+    assert len(data["memberships"]) == 94
     assert len(data["registrations"]) == 30
     assert len(data["reviews"]) == 15
