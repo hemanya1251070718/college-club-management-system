@@ -369,35 +369,131 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 
   /**
-   * RULE 5 & 7: Destructive Action Confirmation Dialog
-   * Replaces native window.confirm() with a graceful, accessible modal
+   * ZERO-TEXT VISUAL CONFIRMATION BAR
+   * Pure minimal floating bar: Green for confirm, Red for deleting.
+   * Intercepts:
+   * 1. Deleting membership (and all delete forms) -> Red button executes delete
+   * 2. Adding/editing membership -> Green button confirms submission
+   * 3. Adding/editing student -> Green button confirms submission
+   * 4. Giving feedback -> Green button confirms submission
+   * 5. Before any event (create event, register for event) -> Green button confirms
    */
-  const deleteModalEl = document.getElementById("deleteConfirmModal");
-  let pendingDeleteForm = null;
+  const minimalConfirmModalEl = document.getElementById("minimalConfirmBarModal");
+  if (minimalConfirmModalEl) {
+    const greenBtn = document.getElementById("confirmBarGreenBtn");
+    const redBtn = document.getElementById("confirmBarRedBtn");
+    const deleteIcon = redBtn ? redBtn.querySelector(".confirm-icon-delete") : null;
+    const cancelIcon = redBtn ? redBtn.querySelector(".confirm-icon-cancel") : null;
 
-  if (deleteModalEl) {
-    const confirmBtn = document.getElementById("deleteConfirmSubmitBtn");
-    const targetLabel = document.getElementById("deleteConfirmTargetLabel");
+    let pendingActionForm = null;
+    let pendingActionMode = null; // 'delete' or 'confirm'
+    let isExecutingConfirmedSubmit = false;
 
+    const getConfirmModal = () => {
+      if (typeof bootstrap !== "undefined" && bootstrap.Modal) {
+        return bootstrap.Modal.getOrCreateInstance(minimalConfirmModalEl);
+      }
+      return null;
+    };
+
+    // 1. Intercept DELETE actions (Red for deleting)
     document.querySelectorAll("form.delete-form").forEach(form => {
       form.addEventListener("submit", (e) => {
+        if (isExecutingConfirmedSubmit) return;
         e.preventDefault();
-        pendingDeleteForm = form;
-        const entityName = form.dataset.entity || "record";
-        if (targetLabel) {
-          targetLabel.textContent = `Are you sure you want to permanently delete this ${entityName}? This database operation is irreversible.`;
-        }
-        const modal = bootstrap.Modal.getOrCreateInstance(deleteModalEl);
-        modal.show();
+        pendingActionForm = form;
+        pendingActionMode = "delete";
+
+        // Show trash icon on Red button
+        if (deleteIcon) deleteIcon.classList.remove("d-none");
+        if (cancelIcon) cancelIcon.classList.add("d-none");
+
+        const modal = getConfirmModal();
+        if (modal) modal.show();
       });
     });
 
-    if (confirmBtn) {
-      confirmBtn.addEventListener("click", () => {
-        if (pendingDeleteForm) {
-          const btn = pendingDeleteForm.querySelector('button[type="submit"]');
-          if (btn) btn.disabled = true;
-          pendingDeleteForm.submit();
+    // 2. Intercept ADD/SUBMIT actions (Green for confirm)
+    // Applies to: adding membership, adding student, giving feedback, event registration/creation
+    const eligibleFormSelectors = [
+      'form[action*="membership"]',
+      'form[action*="student"]',
+      'form[action*="feedback"]',
+      'form[action*="register"]',
+      'form[action*="event"]'
+    ];
+
+    document.querySelectorAll("form[method='POST']:not(.delete-form):not(#login-form):not(#auth-main-form)").forEach(form => {
+      const action = form.getAttribute("action") || window.location.pathname;
+      const isTargetForm = eligibleFormSelectors.some(sel => form.matches(sel)) ||
+        action.includes("membership") ||
+        action.includes("student") ||
+        action.includes("feedback") ||
+        action.includes("register") ||
+        action.includes("event") ||
+        window.location.pathname.includes("/memberships/") ||
+        window.location.pathname.includes("/students/") ||
+        window.location.pathname.includes("/events/");
+
+      if (isTargetForm) {
+        form.addEventListener("submit", (e) => {
+          if (isExecutingConfirmedSubmit) return;
+          if (typeof form.checkValidity === "function" && !form.checkValidity()) {
+            form.reportValidity();
+            return;
+          }
+          e.preventDefault();
+          pendingActionForm = form;
+          pendingActionMode = "confirm";
+
+          // Show cancel (x) icon on Red button
+          if (deleteIcon) deleteIcon.classList.add("d-none");
+          if (cancelIcon) cancelIcon.classList.remove("d-none");
+
+          const modal = getConfirmModal();
+          if (modal) modal.show();
+        });
+      }
+    });
+
+    // RED BUTTON HANDLER:
+    // If mode is 'delete' -> RED EXECUTES THE DELETE!
+    // If mode is 'confirm' -> RED CANCELS (closes bar without submitting)
+    if (redBtn) {
+      redBtn.addEventListener("click", () => {
+        const modal = getConfirmModal();
+        if (pendingActionMode === "delete" && pendingActionForm) {
+          isExecutingConfirmedSubmit = true;
+          if (modal) modal.hide();
+          const submitBtn = pendingActionForm.querySelector('button[type="submit"]');
+          if (submitBtn) submitBtn.disabled = true;
+          pendingActionForm.submit();
+        } else {
+          // Cancelled action
+          if (modal) modal.hide();
+          pendingActionForm = null;
+          pendingActionMode = null;
+        }
+      });
+    }
+
+    // GREEN BUTTON HANDLER:
+    // If mode is 'confirm' -> GREEN CONFIRMS AND SUBMITS!
+    // If mode is 'delete' -> GREEN CANCELS (closes bar without deleting)
+    if (greenBtn) {
+      greenBtn.addEventListener("click", () => {
+        const modal = getConfirmModal();
+        if (pendingActionMode === "confirm" && pendingActionForm) {
+          isExecutingConfirmedSubmit = true;
+          if (modal) modal.hide();
+          const submitBtn = pendingActionForm.querySelector('button[type="submit"]');
+          if (submitBtn) submitBtn.disabled = true;
+          pendingActionForm.submit();
+        } else {
+          // Cancelled delete
+          if (modal) modal.hide();
+          pendingActionForm = null;
+          pendingActionMode = null;
         }
       });
     }

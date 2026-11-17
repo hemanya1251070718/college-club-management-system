@@ -104,11 +104,9 @@
             </div>
 
             <div class="col-md-4">
-              <label class="tesla-form-label">Status *</label>
-              <select name="status" class="tesla-form-select" required>
-                <option value="Active" {% if not membership or membership.status == 'Active' %}selected{% endif %}>Active</option>
-                <option value="Inactive" {% if membership and membership.status == 'Inactive' %}selected{% endif %}>Inactive</option>
-              </select>
+              <label class="tesla-form-label">Enrollment Status</label>
+              <input type="text" class="tesla-form-control font-mono text-success" value="Active (Enrolled)" readonly>
+              <input type="hidden" name="status" value="Active">
             </div>
           </div>
 

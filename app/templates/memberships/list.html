@@ -138,7 +138,6 @@
       <button type="button" class="table-pill-btn" data-filter="Coordinator" data-target="memberships-table-body">Coordinators</button>
       <button type="button" class="table-pill-btn" data-filter="Lead" data-target="memberships-table-body">Leads</button>
       <button type="button" class="table-pill-btn" data-filter="Member" data-target="memberships-table-body">Members</button>
-      <button type="button" class="table-pill-btn" data-filter="Active" data-target="memberships-table-body">Active Status</button>
     </div>
     <div class="table-match-counter">
       Showing <strong class="match-count">{{ memberships|length }}</strong> of {{ memberships|length }} memberships
@@ -156,7 +155,7 @@
             <th>Club</th>
             <th>Role</th>
             <th>Join Date</th>
-            <th>Status</th>
+            <th>Enrollment</th>
             <th class="text-end">Actions</th>
           </tr>
         </thead>
@@ -213,27 +212,21 @@
             </td>
             <td><small class="text-secondary tabular-nums">{{ m.join_date }}</small></td>
             <td>
-              {% if m.status == 'Active' %}
-                <span class="badge-status success d-inline-flex align-items-center gap-1">
-                  <span class="pulse-dot pulse-dot-active"></span>Active
-                </span>
-              {% else %}
-                <span class="badge-status neutral">{{ m.status }}</span>
-              {% endif %}
+              <span class="badge-status success d-inline-flex align-items-center gap-1 font-mono">
+                <span class="pulse-dot pulse-dot-active"></span>Enrolled
+              </span>
             </td>
             <td class="text-end">
               {% if current_role != 'member' %}
-              <div class="d-inline-flex gap-1 action-write-btn" data-role-req="admin,manager,guest">
+              <div class="d-inline-flex align-items-center gap-1 action-write-btn" data-role-req="admin,manager,guest">
                 <a href="{{ url_for('main.edit_membership', membership_id=m.membership_id) }}" class="btn-ghost-action" title="Edit Membership">
                   <i class="bi bi-pencil"></i>
                 </a>
-                {% if current_role in ['admin', 'guest'] %}
-                <form method="POST" action="{{ url_for('main.delete_membership', membership_id=m.membership_id) }}" class="d-inline delete-form" data-entity="membership">
-                  <button type="submit" class="btn-ghost-action text-danger" title="Cancel Membership">
-                    <i class="bi bi-trash"></i>
+                <form method="POST" action="{{ url_for('main.delete_membership', membership_id=m.membership_id) }}" class="d-inline delete-form" data-entity="membership for {{ m.student_name }}">
+                  <button type="submit" class="btn-ghost-action text-danger" title="Delete Member (Trigger 2: trg_after_membership_delete_sync_count)">
+                    <i class="bi bi-trash3-fill"></i>
                   </button>
                 </form>
-                {% endif %}
               </div>
               {% else %}
               <span class="text-secondary small font-mono opacity-60"><i class="bi bi-lock me-1"></i>Protected</span>

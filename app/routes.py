@@ -738,9 +738,10 @@ def delete_membership(membership_id):
 
         conn.close()
         flash(
-            f"Membership removed! Database Trigger 'trg_after_membership_delete_sync_count' fired: "
-            f"Club '{club_id}' member_count automatically decremented from {count_before} to {count_after}.",
-            "info"
+            f"Membership deleted! Database Trigger 2 ('trg_after_membership_delete_sync_count') fired: "
+            f"Club '{club_id}' member count automatically decremented from {count_before} to {count_after}. "
+            f"Student remains intact in Students directory and can be re-enrolled anytime.",
+            "success"
         )
     except Exception as e:
         flash(f"Error deleting membership: {str(e)}", "danger")

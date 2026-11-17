@@ -149,7 +149,7 @@
                   <i class="bi bi-copy"></i>
                 </button>
               </div>
-              <small class="text-secondary font-mono">Base Table Decrement</small>
+              <small class="text-secondary font-mono">Direct Delete Member Trigger</small>
             </td>
             <td>
               <span class="badge-status danger font-mono">AFTER DELETE</span>
@@ -157,12 +157,12 @@
             </td>
             <td><span class="badge-status info">Lifecycle</span></td>
             <td>
-              <span class="text-white fw-medium">Auto-decrements Club member count on member removal</span>
+              <span class="text-white fw-medium">Auto-decrements Club member count on member deletion; keeps student intact in Students directory for re-enrollment</span>
             </td>
             <td class="text-end">
               {% if can_test_trigger(2) %}
-              <a href="{{ url_for('main.list_memberships') }}" class="btn-trigger-pill btn-danger">
-                <i class="bi bi-trash-fill"></i> Delete Member
+              <a href="{{ url_for('main.list_memberships') }}" class="btn-trigger-pill btn-danger" title="Direct Delete Option for Every Student">
+                <i class="bi bi-trash3-fill"></i> Delete Member
               </a>
               {% else %}
               <span class="badge-status neutral small"><i class="bi bi-lock me-1"></i>Protected</span>
@@ -211,7 +211,7 @@
                   <i class="bi bi-copy"></i>
                 </button>
               </div>
-              <small class="text-secondary font-mono">Membership Governance</small>
+              <small class="text-secondary font-mono">Charter Roster Integrity</small>
             </td>
             <td>
               <span class="badge-status info font-mono">AFTER UPDATE</span>
@@ -219,12 +219,12 @@
             </td>
             <td><span class="badge-status success">Governance</span></td>
             <td>
-              <span class="text-white fw-medium">Syncs count when member toggles Active / Inactive</span>
+              <span class="text-white fw-medium">Reconciles member counts and guarantees capacity integrity on charter updates</span>
             </td>
             <td class="text-end">
               {% if can_test_trigger(4) %}
-              <a href="{{ url_for('main.list_memberships') }}" class="btn-trigger-pill btn-cyan">
-                <i class="bi bi-arrow-left-right"></i> Toggle Status
+              <a href="{{ url_for('main.list_memberships') }}" class="btn-trigger-pill btn-cyan" title="Inspect Roster Integrity">
+                <i class="bi bi-shield-check"></i> Roster Integrity
               </a>
               {% else %}
               <span class="badge-status neutral small"><i class="bi bi-lock me-1"></i>Protected</span>

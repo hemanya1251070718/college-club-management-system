@@ -293,6 +293,18 @@ table tbody tr:hover {
   font-weight: 600 !important;
 }
 
+[data-theme="light"] .tidewell-card-item h4,
+[data-theme="light"] .tidewell-card-item strong {
+  color: #0F172A !important;
+  font-weight: 700 !important;
+}
+
+[data-theme="light"] .tidewell-card-item .card-item-meta,
+[data-theme="light"] .tidewell-card-item small {
+  color: #475569 !important;
+  font-weight: 600 !important;
+}
+
 [data-theme="light"] .sched-badge {
   background: #E2E8F0 !important;
   color: #0F172A !important;
@@ -469,4 +481,96 @@ table tbody tr:hover {
 
 [data-theme="light"] .hero-tidewell-section {
   background-color: #F1F5F9 !important;
+}
+
+/* =========================================================================
+   ZERO-TEXT VISUAL CONFIRMATION BAR (Minimal Floating Island)
+   ========================================================================= */
+.minimal-confirm-dialog {
+  max-width: 240px !important;
+  margin: auto !important;
+}
+
+.minimal-confirm-bar-card {
+  background: rgba(15, 23, 42, 0.94) !important;
+  backdrop-filter: blur(24px) !important;
+  -webkit-backdrop-filter: blur(24px) !important;
+  border: 1.5px solid rgba(255, 255, 255, 0.18) !important;
+  border-radius: 9999px !important;
+  box-shadow: 0 20px 50px -10px rgba(0, 0, 0, 0.6), 0 0 25px rgba(16, 185, 129, 0.15) !important;
+  padding: 6px 16px !important;
+  width: auto !important;
+  display: inline-block !important;
+  margin: 0 auto !important;
+}
+
+[data-theme="light"] .minimal-confirm-bar-card {
+  background: #FFFFFF !important;
+  border: 1.5px solid #CBD5E1 !important;
+  box-shadow: 0 20px 50px -10px rgba(15, 23, 42, 0.25), 0 0 20px rgba(16, 185, 129, 0.1) !important;
+}
+
+.minimal-confirm-bar-inner {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 16px !important;
+  height: 52px !important;
+}
+
+.confirm-bar-divider {
+  width: 2px !important;
+  height: 28px !important;
+  background: rgba(255, 255, 255, 0.16) !important;
+  border-radius: 2px !important;
+}
+
+[data-theme="light"] .confirm-bar-divider {
+  background: #CBD5E1 !important;
+}
+
+.confirm-bar-action-btn {
+  width: 44px !important;
+  height: 44px !important;
+  border-radius: 50% !important;
+  border: none !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  font-size: 1.35rem !important;
+  cursor: pointer !important;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1) !important;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.25) !important;
+}
+
+.confirm-bar-action-btn:hover {
+  transform: scale(1.14) !important;
+}
+
+.confirm-bar-action-btn:active {
+  transform: scale(0.92) !important;
+}
+
+/* Red button: For deleting (or cancelling non-delete actions) */
+.btn-action-red {
+  background: linear-gradient(135deg, #EF4444 0%, #DC2626 100%) !important;
+  color: #FFFFFF !important;
+  box-shadow: 0 4px 16px rgba(239, 68, 68, 0.45) !important;
+}
+
+.btn-action-red:hover {
+  background: linear-gradient(135deg, #F87171 0%, #EF4444 100%) !important;
+  box-shadow: 0 6px 22px rgba(239, 68, 68, 0.7) !important;
+}
+
+/* Green button: For confirming submission (or aborting deletion) */
+.btn-action-green {
+  background: linear-gradient(135deg, #10B981 0%, #059669 100%) !important;
+  color: #FFFFFF !important;
+  box-shadow: 0 4px 16px rgba(16, 185, 129, 0.45) !important;
+}
+
+.btn-action-green:hover {
+  background: linear-gradient(135deg, #34D399 0%, #10B981 100%) !important;
+  box-shadow: 0 6px 22px rgba(16, 185, 129, 0.7) !important;
 }
